@@ -1,0 +1,5 @@
+name: play_p2
+dependencies:
+  browser: any
+dev_dependencies:
+  play_pixi: any
