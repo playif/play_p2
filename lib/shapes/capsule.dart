@@ -28,7 +28,7 @@ class Capsule extends Shape {
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB (AABB out, List position, num angle){
+  computeAABB (AABB out, [List position, num angle]){
     num radius = this.radius;
 
     // Compute center position of one of the the circles, world oriented, but with local offset

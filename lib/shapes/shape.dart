@@ -178,5 +178,5 @@ abstract class Shape {
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB (AABB out, List position, num angle);
+  computeAABB (AABB out, [List position, num angle]);
 }
