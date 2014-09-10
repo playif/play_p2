@@ -7,11 +7,7 @@ abstract class Shape {
   int type;
   int id;
 
-  /**
-   * Bounding circle radius of this shape
-   * @property boundingRadius
-   * @type {Number}
-   */
+  /// ounding circle radius of this shape
   num boundingRadius;
 
   /**
@@ -45,25 +41,13 @@ abstract class Shape {
    */
   int collisionGroup;
 
-  /**
-   * Collision mask of this shape. See .collisionGroup.
-   * @property collisionMask
-   * @type {Number}
-   */
+  /// Collision mask of this shape. See .collisionGroup.
   int collisionMask;
 
-  /**
-   * Material to use in collisions for this Shape. If this is set to null, the world will use default material properties instead.
-   * @property material
-   * @type {Material}
-   */
-  var material;
+  /// Material to use in collisions for this Shape. If this is set to null, the world will use default material properties instead.
+  Material material;
 
-  /**
-   * Area of this shape.
-   * @property area
-   * @type {Number}
-   */
+  /// Area of this shape.
   num area;
 
   /// Set to true if you want this shape to be a sensor. A sensor does not generate contacts, but it still reports contact events. This is good if you want to know if a shape is overlapping another shape, without them generating contacts.

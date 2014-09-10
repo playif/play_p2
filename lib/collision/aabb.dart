@@ -6,7 +6,7 @@ class AABB {
   List lowerBound;
   List upperBound;
 
-  AABB(options) {
+  AABB([options]) {
     /**
      * The lower bound of the bounding box.
      * @property lowerBound
