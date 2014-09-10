@@ -3,7 +3,7 @@ part of p2;
 class World extends EventEmitter {
 
   /// All springs in the world. To add a spring to the world, use [addSpring].
-  List springs;
+  List<Spring> springs;
 
 
   /// All bodies in the world. To add a body to the world, use [addBody].
@@ -898,8 +898,8 @@ class World extends EventEmitter {
     this.emit(preSolveEvent);
 
     // update constraint equations
-    var Nconstraints = constraints.length;
-    for (i = 0; i != Nconstraints; i++) {
+    Nconstraints = constraints.length;
+    for (int i = 0; i != Nconstraints; i++) {
       constraints[i].update();
     }
 
@@ -909,7 +909,7 @@ class World extends EventEmitter {
         islandManager.equations.length = 0;
         Utils.appendArray(islandManager.equations, np.contactEquations);
         Utils.appendArray(islandManager.equations, np.frictionEquations);
-        for(i = 0; i!==Nconstraints; i++)
+        for(int i = 0; i!=Nconstraints; i++)
         {
           Utils.appendArray(islandManager.equations, constraints[i].equations);
         }
@@ -929,7 +929,7 @@ class World extends EventEmitter {
         solver.addEquations(np.frictionEquations);
 
         // Add user-defined constraint equations
-        for (i = 0; i != Nconstraints; i++) {
+        for (int i = 0; i != Nconstraints; i++) {
           solver.addEquations(constraints[i].equations);
         }
 
@@ -978,13 +978,13 @@ class World extends EventEmitter {
 
     // Sleeping update
     if (this.sleepMode == World.BODY_SLEEPING) {
-      for (i = 0; i != Nbodies; i++) {
+      for (int i = 0; i != Nbodies; i++) {
         bodies[i].sleepTick(this.time, false, dt);
       }
     } else if (this.sleepMode == World.ISLAND_SLEEPING && this.islandSplit) {
 
       // Tell all bodies to sleep tick but dont sleep yet
-      for (i = 0; i != Nbodies; i++) {
+      for (int i = 0; i != Nbodies; i++) {
         bodies[i].sleepTick(this.time, true, dt);
       }
 
@@ -1001,7 +1001,7 @@ class World extends EventEmitter {
 
     // Remove bodies that are scheduled for removal
     if (this.bodiesToBeRemoved.length) {
-      for(var i = 0; i!==this.bodiesToBeRemoved.length; i++)
+      for(int  i = 0; i!=this.bodiesToBeRemoved.length; i++)
       {
         this.removeBody(this.bodiesToBeRemoved[i]);
       }
@@ -1115,10 +1115,10 @@ class World extends EventEmitter {
             bi.type == Body.DYNAMIC &&
             bi.sleepState == Body.SLEEPING &&
             bj.sleepState == Body.AWAKE &&
-            bj.type !== Body.STATIC
+            bj.type != Body.STATIC
         ) {
-          var speedSquaredB = vec2.squaredLength(bj.velocity) + Math.pow(bj.angularVelocity, 2);
-          var speedLimitSquaredB = Math.pow(bj.sleepSpeedLimit, 2);
+          var speedSquaredB = vec2.squaredLength(bj.velocity) + pow(bj.angularVelocity, 2);
+          var speedLimitSquaredB = pow(bj.sleepSpeedLimit, 2);
           if (speedSquaredB >= speedLimitSquaredB * 2) {
             bi._wakeUpAfterNarrowphase = true;
           }
@@ -1130,8 +1130,8 @@ class World extends EventEmitter {
             bi.sleepState == Body.AWAKE &&
             bi.type != Body.STATIC
         ) {
-          var speedSquaredA = vec2.squaredLength(bi.velocity) + Math.pow(bi.angularVelocity, 2);
-          var speedLimitSquaredA = Math.pow(bi.sleepSpeedLimit, 2);
+          var speedSquaredA = vec2.squaredLength(bi.velocity) + pow(bi.angularVelocity, 2);
+          var speedLimitSquaredA = pow(bi.sleepSpeedLimit, 2);
           if (speedSquaredA >= speedLimitSquaredA * 2) {
             bj._wakeUpAfterNarrowphase = true;
           }
@@ -1150,7 +1150,7 @@ class World extends EventEmitter {
 // Reset contact equations
           e.contactEquations.length = 0;
 
-          if (typeof(numContacts) == "number") {
+          if (numContacts != null) {
             for (var i = np.contactEquations.length - numContacts; i < np.contactEquations.length; i++) {
               e.contactEquations.push(np.contactEquations[i]);
             }
@@ -1160,7 +1160,7 @@ class World extends EventEmitter {
         }
 
 // divide the max friction force by the number of contacts
-        if (typeof(numContacts) == "number" && numFrictionEquations > 1) {
+        if (numContacts != null && numFrictionEquations > 1) {
           // Why divide by 1?
           for (var i = np.frictionEquations.length - numFrictionEquations; i < np.frictionEquations.length; i++) {
             var f = np.frictionEquations[i];
@@ -1172,7 +1172,7 @@ class World extends EventEmitter {
 
   }
 
-  ;
+
 
   /**
    * Add a spring to the simulation
@@ -1181,7 +1181,7 @@ class World extends EventEmitter {
    * @param {Spring} s
    */
 
-  addSpring(String s) {
+  addSpring(Spring s) {
     this.springs.add(s);
     this.addSpringEvent.spring = s;
     this.emit(this.addSpringEvent);
@@ -1194,7 +1194,7 @@ class World extends EventEmitter {
    * @param {Spring} s
    */
 
-  removeSpring(String s) {
+  removeSpring(Spring s) {
     var idx = this.springs.indexOf(s);
     if (idx != -1) {
       Utils.splice(this.springs, idx, 1);
@@ -1270,7 +1270,7 @@ class World extends EventEmitter {
    */
 
   disableBodyCollision(Body bodyA, Body bodyB) {
-    this.disabledBodyCollisionPairs.add(bodyA, bodyB);
+    this.disabledBodyCollisionPairs.addAll([bodyA, bodyB]);
   }
 
   /**
@@ -1469,34 +1469,24 @@ class World extends EventEmitter {
 
     // Set for default contact material
     var c = this.defaultContactMaterial;
-    if (typeof(parameters.stiffness) != "undefined") {
+    if (parameters.stiffness != null) {
       c.stiffness = parameters.stiffness;
       c.frictionStiffness = parameters.stiffness;
     }
-    if (typeof(parameters.relaxation) != "undefined") {
+    if (parameters.relaxation != null) {
       c.relaxation = parameters.relaxation;
       c.frictionRelaxation = parameters.relaxation;
     }
   }
 
-  /**
-   * Set the stiffness for all equations and contact materials.
-   * @method setGlobalStiffness
-   * @param {Number} stiffness
-   */
-
+  /// Set the stiffness for all equations and contact materials.
   setGlobalStiffness(num stiffness) {
     this.setGlobalEquationParameters({
         stiffness: stiffness
     });
   }
 
-  /**
-   * Set the relaxation for all equations and contact materials.
-   * @method setGlobalRelaxation
-   * @param {Number} relaxation
-   */
-
+  /// Set the relaxation for all equations and contact materials.
   setGlobalRelaxation(num relaxation) {
     this.setGlobalEquationParameters({
         relaxation: relaxation

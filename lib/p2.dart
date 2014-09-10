@@ -45,7 +45,7 @@ part "math/vec2.dart";
 part "object/body.dart";
 part "object/linear_spring.dart";
 part "object/rotational_spring.dart";
-part "object/sprint.dart";
+part "object/spring.dart";
 
 
 part "shapes/capsule.dart";
