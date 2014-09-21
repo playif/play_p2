@@ -60,7 +60,7 @@ class vec2 {
 
   /// Transform a point position to global frame.
 
-  toGlobalFrame(List out, List localPoint, List framePosition, num frameAngle) {
+  static toGlobalFrame(List out, List localPoint, List framePosition, num frameAngle) {
     vec2.copy(out, localPoint);
     vec2.rotate(out, out, frameAngle);
     vec2.add(out, out, framePosition);
@@ -68,7 +68,7 @@ class vec2 {
 
   /// Compute centroid of a triangle spanned by vectors a,b,c.
 
-  centroid(List out, List a, List b, List c) {
+  static centroid(List out, List a, List b, List c) {
     vec2.add(out, a, b);
     vec2.add(out, out, c);
     vec2.scale(out, out, 1 / 3);

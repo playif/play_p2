@@ -3,3 +3,5 @@ dependencies:
   browser: any
 dev_dependencies:
   play_pixi: any
+  datgui:
+    path: ../datgui

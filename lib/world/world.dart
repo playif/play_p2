@@ -673,9 +673,9 @@ class World extends EventEmitter {
    * @see http://bulletphysics.org/mediawiki-1.5.8/index.php/Stepping_The_World
    */
 
-  step(dt, timeSinceLastCalled, maxSubSteps) {
-    maxSubSteps = maxSubSteps || 10;
-    timeSinceLastCalled = timeSinceLastCalled || 0;
+  step(num dt, [num timeSinceLastCalled = 0, num maxSubSteps =10]) {
+//    maxSubSteps = maxSubSteps || 10;
+//    timeSinceLastCalled = timeSinceLastCalled || 0;
 
     if (timeSinceLastCalled == 0) {
       // Fixed, simple stepping

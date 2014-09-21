@@ -75,3 +75,4 @@ part "world/world.dart";
 
 
 
+String version='0.6.0';

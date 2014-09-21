@@ -109,7 +109,7 @@ class Equation {
   }
 
   /// Computes the RHS of the SPOOK equation
-  num computeB (a,b,h){
+  num computeB (num a, num b, num h){
     var GW = this.computeGW();
     var Gq = this.computeGq();
     var GiMf = this.computeGiMf();
