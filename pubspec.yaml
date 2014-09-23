@@ -1,5 +1,5 @@
 name: p2
-version: 0.5.0
+version: 0.5.0+1
 description:
   A Dart port for P2.js 2D physics library.
 author: playif <playif@gmail.com>
