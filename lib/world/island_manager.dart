@@ -184,7 +184,7 @@ class IslandManager {
     while ((child = IslandManager.getUnvisitedNode(nodes)) != null) {
 
       // Create new island
-      Island island = this._islandPool.length ? this._islandPool.removeLast() : new Island();
+      Island island = this._islandPool.isNotEmpty ? this._islandPool.removeLast() : new Island();
 
       // Get all equations and bodies in this island
       this.bfs(child, island.bodies, island.equations);

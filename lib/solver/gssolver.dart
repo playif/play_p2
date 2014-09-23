@@ -23,10 +23,10 @@ class GSSolver extends Solver {
   /// The number of iterations that were made during the last solve. If .tolerance is zero, this value will always be equal to .iterations, but if .tolerance is larger than zero, and the solver can quit early, then this number will be somewhere between 1 and .iterations.
   int usedIterations;
 
-  GSSolver([options]):super(options, Solver.GS) {
-    this.iterations = options.iterations || 10;
+  GSSolver({num iterations:10,num tolerance:1e-10}):super(Solver.GS) {
+    this.iterations = iterations;
 
-    this.tolerance = options.tolerance || 1e-10;
+    this.tolerance = tolerance;
 
     this.arrayStep = 30;
     this.lambda = new Float32List(this.arrayStep);
@@ -53,7 +53,7 @@ class GSSolver extends Solver {
    * @param  {Number}  h       Time step
    * @param  {World}   world    World to solve
    */
-  solve (h, world){
+  solve (num h, World world){
 
     this.sortEquations();
 
@@ -72,7 +72,7 @@ class GSSolver extends Solver {
 
     this.usedIterations = 0;
 
-    if(Neq){
+    if(Neq != 0){
       for(var i=0; i!=Nbodies; i++){
         var b = bodies[i];
 
@@ -83,9 +83,9 @@ class GSSolver extends Solver {
 
     // Things that does not change during iteration can be computed once
     if(lambda.length < Neq){
-      lambda = this.lambda =  new Utils.ARRAY_TYPE(Neq + this.arrayStep);
-      this.Bs =               new Utils.ARRAY_TYPE(Neq + this.arrayStep);
-      this.invCs =            new Utils.ARRAY_TYPE(Neq + this.arrayStep);
+      lambda = this.lambda =  new Float32List(Neq + this.arrayStep);
+      this.Bs =               new Float32List(Neq + this.arrayStep);
+      this.invCs =            new Float32List(Neq + this.arrayStep);
     }
     setArrayZero(lambda);
     var invCs = this.invCs,
@@ -93,7 +93,7 @@ class GSSolver extends Solver {
     lambda = this.lambda;
 
     for(var i=0; i!=equations.length; i++){
-      var c = equations[i];
+      Equation c = equations[i];
       if(c.timeStep != h || c.needsUpdate){
         c.timeStep = h;
         c.update();
@@ -113,7 +113,7 @@ class GSSolver extends Solver {
         b.resetConstraintVelocity();
       }
 
-      if(maxFrictionIter){
+      if(maxFrictionIter != 0){
         // Iterate over contact equations to get normal forces
         for(iter=0; iter!=maxFrictionIter; iter++){
 
@@ -186,7 +186,7 @@ class GSSolver extends Solver {
   static updateMultipliers (equations, lambda, invDt){
     // Set the .multiplier property of each equation
     var l = equations.length;
-    while(l--){
+    while(l-- >0){
       equations[l].multiplier = lambda[l] * invDt;
     }
   }

@@ -238,7 +238,7 @@ class Body extends EventEmitter {
   /// The last time when the body went to SLEEPY state.
   num timeLastSleepy;
 
-  num idleTime;
+  num idleTime=0;
 
   var concavePath;
 
@@ -246,7 +246,7 @@ class Body extends EventEmitter {
 
   static int _idCounter = 0;
 
-  Body([options]) :super() {
+  Body({int type: Body.STATIC, num mass: 0, List position, List velocity, num angle: 0, num angularVelocity:0, List force, num angularForce: 0, bool fixedRotation: false, num damping: 0.1, num angularDamping: 0.1}) : super() {
 
     this.id = ++Body._idCounter;
 
@@ -260,7 +260,7 @@ class Body extends EventEmitter {
 
     this.shapeAngles = [];
 
-    this.mass = options.mass || 0;
+    this.mass = mass;
 
     this.invMass = 0;
 
@@ -271,12 +271,12 @@ class Body extends EventEmitter {
     this.invMassSolve = 0;
     this.invInertiaSolve = 0;
 
-    this.fixedRotation = !!options.fixedRotation;
+    this.fixedRotation = fixedRotation;
 
 
     this.position = vec2.fromValues(0, 0);
-    if (options.position) {
-      vec2.copy(this.position, options.position);
+    if (position != null) {
+      vec2.copy(this.position, position);
     }
 
     this.interpolatedPosition = vec2.fromValues(0, 0);
@@ -303,8 +303,8 @@ class Body extends EventEmitter {
      * @type {Array}
      */
     this.velocity = vec2.fromValues(0, 0);
-    if (options.velocity) {
-      vec2.copy(this.velocity, options.velocity);
+    if (velocity != null) {
+      vec2.copy(this.velocity, velocity);
     }
 
     /**
@@ -336,14 +336,14 @@ class Body extends EventEmitter {
      *         return angle;
      *     }
      */
-    this.angle = options.angle || 0;
+    this.angle = angle;
 
     /**
      * The angular velocity of the body, in radians per second.
      * @property angularVelocity
      * @type {number}
      */
-    this.angularVelocity = options.angularVelocity || 0;
+    this.angularVelocity = angularVelocity;
 
     /**
      * The force acting on the body. Since the body force (and {{#crossLink "Body/angularForce:property"}}{{/crossLink}}) will be zeroed after each step, so you need to set the force before each step.
@@ -365,8 +365,8 @@ class Body extends EventEmitter {
      *     }
      */
     this.force = vec2.create();
-    if (options.force) {
-      vec2.copy(this.force, options.force);
+    if (force != null) {
+      vec2.copy(this.force, force);
     }
 
     /**
@@ -374,7 +374,7 @@ class Body extends EventEmitter {
      * @property angularForce
      * @type {number}
      */
-    this.angularForce = options.angularForce || 0;
+    this.angularForce = angularForce;
 
     /**
      * The linear damping acting on the body in the velocity direction. Should be a value between 0 and 1.
@@ -382,7 +382,7 @@ class Body extends EventEmitter {
      * @type {Number}
      * @default 0.1
      */
-    this.damping = options.damping != null ? options.damping : 0.1;
+    this.damping = damping;
 
     /**
      * The angular force acting on the body. Should be a value between 0 and 1.
@@ -390,7 +390,7 @@ class Body extends EventEmitter {
      * @type {Number}
      * @default 0.1
      */
-    this.angularDamping = options.angularDamping != null ? options.angularDamping : 0.1;
+    this.angularDamping = angularDamping;
 
     /**
      * The type of motion this body has. Should be one of: {{#crossLink "Body/STATIC:property"}}Body.STATIC{{/crossLink}}, {{#crossLink "Body/DYNAMIC:property"}}Body.DYNAMIC{{/crossLink}} and {{#crossLink "Body/KINEMATIC:property"}}Body.KINEMATIC{{/crossLink}}.
@@ -421,11 +421,9 @@ class Body extends EventEmitter {
      *         type: Body.KINEMATIC // Type can be set via the options object.
      *     });
      */
-    this.type = Body.STATIC;
+    this.type = type;
 
-    if (options.type != null) {
-      this.type = options.type;
-    } else if (!options.mass) {
+    if (mass == 0) {
       this.type = Body.STATIC;
     } else {
       this.type = Body.DYNAMIC;
@@ -601,15 +599,15 @@ class Body extends EventEmitter {
    */
 
   updateBoundingRadius() {
-    var shapes = this.shapes,
-    shapeOffsets = this.shapeOffsets,
-    N = shapes.length,
-    radius = 0;
+    List shapes = this.shapes,
+        shapeOffsets = this.shapeOffsets;
+    num N = shapes.length,
+        radius = 0;
 
-    for (var i = 0; i != N; i++) {
-      var shape = shapes[i],
-      offset = vec2.length(shapeOffsets[i]),
-      r = shape.boundingRadius;
+    for (int i = 0; i != N; i++) {
+      Shape shape = shapes[i];
+      num offset = vec2.length(shapeOffsets[i]),
+          r = shape.boundingRadius;
       if (offset + r > radius) {
         radius = offset + r;
       }
@@ -642,7 +640,7 @@ class Body extends EventEmitter {
    *     body.addShape(shape,[0,1],Math.PI/2);
    */
 
-  addShape(shape, [List offset, num angle = 0.0]) {
+  addShape(Shape shape, [List offset, num angle = 0.0]) {
 
     // Copy the offset vector
     if (offset != null) {
@@ -651,9 +649,9 @@ class Body extends EventEmitter {
       offset = vec2.fromValues(0, 0);
     }
 
-    this.shapes .add(shape);
+    this.shapes.add(shape);
     this.shapeOffsets.add(offset);
-    this.shapeAngles .add(angle);
+    this.shapeAngles.add(angle);
     this.updateMassProperties();
     this.updateBoundingRadius();
 
@@ -667,7 +665,7 @@ class Body extends EventEmitter {
    * @return {Boolean}       True if the shape was found and removed, else false.
    */
 
-  removeShape(shape) {
+  bool removeShape(Shape shape) {
     var idx = this.shapes.indexOf(shape);
 
     if (idx != -1) {
@@ -703,15 +701,15 @@ class Body extends EventEmitter {
     } else {
 
       var shapes = this.shapes,
-      N = shapes.length,
-      m = this.mass / N,
-      I = 0;
+          N = shapes.length,
+          m = this.mass / N,
+          I = 0;
 
       if (!this.fixedRotation) {
         for (var i = 0; i < N; i++) {
           var shape = shapes[i],
-          r2 = vec2.squaredLength(this.shapeOffsets[i]),
-          Icm = shape.computeMomentOfInertia(m);
+              r2 = vec2.squaredLength(this.shapeOffsets[i]),
+              Icm = shape.computeMomentOfInertia(m);
           I += Icm + m * r2;
         }
         this.inertia = I;
@@ -785,12 +783,12 @@ class Body extends EventEmitter {
    * @return {Boolean} True on success, else false.
    */
 
-  fromPolygon(List<List> path, options) {
-    options = options || {
-    };
+  bool fromPolygon(List<List> path, {bool optimalDecomp: false, bool skipSimpleCheck: false, num removeCollinearPoints: 0}) {
+//    options = options || {
+//    };
 
     // Remove all shapes
-    for (var i = this.shapes.length; i >= 0; --i) {
+    for (int i = this.shapes.length-1; i >= 0; --i) {
       this.removeShape(this.shapes[i]);
     }
 
@@ -800,43 +798,44 @@ class Body extends EventEmitter {
     // Make it counter-clockwise
     p.makeCCW();
 
-    if (options.removeCollinearPoints != null) {
-      p.removeCollinearPoints(options.removeCollinearPoints);
+    if (removeCollinearPoints != 0) {
+      p.removeCollinearPoints(removeCollinearPoints);
     }
 
     // Check if any line segment intersects the path itself
-    if (options.skipSimpleCheck != null) {
+    if (skipSimpleCheck) {
       if (!p.isSimple()) {
         return false;
       }
     }
 
     // Save this path for later
-    this.concavePath = p.vertices.slice(0);
+    this.concavePath = p.vertices.toList();
     for (var i = 0; i < this.concavePath.length; i++) {
-      var v = [0, 0];
+      //List v = [0, 0];
+      List v = vec2.fromValues(0, 0);
       vec2.copy(v, this.concavePath[i]);
       this.concavePath[i] = v;
     }
 
     // Slow or fast decomp?
-    var convexes;
-    if (options.optimalDecomp) {
+    List convexes;
+    if (optimalDecomp) {
       convexes = p.decomp();
     } else {
       convexes = p.quickDecomp();
     }
 
-    var cm = vec2.create();
+    List cm = vec2.create();
 
     // Add convexes
-    for (var i = 0; i != convexes.length; i++) {
+    for (int i = 0; i != convexes.length; i++) {
       // Create convex
-      var c = new Convex(convexes[i].vertices);
+      Convex c = new Convex(convexes[i].vertices);
 
       // Move all vertices so its center of mass is in the local center of the convex
-      for (var j = 0; j != c.vertices.length; j++) {
-        var v = c.vertices[j];
+      for (int j = 0; j != c.vertices.length; j++) {
+        List v = c.vertices[j];
         vec2.sub(v, v, c.centerOfMass);
       }
 
@@ -856,10 +855,10 @@ class Body extends EventEmitter {
     return true;
   }
 
-  var adjustCenterOfMass_tmp1 = vec2.fromValues(0, 0),
-  adjustCenterOfMass_tmp2 = vec2.fromValues(0, 0),
-  adjustCenterOfMass_tmp3 = vec2.fromValues(0, 0),
-  adjustCenterOfMass_tmp4 = vec2.fromValues(0, 0);
+  List adjustCenterOfMass_tmp1 = vec2.fromValues(0, 0),
+      adjustCenterOfMass_tmp2 = vec2.fromValues(0, 0),
+      adjustCenterOfMass_tmp3 = vec2.fromValues(0, 0),
+      adjustCenterOfMass_tmp4 = vec2.fromValues(0, 0);
 
   /**
    * Moves the shape offsets so their center of mass becomes the body center of mass.
@@ -868,14 +867,14 @@ class Body extends EventEmitter {
 
   adjustCenterOfMass() {
     var offset_times_area = adjustCenterOfMass_tmp2,
-    sum = adjustCenterOfMass_tmp3,
-    cm = adjustCenterOfMass_tmp4,
-    totalArea = 0;
+        sum = adjustCenterOfMass_tmp3,
+        cm = adjustCenterOfMass_tmp4,
+        totalArea = 0;
     vec2.set(sum, 0, 0);
 
     for (var i = 0; i != this.shapes.length; i++) {
       var s = this.shapes[i],
-      offset = this.shapeOffsets[i];
+          offset = this.shapeOffsets[i];
       vec2.scale(offset_times_area, offset, s.area);
       vec2.add(sum, sum, offset_times_area);
       totalArea += s.area;
@@ -886,10 +885,10 @@ class Body extends EventEmitter {
     // Now move all shapes
     for (var i = 0; i != this.shapes.length; i++) {
       var s = this.shapes[i],
-      offset = this.shapeOffsets[i];
+          offset = this.shapeOffsets[i];
 
       // Offset may be undefined. Fix that.
-      if (!offset) {
+      if (offset == null) {
         offset = this.shapeOffsets[i] = vec2.create();
       }
 
@@ -900,7 +899,7 @@ class Body extends EventEmitter {
     vec2.add(this.position, this.position, cm);
 
     // And concave path
-    for (var i = 0; this.concavePath && i < this.concavePath.length; i++) {
+    for (var i = 0; this.concavePath!= null && i < this.concavePath.length; i++) {
       vec2.sub(this.concavePath[i], this.concavePath[i], cm);
     }
 
@@ -920,14 +919,14 @@ class Body extends EventEmitter {
 
   resetConstraintVelocity() {
     var b = this,
-    vlambda = b.vlambda;
+        vlambda = b.vlambda;
     vec2.set(vlambda, 0, 0);
     b.wlambda = 0;
   }
 
   addConstraintVelocity() {
     var b = this,
-    v = b.velocity;
+        v = b.velocity;
     vec2.add(v, v, b.vlambda);
     b.angularVelocity += b.wlambda;
   }
@@ -992,8 +991,8 @@ class Body extends EventEmitter {
     this.wantsToSleep = false;
 
     var sleepState = this.sleepState,
-    speedSquared = vec2.squaredLength(this.velocity) + pow(this.angularVelocity, 2),
-    speedLimitSquared = pow(this.sleepSpeedLimit, 2);
+        speedSquared = vec2.squaredLength(this.velocity) + pow(this.angularVelocity, 2),
+        speedLimitSquared = pow(this.sleepSpeedLimit, 2);
 
     // Add to idle time
     if (speedSquared >= speedLimitSquared) {
@@ -1027,14 +1026,17 @@ class Body extends EventEmitter {
     */
   }
 
-  getVelocityFromPosition(store, timeStep) {
-    store = store || vec2.create();
+  getVelocityFromPosition([List store, num timeStep]) {
+    if (store == null) {
+      store = vec2.create();
+    }
+
     vec2.sub(store, this.position, this.previousPosition);
     vec2.scale(store, store, 1 / timeStep);
     return store;
   }
 
-  getAngularVelocityFromPosition(timeStep) {
+  getAngularVelocityFromPosition(num timeStep) {
     return (this.angle - this.previousAngle) / timeStep;
   }
 
@@ -1050,15 +1052,18 @@ class Body extends EventEmitter {
   }
 
 
-  P2Event sleepyEvent = new P2Event()
-    ..type = "sleepy";
+  static Map sleepyEvent = {
+    'type': "sleepy"
+  };
 
 
-  P2Event sleepEvent = new P2Event()
-    ..type = "sleep";
+  static Map sleepEvent = {
+    'type': "sleep"
+  };
 
-  P2Event wakeUpEvent = new P2Event()
-    ..type = "wakeup";
+  static Map wakeUpEvent = {
+    'type': "wakeup"
+  };
 
   /// Dynamic body.
   static const int DYNAMIC = 1;

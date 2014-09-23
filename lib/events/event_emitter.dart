@@ -1,11 +1,13 @@
 part of p2;
 
-class P2Event{
-  String type;
-}
+//class P2Event{
+//  String type;
+//}
+
+typedef EventFunc(Map event);
 
 class EventEmitter {
-  Map<String, List<Function>> _listeners;
+  Map<String, List<EventFunc>> _listeners;
 
   /**
    * Add an event listener
@@ -15,13 +17,12 @@ class EventEmitter {
    * @return {EventEmitter} The self object, for chainability.
    */
 
-  EventEmitter on(String type, Function listener) {
-
+  EventEmitter on(String type, EventFunc listener) {
     if (this._listeners == null) {
       this._listeners = {
       };
     }
-    Map<String, List<Function>> listeners = this._listeners;
+    Map<String, List<EventFunc>> listeners = this._listeners;
     if (!listeners.containsKey(type)) {
       listeners[ type ] = [];
     }
@@ -39,11 +40,11 @@ class EventEmitter {
    * @return {Boolean}
    */
 
-  bool has(String type, [Function listener]) {
+  bool has(String type, [EventFunc listener]) {
     if (this._listeners == null) {
       return false;
     }
-    Map<String, List<Function>> listeners = this._listeners;
+    Map<String, List<EventFunc>> listeners = this._listeners;
     if (listener != null) {
       if (listeners.containsKey(type) && listeners[ type ].contains(listener)) {
         return true;
@@ -65,11 +66,11 @@ class EventEmitter {
    * @return {EventEmitter} The self object, for chainability.
    */
 
-  EventEmitter off(String type, Function listener) {
+  EventEmitter off(String type, EventFunc listener) {
     if (this._listeners == null) {
       return this;
     }
-    Map<String, List<Function>> listeners = this._listeners;
+    Map<String, List<EventFunc>> listeners = this._listeners;
     int index = listeners[ type ].indexOf(listener);
     if (index != -1) {
       listeners[ type ].removeAt(index);
@@ -85,17 +86,17 @@ class EventEmitter {
    * @return {EventEmitter} The self object, for chainability.
    */
 
-  EventEmitter emit(event) {
+  EventEmitter emit(Map event) {
     if (this._listeners == null) {
       return this;
     }
-    Map<String, List<Function>> listeners = this._listeners;
-    List<Function> listenerArray = listeners[ event.type ];
+    Map<String, List<EventFunc>> listeners = this._listeners;
+    List<EventFunc> listenerArray = listeners[ event['type'] ];
     if (listenerArray != null) {
-      event.target = this;
+      event['target'] = this;
       for (var i = 0, l = listenerArray.length; i < l; i ++) {
-        Function listener = listenerArray[ i ];
-        Function.apply(listener, event);
+        EventFunc listener = listenerArray[ i ];
+        listener(event);
       }
     }
     return this;

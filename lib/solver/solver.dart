@@ -11,7 +11,7 @@ abstract class Solver extends EventEmitter{
   /// Function that is used to sort all equations before each solve.
   Function equationSortFunction;
 
-  Solver(options,int type) : super() {
+  Solver(int type,{Function equationSortFunction}) : super() {
     //options = options || {};
 
     //EventEmitter.call(this);
@@ -20,7 +20,7 @@ abstract class Solver extends EventEmitter{
 
     this.equations = [];
 
-    this.equationSortFunction = options.equationSortFunction || false;
+    this.equationSortFunction = equationSortFunction;
   }
 
   /**
@@ -33,7 +33,7 @@ abstract class Solver extends EventEmitter{
     throw new Exception("Solver.solve should be implemented by subclasses!");
   }
 
-  Map mockWorld = {'bodies':[]};
+  World mockWorld = new World(fake:true);
 
   /**
    * Solves all constraints in an island.
@@ -48,11 +48,11 @@ abstract class Solver extends EventEmitter{
     if(island.equations.length != null){
       // Add equations to solver
       this.addEquations(island.equations);
-      mockWorld.bodies.length = 0;
+      mockWorld.bodies.clear();
       island.getBodies(mockWorld.bodies);
 
       // Solve
-      if(mockWorld.bodies.length){
+      if(mockWorld.bodies.isNotEmpty){
         this.solve(dt,mockWorld);
       }
     }

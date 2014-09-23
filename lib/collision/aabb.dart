@@ -6,15 +6,15 @@ class AABB {
   List lowerBound;
   List upperBound;
 
-  AABB([options]) {
+  AABB({List lowerBound, List upperBound}) {
     /**
      * The lower bound of the bounding box.
      * @property lowerBound
      * @type {Array}
      */
     this.lowerBound = vec2.create();
-    if (options != null && options.lowerBound) {
-      vec2.copy(this.lowerBound, options.lowerBound);
+    if (lowerBound != null) {
+      vec2.copy(this.lowerBound, lowerBound);
     }
 
     /**
@@ -23,8 +23,8 @@ class AABB {
      * @type {Array}
      */
     this.upperBound = vec2.create();
-    if (options && options.upperBound) {
-      vec2.copy(this.upperBound, options.upperBound);
+    if (upperBound != null) {
+      vec2.copy(this.upperBound, upperBound);
     }
 
   }
@@ -37,7 +37,7 @@ class AABB {
 
   setFromPoints(List points, [List position, num angle = 0, int skinSize = 0]) {
     List l = this.lowerBound,
-    u = this.upperBound;
+        u = this.upperBound;
 
 
     // Set to the first point
@@ -50,13 +50,13 @@ class AABB {
 
     // Compute cosines and sines just once
     num cosAngle = cos(angle),
-    sinAngle = sin(angle);
+        sinAngle = sin(angle);
     for (int i = 1; i < points.length; i++) {
       List p = points[i];
 
       if (angle != 0) {
         num x = p[0],
-        y = p[1];
+            y = p[1];
         tmp[0] = cosAngle * x - sinAngle * y;
         tmp[1] = sinAngle * x + cosAngle * y;
         p = tmp;
@@ -130,16 +130,15 @@ class AABB {
 
   overlaps(AABB aabb) {
     List l1 = this.lowerBound,
-    u1 = this.upperBound,
-    l2 = aabb.lowerBound,
-    u2 = aabb.upperBound;
+        u1 = this.upperBound,
+        l2 = aabb.lowerBound,
+        u2 = aabb.upperBound;
 
     //      l2        u2
     //      |---------|
     // |--------|
     // l1       u1
 
-    return ((l2[0] <= u1[0] && u1[0] <= u2[0]) || (l1[0] <= u2[0] && u2[0] <= u1[0])) &&
-           ((l2[1] <= u1[1] && u1[1] <= u2[1]) || (l1[1] <= u2[1] && u2[1] <= u1[1]));
+    return ((l2[0] <= u1[0] && u1[0] <= u2[0]) || (l1[0] <= u2[0] && u2[0] <= u1[0])) && ((l2[1] <= u1[1] && u1[1] <= u2[1]) || (l1[1] <= u2[1] && u2[1] <= u1[1]));
   }
 }

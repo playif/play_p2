@@ -35,4 +35,8 @@ class Line extends Shape {
     vec2.set(points[1],  l2,  0);
     out.setFromPoints(points,position,angle,0);
   }
+  
+  updateArea(){
+    
+  }
 }

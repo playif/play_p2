@@ -81,10 +81,10 @@ class OverlapKeeper {
     var current = this.overlappingShapesCurrentState;
 
     // Store current contact state
-    if (!current.get(shapeA.id, shapeB.id)) {
+    if (current.get(shapeA.id, shapeB.id) == null) {
 
       var data;
-      if (this.recordPool.length) {
+      if (this.recordPool.isNotEmpty) {
         data = this.recordPool.removeLast();
         data.set(bodyA, shapeA, bodyB, shapeB);
       } else {
@@ -124,8 +124,8 @@ class OverlapKeeper {
     return false;
   }
 
-  getDiff(TupleDictionary dictA,TupleDictionary dictB, [List result]) {
-    if(result == null) result = [];
+  getDiff(TupleDictionary dictA, TupleDictionary dictB, [List result]) {
+    if (result == null) result = [];
     //var result = result || [];
     TupleDictionary last = dictA;
     TupleDictionary current = dictB;
@@ -153,7 +153,7 @@ class OverlapKeeper {
 
   isNewOverlap(Shape shapeA, Shape shapeB) {
     var idA = shapeA.id | 0,
-    idB = shapeB.id | 0;
+        idB = shapeB.id | 0;
     var last = this.overlappingShapesLastState;
     var current = this.overlappingShapesCurrentState;
     // Not in last but in new
@@ -172,8 +172,8 @@ class OverlapKeeper {
     return this.getBodyDiff(overlaps, result);
   }
 
-  getBodyDiff(List overlaps, List result) {
-    result = result || [];
+  getBodyDiff(List overlaps, [List result]) {
+    if (result == null) result = [];
     var accumulator = this.tmpDict;
 
     int l = overlaps.length;

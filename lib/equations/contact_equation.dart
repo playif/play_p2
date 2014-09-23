@@ -24,7 +24,7 @@ class ContactEquation extends Equation {
   /// The shape in body j that triggered this contact.
   Shape shapeB;
 
-  ContactEquation(Body bodyA, Body bodyB) :super(bodyA, bodyB, 0) {
+  ContactEquation(Body bodyA, Body bodyB) :super(bodyA, bodyB, 0, double.MAX_FINITE) {
     this.contactPointA = vec2.create();
     this.penetrationVec = vec2.create();
     this.contactPointB = vec2.create();

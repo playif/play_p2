@@ -64,8 +64,8 @@ init() {
 
 // Animation loop
 
-animate(t) {
-  t = t || 0;
+animate(num t) {
+  //t = t || 0;
   PIXI.requestAnimFrame(animate);
 
   // Move physics bodies forward in time

@@ -6,6 +6,15 @@ class Capsule extends Shape {
 
   Capsule([this.length=1, this.radius=1]) :super(Shape.CAPSULE);
 
+  /// Compute the mass moment of inertia of the Capsule.
+  num computeMomentOfInertia(num mass){
+      // Approximate with rectangle
+      num r = this.radius,
+          w = this.length + r, // 2*r is too much, 0 is too little
+          h = r*2;
+      return mass * (h*h + w*w) / 12;
+  }
+  
   /**
    * @method updateBoundingRadius
    */

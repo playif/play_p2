@@ -20,15 +20,15 @@ abstract class Constraint {
   /// Set to true if you want the connected bodies to collide.
   bool collideConnected;
 
-  Constraint(Body bodyA, Body bodyB, num type, [options]) {
+  Constraint(Body bodyA, Body bodyB, num type, {bool collideConnected: true, bool wakeUpBodies: true}) {
 
 
     this.type = type;
 
-    options = Utils.defaults(options, {
-        collideConnected : true,
-        wakeUpBodies : true,
-    });
+//    options = Utils.defaults(options, {
+//        collideConnected : true,
+//        wakeUpBodies : true,
+//    });
 
     this.equations = [];
 
@@ -36,14 +36,14 @@ abstract class Constraint {
 
     this.bodyB = bodyB;
 
-    this.collideConnected = options.collideConnected;
+    this.collideConnected = collideConnected;
 
     // Wake up bodies when connected
-    if (options.wakeUpBodies) {
-      if (bodyA) {
+    if (wakeUpBodies) {
+      if (bodyA != null) {
         bodyA.wakeUp();
       }
-      if (bodyB) {
+      if (bodyB != null) {
         bodyB.wakeUp();
       }
     }
@@ -51,7 +51,7 @@ abstract class Constraint {
 
 
   /// Updates the internal constraint parameters before solve.
-  update (){
+  update() {
     throw new Exception("method update() not implmemented in this Constraint subclass!");
   }
 
@@ -66,9 +66,9 @@ abstract class Constraint {
   static const int REVOLUTE = 5;
 
   /// Set stiffness for this constraint.
-  setStiffness (num stiffness){
+  setStiffness(num stiffness) {
     List<Equation> eqs = this.equations;
-    for(int i=0; i != eqs.length; i++){
+    for (int i = 0; i != eqs.length; i++) {
       Equation eq = eqs[i];
       eq.stiffness = stiffness;
       eq.needsUpdate = true;
@@ -76,9 +76,9 @@ abstract class Constraint {
   }
 
   /// Set relaxation for this constraint.
-  setRelaxation (num relaxation){
+  setRelaxation(num relaxation) {
     List<Equation> eqs = this.equations;
-    for(int i=0; i != eqs.length; i++){
+    for (int i = 0; i != eqs.length; i++) {
       Equation eq = eqs[i];
       eq.relaxation = relaxation;
       eq.needsUpdate = true;

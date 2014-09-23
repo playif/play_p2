@@ -22,7 +22,7 @@ class FrictionEquation extends Equation {
   /// The friction coefficient to use.
   num frictionCoefficient = 0.3;
 
-  FrictionEquation(Body bodyA, Body bodyB, num slipForce) : super(bodyA, bodyB, -slipForce, slipForce) {
+  FrictionEquation(Body bodyA, Body bodyB, [num slipForce=0]) : super(bodyA, bodyB, -slipForce, slipForce) {
     this.contactPointA = vec2.create();
     this.contactPointB = vec2.create();
     this.t = vec2.create();
@@ -39,7 +39,7 @@ class FrictionEquation extends Equation {
   }
 
   /// Get the max force for the constraint.
-  getSlipForce(){
+  num getSlipForce(){
     return this.maxForce;
   }
 
@@ -61,10 +61,10 @@ class FrictionEquation extends Equation {
     G[4] = t[1];
     G[5] = vec2.crossLength(rj,t);
 
-    var GW = this.computeGW(),
+    num GW = this.computeGW(),
     GiMf = this.computeGiMf();
 
-    var B = /* - g * a  */ - GW * b - h*GiMf;
+    num B = /* - g * a  */ - GW * b - h*GiMf;
 
     return B;
   }

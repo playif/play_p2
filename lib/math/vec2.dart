@@ -11,7 +11,7 @@ class vec2 {
 
   /// Cross product between a vector and the Z component of a vector
 
-  static num crossVZ(List out, List vec, num zcomp) {
+  static List crossVZ(List out, List vec, num zcomp) {
     vec2.rotate(out, vec, -PI / 2); // Rotate according to the right hand rule
     vec2.scale(out, out, zcomp); // Scale with z
     return out;
@@ -19,7 +19,7 @@ class vec2 {
 
   /// Cross product between a vector and the Z component of a vector
 
-  static num crossZV(List out, num zcomp, List vec) {
+  static List crossZV(List out, num zcomp, List vec) {
     vec2.rotate(out, vec, PI / 2); // Rotate according to the right hand rule
     vec2.scale(out, out, zcomp); // Scale with z
     return out;
@@ -79,8 +79,8 @@ class vec2 {
 
   static List create() {
     Float32List out = new Float32List(2);
-    out[0] = 0;
-    out[1] = 0;
+    out[0] = 0.0;
+    out[1] = 0.0;
     return out;
   }
 
@@ -95,18 +95,18 @@ class vec2 {
 
   /// Creates a new vec2 initialized with the given values
 
-  static List fromValues(x, y) {
+  static List fromValues(num x, num y) {
     Float32List out = new Float32List(2);
-    out[0] = x;
-    out[1] = y;
+    out[0] = x.toDouble();
+    out[1] = y.toDouble();
     return out;
   }
 
   /// Copy the values from one vec2 to another
 
   static List copy(List out, List a) {
-    out[0] = a[0];
-    out[1] = a[1];
+    out[0] = a[0].toDouble();
+    out[1] = a[1].toDouble();
     return out;
   }
 

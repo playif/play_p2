@@ -40,17 +40,17 @@ class Line {
    */
 
   static bool segmentsIntersect(List p1, List p2, List q1, List q2) {
-    var dx = p2[0] - p1[0];
-    var dy = p2[1] - p1[1];
-    var da = q2[0] - q1[0];
-    var db = q2[1] - q1[1];
+    num dx = p2[0] - p1[0];
+    num dy = p2[1] - p1[1];
+    num da = q2[0] - q1[0];
+    num db = q2[1] - q1[1];
 
     // segments are parallel
     if (da * dy - db * dx == 0)
       return false;
 
-    var s = (dx * (q1[1] - p1[1]) + dy * (p1[0] - q1[0])) / (da * dy - db * dx);
-    var t = (da * (p1[1] - q1[1]) + db * (q1[0] - p1[0])) / (db * dx - da * dy);
+    num s = (dx * (q1[1] - p1[1]) + dy * (p1[0] - q1[0])) / (da * dy - db * dx);
+    num t = (da * (p1[1] - q1[1]) + db * (q1[0] - p1[0])) / (db * dx - da * dy);
 
     return (s >= 0 && s <= 1 && t >= 0 && t <= 1);
   }

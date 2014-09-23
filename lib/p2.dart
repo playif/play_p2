@@ -4,6 +4,8 @@ library p2;
 
 import "dart:typed_data";
 import "dart:math";
+import "dart:html";
+
 import "poly_decomp/index.dart" as decomp;
 
 

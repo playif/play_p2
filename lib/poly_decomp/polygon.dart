@@ -16,8 +16,9 @@ class Polygon {
 
   List at(int i) {
     var v = this.vertices,
-    s = v.length;
-    return v[i < 0 ? i % s + s : i % s];
+        s = v.length;
+    if (i < 0) i += s;
+    return v[i < 0 ? (i % s) + s : i % s];
   }
 
   /**
@@ -48,6 +49,7 @@ class Polygon {
 
   List clear() {
     this.vertices.clear();
+    return this.vertices;
   }
 
   /**
@@ -70,6 +72,8 @@ class Polygon {
     for (int i = from; i < to; i++) {
       this.vertices.add(poly.vertices[i]);
     }
+
+    return this.vertices;
   }
 
   /**
@@ -79,7 +83,7 @@ class Polygon {
 
   makeCCW() {
     var br = 0,
-    v = this.vertices;
+        v = this.vertices;
 
     // find bottom right point
     for (var i = 1; i < this.vertices.length; ++i) {
@@ -115,7 +119,7 @@ class Polygon {
   }
 
   List tmpLine1 = [],
-  tmpLine2 = [];
+      tmpLine2 = [];
 
   /**
    * Check if two vertices in the polygon can see each other
@@ -126,7 +130,10 @@ class Polygon {
    */
 
   bool canSee(int a, int b) {
-    var p, dist, l1 = tmpLine1, l2 = tmpLine2;
+    var p,
+        dist,
+        l1 = tmpLine1,
+        l2 = tmpLine2;
 
     if (Point.leftOn(this.at(a + 1), this.at(a), this.at(b)) && Point.rightOn(this.at(a - 1), this.at(a), this.at(b))) {
       return false;
@@ -135,7 +142,7 @@ class Polygon {
     for (var i = 0; i != this.vertices.length; ++i) {
       // for each edge
       if ((i + 1) % this.vertices.length == a || i == a) // ignore incident edges
-        continue;
+      continue;
       if (Point.leftOn(this.at(a), this.at(b), this.at(i + 1)) && Point.rightOn(this.at(a), this.at(b), this.at(i))) {
         // if diag intersects an edge
         l1[0] = this.at(a);
@@ -167,18 +174,15 @@ class Polygon {
     p.clear();
     if (i < j) {
       // Insert all vertices from i to j
-      for (var k = i; k <= j; k++)
-        p.vertices.push(this.vertices[k]);
+      for (var k = i; k <= j; k++) p.vertices.add(this.vertices[k]);
 
     } else {
 
       // Insert vertices 0 to j
-      for (var k = 0; k <= j; k++)
-        p.vertices.push(this.vertices[k]);
+      for (var k = 0; k <= j; k++) p.vertices.add(this.vertices[k]);
 
       // Insert vertices i to end
-      for (var k = i; k < this.vertices.length; k++)
-        p.vertices.push(this.vertices[k]);
+      for (var k = i; k < this.vertices.length; k++) p.vertices.add(this.vertices[k]);
     }
 
     return p;
@@ -192,7 +196,10 @@ class Polygon {
    */
 
   List getCutEdges() {
-    var min = [], tmp1 = [], tmp2 = [], tmpPoly = new Polygon();
+    var min = [],
+        tmp1 = [],
+        tmp2 = [],
+        tmpPoly = new Polygon();
     var nDiags = double.MAX_FINITE;
 
     for (var i = 0; i < this.vertices.length; ++i) {
@@ -202,13 +209,12 @@ class Polygon {
             tmp1 = this.copy(i, j, tmpPoly).getCutEdges();
             tmp2 = this.copy(j, i, tmpPoly).getCutEdges();
 
-            for (var k = 0; k < tmp2.length; k++)
-              tmp1.push(tmp2[k]);
+            for (var k = 0; k < tmp2.length; k++) tmp1.add(tmp2[k]);
 
             if (tmp1.length < nDiags) {
               min = tmp1;
               nDiags = tmp1.length;
-              min.push([this.at(i), this.at(j)]);
+              min.add([this.at(i), this.at(j)]);
             }
           }
         }
@@ -226,10 +232,7 @@ class Polygon {
 
   decomp() {
     var edges = this.getCutEdges();
-    if (edges.length > 0)
-      return this.slice(edges);
-    else
-      return [this];
+    if (edges.length > 0) return this.slice(edges); else return [this];
   }
 
   /**
@@ -241,7 +244,7 @@ class Polygon {
 
   List slice(List cutEdges) {
     if (cutEdges.length == 0) return [this];
-    if (cutEdges is List && cutEdges.length && cutEdges[0] is List && cutEdges[0].length == 2 && cutEdges[0][0] is List) {
+    if (cutEdges is List && cutEdges.isNotEmpty && cutEdges[0] is List && cutEdges[0].length == 2 && cutEdges[0][0] is List) {
 
       List polys = [this];
 
@@ -269,10 +272,9 @@ class Polygon {
       var j = this.vertices.indexOf(cutEdge[1]);
 
       if (i != -1 && j != -1) {
-        return [this.copy(i, j),
-        this.copy(j, i)];
+        return [this.copy(i, j), this.copy(j, i)];
       } else {
-        return false;
+        return null;
       }
     }
   }
@@ -316,10 +318,7 @@ class Polygon {
     var c2 = (a2 * q1[0]) + (b2 * q1[1]);
     var det = (a1 * b2) - (a2 * b1);
 
-    if (!Scalar.eq(det, 0, delta))
-      return [((b2 * c1) - (b1 * c2)) / det, ((a1 * c2) - (a2 * c1)) / det];
-    else
-      return [0, 0];
+    if (!Scalar.eq(det, 0, delta)) return [((b2 * c1) - (b1 * c2)) / det, ((a1 * c2) - (a2 * c1)) / det]; else return [0, 0];
   }
 
   /**
@@ -334,17 +333,24 @@ class Polygon {
    * @return {Array}
    */
 
-  List quickDecomp([ List result, List reflexVertices, List steinerPoints
-  , num delta=25, num maxlevel=100, num level=0]) {
+  List quickDecomp([List result, List reflexVertices, List steinerPoints, num delta = 25, num maxlevel = 100, num level = 0]) {
 
     result = result != null ? result : [];
     reflexVertices = reflexVertices != null ? reflexVertices : [];
     steinerPoints = steinerPoints != null ? steinerPoints : [];
 
-    List upperInt = [0, 0], lowerInt = [0, 0], p = [0, 0]; // Points
-    num upperDist = 0, lowerDist = 0, d = 0, closestDist = 0; // scalars
-    int upperIndex = 0, lowerIndex = 0, closestIndex = 0; // Integers
-    Polygon lowerPoly = new Polygon(), upperPoly = new Polygon(); // polygons
+    List upperInt = [0, 0],
+        lowerInt = [0, 0],
+        p = [0, 0]; // Points
+    num upperDist = 0,
+        lowerDist = 0,
+        d = 0,
+        closestDist = 0; // scalars
+    int upperIndex = 0,
+        lowerIndex = 0,
+        closestIndex = 0; // Integers
+    Polygon lowerPoly = new Polygon(),
+        upperPoly = new Polygon(); // polygons
     Polygon poly = this;
     List v = this.vertices;
 
@@ -352,7 +358,7 @@ class Polygon {
 
     level++;
     if (level > maxlevel) {
-      print("quickDecomp: max level (" + maxlevel + ") reached.");
+      print("quickDecomp: max level (" + maxlevel.toString() + ") reached.");
       return result;
     }
 
@@ -363,8 +369,7 @@ class Polygon {
 
 
         for (var j = 0; j < this.vertices.length; ++j) {
-          if (Point.left(poly.at(i - 1), poly.at(i), poly.at(j))
-              && Point.rightOn(poly.at(i - 1), poly.at(i), poly.at(j - 1))) {
+          if (Point.left(poly.at(i - 1), poly.at(i), poly.at(j)) && Point.rightOn(poly.at(i - 1), poly.at(i), poly.at(j - 1))) {
             // if line intersects with an edge
             p = getIntersectionPoint(poly.at(i - 1), poly.at(i), poly.at(j), poly.at(j - 1)); // find the point of intersection
             if (Point.right(poly.at(i + 1), poly.at(i), p)) {
@@ -378,8 +383,7 @@ class Polygon {
               }
             }
           }
-          if (Point.left(poly.at(i + 1), poly.at(i), poly.at(j + 1))
-              && Point.rightOn(poly.at(i + 1), poly.at(i), poly.at(j))) {
+          if (Point.left(poly.at(i + 1), poly.at(i), poly.at(j + 1)) && Point.rightOn(poly.at(i + 1), poly.at(i), poly.at(j))) {
             p = getIntersectionPoint(poly.at(i + 1), poly.at(i), poly.at(j), poly.at(j + 1));
             if (Point.left(poly.at(i - 1), poly.at(i), p)) {
               d = Point.sqdist(poly.vertices[i], p);
@@ -436,8 +440,7 @@ class Polygon {
           }
 
           for (var j = lowerIndex; j <= upperIndex; ++j) {
-            if (Point.leftOn(poly.at(i - 1), poly.at(i), poly.at(j))
-                && Point.rightOn(poly.at(i + 1), poly.at(i), poly.at(j))) {
+            if (Point.leftOn(poly.at(i - 1), poly.at(i), poly.at(j)) && Point.rightOn(poly.at(i + 1), poly.at(i), poly.at(j))) {
               d = Point.sqdist(poly.at(i), poly.at(j));
               if (d < closestDist) {
                 closestDist = d;
@@ -486,7 +489,7 @@ class Polygon {
    */
 
   num removeCollinearPoints([num precision]) {
-    var num = 0;
+    int num = 0;
     for (var i = this.vertices.length - 1; this.vertices.length > 3 && i >= 0; --i) {
       if (Point.collinear(this.at(i - 1), this.at(i), this.at(i + 1), precision)) {
         // Remove the middle point

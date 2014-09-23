@@ -28,7 +28,7 @@ part of p2;
  *     heightfieldBody.addShape(heightfieldShape);
  *     world.addBody(heightfieldBody);
  */
-class Heightfield extends Shape{
+class Heightfield extends Shape {
   /// An array of numbers, or height values, that are spread out along the x axis.
   List data;
 
@@ -42,23 +42,23 @@ class Heightfield extends Shape{
   num elementWidth;
 
 
-  Heightfield(data, options) : super(Shape.HEIGHTFIELD) {
-    options = Utils.defaults(options, {
-        maxValue : null,
-        minValue : null,
-        elementWidth : 0.1
-    });
+  Heightfield(List data, {num maxValue, num minValue, num elementWidth}) : super(Shape.HEIGHTFIELD) {
+//    options = Utils.defaults(options, {
+//        maxValue : null,
+//        minValue : null,
+//        elementWidth : 0.1
+//    });
 
-    if(options.minValue == null || options.maxValue == null){
-      options.maxValue = data[0];
-      options.minValue = data[0];
-      for(var i=0; i != data.length; i++){
+    if (minValue == null || maxValue == null) {
+      maxValue = data[0];
+      minValue = data[0];
+      for (var i = 0; i != data.length; i++) {
         var v = data[i];
-        if(v > options.maxValue){
-          options.maxValue = v;
+        if (v > maxValue) {
+          maxValue = v;
         }
-        if(v < options.minValue){
-          options.minValue = v;
+        if (v < minValue) {
+          minValue = v;
         }
       }
     }
@@ -66,11 +66,11 @@ class Heightfield extends Shape{
 
     this.data = data;
 
-    this.maxValue = options.maxValue;
+    this.maxValue = maxValue;
 
-    this.minValue = options.minValue;
+    this.minValue = minValue;
 
-    this.elementWidth = options.elementWidth;
+    this.elementWidth = elementWidth;
 
     //Shape.call(this,Shape.HEIGHTFIELD);
   }
@@ -80,19 +80,19 @@ class Heightfield extends Shape{
    * @param  {Number} mass
    * @return {Number}
    */
-  computeMomentOfInertia (num mass){
+  num computeMomentOfInertia(num mass) {
     return double.MAX_FINITE;
   }
 
-  updateBoundingRadius (){
+  updateBoundingRadius() {
     this.boundingRadius = double.MAX_FINITE;
   }
 
-  updateArea (){
+  updateArea() {
     List data = this.data;
     num area = 0;
-    for(int i=0; i<data.length-1; i++){
-      area += (data[i]+data[i+1]) / 2 * this.elementWidth;
+    for (int i = 0; i < data.length - 1; i++) {
+      area += (data[i] + data[i + 1]) / 2 * this.elementWidth;
     }
     this.area = area;
   }
@@ -103,7 +103,7 @@ class Heightfield extends Shape{
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB (AABB out, [List position, num angle]){
+  computeAABB(AABB out, [List position, num angle]) {
     // Use the max data rectangle
     out.upperBound[0] = this.elementWidth * this.data.length + position[0];
     out.upperBound[1] = this.maxValue + position[1];

@@ -65,9 +65,7 @@ abstract class Shape {
 
 
     this.collisionMask = 1;
-    if (type != null) {
-      this.updateBoundingRadius();
-    }
+
 
 
     this.material = null;
@@ -78,7 +76,7 @@ abstract class Shape {
 
     this.sensor = false;
 
-    this.updateArea();
+    
   }
 
   /**

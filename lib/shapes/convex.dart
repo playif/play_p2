@@ -14,8 +14,13 @@ class Convex extends Shape {
   /// Triangulated version of this convex. The structure is Array of 3-Arrays, and each subarray contains 3 integers, referencing the vertices.
   List triangles;
 
-  Convex([List vertices, List axes]) : super(Shape.CONVEX) {
+  Convex._() : super(Shape.CONVEX);
 
+  Convex([List vertices, List axes]) : super(Shape.CONVEX) {
+    init(vertices, axes);
+  }
+
+  init(List vertices, List axes) {
     this.vertices = [];
 
     this.axes = [];
@@ -57,16 +62,16 @@ class Convex extends Shape {
 
     this.triangles = [];
 
-    if (this.vertices.length) {
+    if (this.vertices.isNotEmpty) {
       this.updateTriangles();
       this.updateCenterOfMass();
     }
 
     /**
-     * The bounding radius of the convex
-     * @property boundingRadius
-     * @type {Number}
-     */
+         * The bounding radius of the convex
+         * @property boundingRadius
+         * @type {Number}
+         */
     this.boundingRadius = 0;
 
     //Shape.call(this, Shape.CONVEX);
@@ -92,10 +97,10 @@ class Convex extends Shape {
 
   projectOntoLocalAxis(List localAxis, List result) {
     var max = null,
-    min = null,
-    v,
-    value,
-    localAxis = tmpVec1;
+        min = null,
+        v,
+        value,
+        localAxis = tmpVec1;
 
     // Get projected position of all vertices
     for (int i = 0; i < this.vertices.length; i++) {
@@ -142,7 +147,7 @@ class Convex extends Shape {
 
   updateTriangles() {
 
-    this.triangles.length = 0;
+    this.triangles.clear();
 
     // Rewrite on polyk notation, array of numbers
     List polykVerts = [];
@@ -157,8 +162,8 @@ class Convex extends Shape {
     // Loop over all triangles, add their inertia contributions to I
     for (int i = 0; i < triangles.length; i += 3) {
       var id1 = triangles[i],
-      id2 = triangles[i + 1],
-      id3 = triangles[i + 2];
+          id2 = triangles[i + 1],
+          id3 = triangles[i + 2];
 
       // Add to triangles
       this.triangles.add([id1, id2, id3]);
@@ -166,14 +171,14 @@ class Convex extends Shape {
   }
 
   var updateCenterOfMass_centroid = vec2.create(),
-  updateCenterOfMass_centroid_times_mass = vec2.create(),
-  updateCenterOfMass_a = vec2.create(),
-  updateCenterOfMass_b = vec2.create(),
-  updateCenterOfMass_c = vec2.create(),
-  updateCenterOfMass_ac = vec2.create(),
-  updateCenterOfMass_ca = vec2.create(),
-  updateCenterOfMass_cb = vec2.create(),
-  updateCenterOfMass_n = vec2.create();
+      updateCenterOfMass_centroid_times_mass = vec2.create(),
+      updateCenterOfMass_a = vec2.create(),
+      updateCenterOfMass_b = vec2.create(),
+      updateCenterOfMass_c = vec2.create(),
+      updateCenterOfMass_ac = vec2.create(),
+      updateCenterOfMass_ca = vec2.create(),
+      updateCenterOfMass_cb = vec2.create(),
+      updateCenterOfMass_n = vec2.create();
 
   /**
    * Update the .centerOfMass property.
@@ -182,26 +187,26 @@ class Convex extends Shape {
 
   updateCenterOfMass() {
     var triangles = this.triangles,
-    verts = this.vertices,
-    cm = this.centerOfMass,
-    centroid = updateCenterOfMass_centroid,
-    n = updateCenterOfMass_n,
-    a = updateCenterOfMass_a,
-    b = updateCenterOfMass_b,
-    c = updateCenterOfMass_c,
-    ac = updateCenterOfMass_ac,
-    ca = updateCenterOfMass_ca,
-    cb = updateCenterOfMass_cb,
-    centroid_times_mass = updateCenterOfMass_centroid_times_mass;
+        verts = this.vertices,
+        cm = this.centerOfMass,
+        centroid = updateCenterOfMass_centroid,
+        n = updateCenterOfMass_n,
+        a = updateCenterOfMass_a,
+        b = updateCenterOfMass_b,
+        c = updateCenterOfMass_c,
+        ac = updateCenterOfMass_ac,
+        ca = updateCenterOfMass_ca,
+        cb = updateCenterOfMass_cb,
+        centroid_times_mass = updateCenterOfMass_centroid_times_mass;
 
     vec2.set(cm, 0, 0);
     num totalArea = 0;
 
     for (var i = 0; i != triangles.length; i++) {
       var t = triangles[i],
-      a = verts[t[0]],
-      b = verts[t[1]],
-      c = verts[t[2]];
+          a = verts[t[0]],
+          b = verts[t[1]],
+          c = verts[t[2]];
 
       vec2.centroid(centroid, a, b, c);
 
@@ -228,9 +233,10 @@ class Convex extends Shape {
 
   computeMomentOfInertia(num mass) {
     var denom = 0.0,
-    numer = 0.0,
-    N = this.vertices.length;
-    for (var j = N - 1, i = 0; i < N; j = i, i ++) {
+        numer = 0.0,
+        N = this.vertices.length;
+    for (var j = N - 1,
+        i = 0; i < N; j = i, i++) {
       var p0 = this.vertices[j];
       var p1 = this.vertices[i];
       var a = (vec2.crossLength(p0, p1)).abs();
@@ -248,7 +254,7 @@ class Convex extends Shape {
 
   updateBoundingRadius() {
     var verts = this.vertices,
-    r2 = 0;
+        r2 = 0;
 
     for (var i = 0; i != verts.length; i++) {
       var l2 = vec2.squaredLength(verts[i]);
@@ -284,12 +290,12 @@ class Convex extends Shape {
     this.area = 0;
 
     List triangles = this.triangles,
-    verts = this.vertices;
+        verts = this.vertices;
     for (var i = 0; i != triangles.length; i++) {
       var t = triangles[i],
-      a = verts[t[0]],
-      b = verts[t[1]],
-      c = verts[t[2]];
+          a = verts[t[0]],
+          b = verts[t[1]],
+          c = verts[t[2]];
 
       // Get mass for the triangle (density=1 in this case)
       num m = Convex.triangleArea(a, b, c);

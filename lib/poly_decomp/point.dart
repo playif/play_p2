@@ -30,8 +30,8 @@ class Point {
     return Point.area(a, b, c) <= 0;
   }
 
-  List tmpPoint1 = [],
-  tmpPoint2 = [];
+  static List tmpPoint1 = new Float32List(2),
+  tmpPoint2 = new Float32List(2);
 
   /**
    * Check if three points are collinear

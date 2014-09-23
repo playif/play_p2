@@ -44,7 +44,7 @@ class Equation {
   /// Whether this equation is enabled or not. If true, it will be added to the solver.
   bool enabled = true;
 
-  Equation(Body bodyA, Body bodyB, [num minForce=-double.MAX_FINITE, num maxForce=double.MAX_FINITE]) {
+  Equation(Body bodyA, Body bodyB, [num minForce = -double.MAX_FINITE, num maxForce = double.MAX_FINITE]) {
 
     this.minForce = minForce;
 
@@ -60,7 +60,7 @@ class Equation {
 
     this.G = new Float32List(6);
     for (var i = 0; i < 6; i++) {
-      this.G[i] = 0;
+      this.G[i] = 0.0;
     }
 
     this.offset = 0;
@@ -86,10 +86,10 @@ class Equation {
   static const num DEFAULT_RELAXATION = 4;
 
   /// Compute SPOOK parameters .a, .b and .epsilon according to the current parameters.
-  update (){
+  update() {
     var k = this.stiffness,
-    d = this.relaxation,
-    h = this.timeStep;
+        d = this.relaxation,
+        h = this.timeStep;
 
     this.a = 4.0 / (h * (1 + 4 * d));
     this.b = (4.0 * d) / (1 + 4 * d);
@@ -99,127 +99,117 @@ class Equation {
   }
 
   /// Multiply a jacobian entry with corresponding positions or velocities
-  gmult (G,vi,wi,vj,wj){
-    return  G[0] * vi[0] +
-            G[1] * vi[1] +
-            G[2] * wi +
-            G[3] * vj[0] +
-            G[4] * vj[1] +
-            G[5] * wj;
+  num gmult(List G, List vi, num wi, List vj, num wj) {
+    return G[0] * vi[0] + G[1] * vi[1] + G[2] * wi + G[3] * vj[0] + G[4] * vj[1] + G[5] * wj;
   }
 
   /// Computes the RHS of the SPOOK equation
-  num computeB (num a, num b, num h){
+  num computeB(num a, num b, num h) {
     var GW = this.computeGW();
     var Gq = this.computeGq();
     var GiMf = this.computeGiMf();
-    return - Gq * a - GW * b - GiMf*h;
+    return -Gq * a - GW * b - GiMf * h;
   }
 
-  List  qi = vec2.create(),
-  qj = vec2.create();
+  List qi = vec2.create(),
+      qj = vec2.create();
 
   /// Computes G\*q, where q are the generalized body coordinates
-  num computeGq(){
-    var G = this.G,
-    bi = this.bodyA,
-    bj = this.bodyB,
-    xi = bi.position,
-    xj = bj.position,
-    ai = bi.angle,
-    aj = bj.angle;
+  num computeGq() {
+    List G = this.G;
+    Body bi = this.bodyA,
+        bj = this.bodyB;
+    List xi = bi.position,
+        xj = bj.position;
+    num ai = bi.angle,
+        aj = bj.angle;
 
     return this.gmult(G, qi, ai, qj, aj) + this.offset;
   }
 
   /// Computes G\*W, where W are the body velocities
-  num computeGW (){
-    var G = this.G,
-    bi = this.bodyA,
-    bj = this.bodyB,
-    vi = bi.velocity,
-    vj = bj.velocity,
-    wi = bi.angularVelocity,
-    wj = bj.angularVelocity;
-    return this.gmult(G,vi,wi,vj,wj) + this.relativeVelocity;
+  num computeGW() {
+    List G = this.G;
+    Body bi = this.bodyA,
+        bj = this.bodyB;
+    List vi = bi.velocity,
+        vj = bj.velocity;
+    num wi = bi.angularVelocity,
+        wj = bj.angularVelocity;
+    return this.gmult(G, vi, wi, vj, wj) + this.relativeVelocity;
   }
 
   /// Computes G\*Wlambda, where W are the body velocities
-  num computeGWlambda (){
+  num computeGWlambda() {
     var G = this.G,
-    bi = this.bodyA,
-    bj = this.bodyB,
-    vi = bi.vlambda,
-    vj = bj.vlambda,
-    wi = bi.wlambda,
-    wj = bj.wlambda;
-    return this.gmult(G,vi,wi,vj,wj);
+        bi = this.bodyA,
+        bj = this.bodyB,
+        vi = bi.vlambda,
+        vj = bj.vlambda,
+        wi = bi.wlambda,
+        wj = bj.wlambda;
+    return this.gmult(G, vi, wi, vj, wj);
   }
 
 
   List iMfi = vec2.create(),
-  iMfj = vec2.create();
+      iMfj = vec2.create();
 
   /// Computes G\*inv(M)\*f, where M is the mass matrix with diagonal blocks for each body, and f are the forces on the bodies.
-  num computeGiMf(){
+  num computeGiMf() {
     var bi = this.bodyA,
-    bj = this.bodyB,
-    fi = bi.force,
-    ti = bi.angularForce,
-    fj = bj.force,
-    tj = bj.angularForce,
-    invMassi = bi.invMassSolve,
-    invMassj = bj.invMassSolve,
-    invIi = bi.invInertiaSolve,
-    invIj = bj.invInertiaSolve,
-    G = this.G;
+        bj = this.bodyB,
+        fi = bi.force,
+        ti = bi.angularForce,
+        fj = bj.force,
+        tj = bj.angularForce,
+        invMassi = bi.invMassSolve,
+        invMassj = bj.invMassSolve,
+        invIi = bi.invInertiaSolve,
+        invIj = bj.invInertiaSolve,
+        G = this.G;
 
-    vec2.scale(iMfi, fi,invMassi);
-    vec2.scale(iMfj, fj,invMassj);
+    vec2.scale(iMfi, fi, invMassi);
+    vec2.scale(iMfj, fj, invMassj);
 
-    return this.gmult(G,iMfi,ti*invIi,iMfj,tj*invIj);
+    return this.gmult(G, iMfi, ti * invIi, iMfj, tj * invIj);
   }
 
   /// Computes G\*inv(M)\*G'
-  num computeGiMGt (){
+  num computeGiMGt() {
     var bi = this.bodyA,
-    bj = this.bodyB,
-    invMassi = bi.invMassSolve,
-    invMassj = bj.invMassSolve,
-    invIi = bi.invInertiaSolve,
-    invIj = bj.invInertiaSolve,
-    G = this.G;
+        bj = this.bodyB,
+        invMassi = bi.invMassSolve,
+        invMassj = bj.invMassSolve,
+        invIi = bi.invInertiaSolve,
+        invIj = bj.invInertiaSolve,
+        G = this.G;
 
-    return  G[0] * G[0] * invMassi +
-            G[1] * G[1] * invMassi +
-            G[2] * G[2] *    invIi +
-            G[3] * G[3] * invMassj +
-            G[4] * G[4] * invMassj +
-            G[5] * G[5] *    invIj;
+    return G[0] * G[0] * invMassi + G[1] * G[1] * invMassi + G[2] * G[2] * invIi + G[3] * G[3] * invMassj + G[4] * G[4] * invMassj + G[5] * G[5] * invIj;
   }
 
   List addToWlambda_temp = vec2.create(),
-  addToWlambda_Gi = vec2.create(),
-  addToWlambda_Gj = vec2.create(),
-  addToWlambda_ri = vec2.create(),
-  addToWlambda_rj = vec2.create(),
-  addToWlambda_Mdiag = vec2.create();
+      addToWlambda_Gi = vec2.create(),
+      addToWlambda_Gj = vec2.create(),
+      addToWlambda_ri = vec2.create(),
+      addToWlambda_rj = vec2.create(),
+      addToWlambda_Mdiag = vec2.create();
 
   /// Add constraint velocity to the bodies.
-  addToWlambda (num deltalambda){
+  addToWlambda(num deltalambda) {
     var bi = this.bodyA,
-    bj = this.bodyB,
-    temp = addToWlambda_temp,
-    Gi = addToWlambda_Gi,
-    Gj = addToWlambda_Gj,
-    ri = addToWlambda_ri,
-    rj = addToWlambda_rj,
-    invMassi = bi.invMassSolve,
-    invMassj = bj.invMassSolve,
-    invIi = bi.invInertiaSolve,
-    invIj = bj.invInertiaSolve,
-    Mdiag = addToWlambda_Mdiag,
-    G = this.G;
+        bj = this.bodyB,
+        temp = addToWlambda_temp,
+        Gi = addToWlambda_Gi,
+        Gj = addToWlambda_Gj,
+        ri = addToWlambda_ri,
+        rj = addToWlambda_rj,
+        invMassi = bi.invMassSolve,
+        invMassj = bj.invMassSolve,
+        invIi = bi.invInertiaSolve,
+        invIj = bj.invInertiaSolve,
+        Mdiag = addToWlambda_Mdiag,
+        G = this.G;
 
     Gi[0] = G[0];
     Gi[1] = G[1];
@@ -228,22 +218,22 @@ class Equation {
 
     // Add to linear velocity
     // v_lambda += inv(M) * delta_lamba * G
-    vec2.scale(temp, Gi, invMassi*deltalambda);
-    vec2.add( bi.vlambda, bi.vlambda, temp);
+    vec2.scale(temp, Gi, invMassi * deltalambda);
+    vec2.add(bi.vlambda, bi.vlambda, temp);
     // This impulse is in the offset frame
     // Also add contribution to angular
     //bi.wlambda -= vec2.crossLength(temp,ri);
     bi.wlambda += invIi * G[2] * deltalambda;
 
 
-    vec2.scale(temp, Gj, invMassj*deltalambda);
-    vec2.add( bj.vlambda, bj.vlambda, temp);
+    vec2.scale(temp, Gj, invMassj * deltalambda);
+    vec2.add(bj.vlambda, bj.vlambda, temp);
     //bj.wlambda -= vec2.crossLength(temp,rj);
     bj.wlambda += invIj * G[5] * deltalambda;
   }
 
   /// Compute the denominator part of the SPOOK equation: C = G\*inv(M)\*G' + eps
-  num computeInvC (num eps){
+  num computeInvC(num eps) {
     return 1.0 / (this.computeGiMGt() + eps);
   }
 }

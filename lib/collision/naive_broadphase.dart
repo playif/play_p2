@@ -18,7 +18,7 @@ class NaiveBroadphase extends Broadphase {
         var bj = bodies[j];
 
         if(Broadphase.canCollide(bi,bj) && this.boundingVolumeCheck(bi,bj)){
-          result.push(bi,bj);
+          result.addAll([bi,bj]);
         }
       }
     }

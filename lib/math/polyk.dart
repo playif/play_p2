@@ -31,12 +31,12 @@ class Polyk {
       var cx = p[2 * i2], cy = p[2 * i2 + 1];
 
       var earFound = false;
-      if (PolyK._convex(ax, ay, bx, by, cx, cy)) {
+      if (Polyk._convex(ax, ay, bx, by, cx, cy)) {
         earFound = true;
         for (var j = 0; j < al; j++) {
           var vi = avl[j];
           if (vi == i0 || vi == i1 || vi == i2) continue;
-          if (PolyK._PointInTriangle(p[2 * vi], p[2 * vi + 1], ax, ay, bx, by, cx, cy)) {
+          if (Polyk._PointInTriangle(p[2 * vi], p[2 * vi + 1], ax, ay, bx, by, cx, cy)) {
             earFound = false;
             break;
           }

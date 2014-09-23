@@ -5,8 +5,8 @@ class RotationalLockEquation extends Equation {
 
   RotationalLockEquation(Body bodyA, Body bodyB, {num angle:0}) :super(bodyA, bodyB) {
     this.angle = angle;
-    G[2] = 1;
-    G[5] = -1;
+    G[2] = 1.0;
+    G[5] = -1.0;
   }
 
   List worldVectorA = vec2.create(),

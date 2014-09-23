@@ -28,4 +28,7 @@ class Particle extends Shape {
     vec2.copy(out.upperBound, position);
   }
 
+  updateArea(){
+    
+  }
 }

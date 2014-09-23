@@ -37,7 +37,7 @@ class ContactMaterial {
 
   static num idCounter = 0;
 
-  ContactMaterial(Material materialA, Material materialB, [options]) {
+  ContactMaterial(Material materialA, Material materialB, {num friction: 0.3, num restitution: 0, num stiffness:Equation.DEFAULT_STIFFNESS, num relaxation:Equation.DEFAULT_RELAXATION, num frictionStiffness:Equation.DEFAULT_STIFFNESS, num frictionRelaxation:Equation.DEFAULT_RELAXATION, num surfaceVelocity: 0}) {
 
     this.id = ContactMaterial.idCounter++;
 
@@ -45,19 +45,19 @@ class ContactMaterial {
 
     this.materialB = materialB;
 
-    this.friction = options.friction != null ? options.friction : 0.3;
+    this.friction = friction ;
 
-    this.restitution = options.restitution != null ? options.restitution : 0.0;
+    this.restitution = restitution;
 
-    this.stiffness = options.stiffness != null ? options.stiffness : Equation.DEFAULT_STIFFNESS;
+    this.stiffness = stiffness;
 
-    this.relaxation = options.relaxation != null ? options.relaxation : Equation.DEFAULT_RELAXATION;
+    this.relaxation = relaxation;
 
-    this.frictionStiffness = options.frictionStiffness != null ? options.frictionStiffness : Equation.DEFAULT_STIFFNESS;
+    this.frictionStiffness = frictionStiffness;
 
-    this.frictionRelaxation = options.frictionRelaxation != null ? options.frictionRelaxation : Equation.DEFAULT_RELAXATION;
+    this.frictionRelaxation = frictionRelaxation;
 
-    this.surfaceVelocity = options.surfaceVelocity != null ? options.surfaceVelocity : 0;
+    this.surfaceVelocity = surfaceVelocity;
 
     this.contactSkinSize = 0.005;
   }

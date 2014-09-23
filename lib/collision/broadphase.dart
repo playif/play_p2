@@ -12,7 +12,7 @@ abstract class Broadphase {
   /// The bounding volume type to use in the broadphase algorithms.
   int boundingVolumeType;
 
-  Broadphase(int type) {
+  Broadphase([int type]) {
     this.type = type;
     this.result = [];
     this.world = null;
@@ -35,7 +35,7 @@ abstract class Broadphase {
     throw new Exception("getCollisionPairs must be implemented in a subclass!");
   }
 
-  List  dist = vec2.create();
+  static List  dist = vec2.create();
 
   /// Check whether the bounding radius of two bodies overlap.
   static bool boundingRadiusCheck (Body bodyA, Body bodyB){
@@ -46,7 +46,7 @@ abstract class Broadphase {
   }
 
   /// Check whether the bounding radius of two bodies overlap.
-  bool aabbCheck(Body bodyA, Body bodyB){
+  static bool aabbCheck(Body bodyA, Body bodyB){
     return bodyA.getAABB().overlaps(bodyB.getAABB());
   }
 
