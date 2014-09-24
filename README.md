@@ -11,17 +11,17 @@ The parameter setting UI can be found in [datgui](https://github.com/playif/datg
 Demos
 =========
 Implemented:
-* [Car](http://schteppe.github.io/p2.js/demos/car.html)
-* [Circle container](http://schteppe.github.io/p2.js/demos/circles.html)
-* [Collision tests](http://schteppe.github.io/p2.js/demos/collisions.html)
-* [Compound objects](http://schteppe.github.io/p2.js/demos/compound.html)
-* [Concave objects](http://schteppe.github.io/p2.js/demos/concave.html)
-* [Constraints](http://schteppe.github.io/p2.js/demos/constraints.html)
-* [DistanceConstraint](http://schteppe.github.io/p2.js/demos/distanceConstraint.html)
-* [Fixed rotation](http://schteppe.github.io/p2.js/demos/fixedRotation.html)
-* [Friction](http://schteppe.github.io/p2.js/demos/friction.html)
-* [Gear constraint](http://schteppe.github.io/p2.js/demos/gearConstraint.html)
-* [Heightfield](http://schteppe.github.io/p2.js/demos/heightfield.html)
+* [Car](https://playif.github.io/p2_demo/car.html)
+* [Circle container](https://playif.github.io/p2_demo/circles.html)
+* [Collision tests](https://playif.github.io/p2_demo/collisions.html)
+* [Compound objects](https://playif.github.io/p2_demo/compound.html)
+* [Concave objects](https://playif.github.io/p2_demo/concave.html)
+* [Constraints](https://playif.github.io/p2_demo/constraints.html)
+* [DistanceConstraint](https://playif.github.io/p2_demo/distanceConstraint.html)
+* [Fixed rotation](https://playif.github.io/p2_demo/fixedRotation.html)
+* [Friction](https://playif.github.io/p2_demo/friction.html)
+* [Gear constraint](https://playif.github.io/p2_demo/gearConstraint.html)
+* [Heightfield](https://playif.github.io/p2_demo/heightfield.html)
 
 Not yet implemented:
 * [Island solver](http://schteppe.github.io/p2.js/demos/islandSolver.html)
