@@ -21,8 +21,8 @@ class AngleLockEquation extends Equation {
   /// Set the gear ratio for this equation
 
   setRatio(num ratio) {
-    G[2] = ratio;
-    G[5] = -1;
+    G[2] = ratio.toDouble();
+    G[5] = -1.0;
     this.ratio = ratio;
   }
 

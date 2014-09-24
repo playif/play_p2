@@ -1,5 +1,5 @@
-import "package:play_p2/p2.dart" as p2;
-import "webgl_renderer.dart";
+import "package:p2/p2.dart" as p2;
+import "renderer.dart";
 
 main() {
   // Create demo application

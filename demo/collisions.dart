@@ -1,5 +1,5 @@
-import "package:play_p2/p2.dart" as p2;
-import "webgl_renderer.dart";
+import "package:p2/p2.dart" as p2;
+import "renderer.dart";
 import "dart:math" as Math;
 
 main() {
@@ -21,7 +21,7 @@ main() {
     world.sleepMode = p2.World.ISLAND_SLEEPING;
 
     world.solver.iterations = 20;
-    world.solver.tolerance = 0.001;
+    world.solver.tolerance = 0.01;
 
     world.setGlobalStiffness(1e4);
 

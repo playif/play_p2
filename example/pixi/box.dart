@@ -1,6 +1,6 @@
 import "dart:html";
 import "package:play_pixi/pixi.dart" as PIXI;
-import "package:play_p2/p2.dart" as p2;
+import "package:p2/p2.dart" as p2;
 
 
 var renderer, stage, container, graphics, zoom,

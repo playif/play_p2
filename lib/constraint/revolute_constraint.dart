@@ -67,23 +67,23 @@ class RevoluteConstraint extends Constraint {
     Equation y = eqs[1];
     //var that = this;
 
-//    x.computeGq = () {
-//      vec2.rotate(worldPivotA, this.pivotA, bodyA.angle);
-//      vec2.rotate(worldPivotB, this.pivotB, bodyB.angle);
-//      vec2.add(g, bodyB.position, worldPivotB);
-//      vec2.sub(g, g, bodyA.position);
-//      vec2.sub(g, g, worldPivotA);
-//      return vec2.dot(g, xAxis);
-//    };
-//
-//    y.computeGq = () {
-//      vec2.rotate(worldPivotA, this.pivotA, bodyA.angle);
-//      vec2.rotate(worldPivotB, this.pivotB, bodyB.angle);
-//      vec2.add(g, bodyB.position, worldPivotB);
-//      vec2.sub(g, g, bodyA.position);
-//      vec2.sub(g, g, worldPivotA);
-//      return vec2.dot(g, yAxis);
-//    };
+    x.replacedGq = () {
+      vec2.rotate(worldPivotA, this.pivotA, bodyA.angle);
+      vec2.rotate(worldPivotB, this.pivotB, bodyB.angle);
+      vec2.add(g, bodyB.position, worldPivotB);
+      vec2.sub(g, g, bodyA.position);
+      vec2.sub(g, g, worldPivotA);
+      return vec2.dot(g, xAxis);
+    };
+
+    y.replacedGq = () {
+      vec2.rotate(worldPivotA, this.pivotA, bodyA.angle);
+      vec2.rotate(worldPivotB, this.pivotB, bodyB.angle);
+      vec2.add(g, bodyB.position, worldPivotB);
+      vec2.sub(g, g, bodyA.position);
+      vec2.sub(g, g, worldPivotA);
+      return vec2.dot(g, yAxis);
+    };
 
     y.minForce = x.minForce = -maxForce;
     y.maxForce = x.maxForce = maxForce;

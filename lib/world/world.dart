@@ -414,7 +414,6 @@ class World extends EventEmitter {
           vec2.sub(interpvelo, b.position, b.previousPosition);
           vec2.scale(interpvelo, interpvelo, h_div_dt);
           vec2.add(b.interpolatedPosition, b.position, interpvelo);
-
           b.interpolatedAngle = b.angle + (b.angle - b.previousAngle) * h_div_dt;
         } else {
           // For static bodies, just copy. Who else will do it?
@@ -809,16 +808,16 @@ class World extends EventEmitter {
       if (numContacts != 0) {
 
         if (bi.allowSleep && bi.type == Body.DYNAMIC && bi.sleepState == Body.SLEEPING && bj.sleepState == Body.AWAKE && bj.type != Body.STATIC) {
-          var speedSquaredB = vec2.squaredLength(bj.velocity) + pow(bj.angularVelocity, 2);
-          var speedLimitSquaredB = pow(bj.sleepSpeedLimit, 2);
+          num speedSquaredB = vec2.squaredLength(bj.velocity) + pow(bj.angularVelocity, 2);
+          num speedLimitSquaredB = pow(bj.sleepSpeedLimit, 2);
           if (speedSquaredB >= speedLimitSquaredB * 2) {
             bi._wakeUpAfterNarrowphase = true;
           }
         }
 
         if (bj.allowSleep && bj.type == Body.DYNAMIC && bj.sleepState == Body.SLEEPING && bi.sleepState == Body.AWAKE && bi.type != Body.STATIC) {
-          var speedSquaredA = vec2.squaredLength(bi.velocity) + pow(bi.angularVelocity, 2);
-          var speedLimitSquaredA = pow(bi.sleepSpeedLimit, 2);
+          num speedSquaredA = vec2.squaredLength(bi.velocity) + pow(bi.angularVelocity, 2);
+          num speedLimitSquaredA = pow(bi.sleepSpeedLimit, 2);
           if (speedSquaredA >= speedLimitSquaredA * 2) {
             bj._wakeUpAfterNarrowphase = true;
           }
@@ -837,7 +836,7 @@ class World extends EventEmitter {
 // Reset contact equations
           e['contactEquations'].clear();
 
-          if (numContacts != null) {
+          if (numContacts != 0) {
             for (var i = np.contactEquations.length - numContacts; i < np.contactEquations.length; i++) {
               e['contactEquations'].add(np.contactEquations[i]);
             }
@@ -847,10 +846,10 @@ class World extends EventEmitter {
         }
 
 // divide the max friction force by the number of contacts
-        if (numContacts != null && numFrictionEquations > 1) {
+        if (numContacts != 0 && numFrictionEquations > 1) {
           // Why divide by 1?
-          for (var i = np.frictionEquations.length - numFrictionEquations; i < np.frictionEquations.length; i++) {
-            var f = np.frictionEquations[i];
+          for (int i = np.frictionEquations.length - numFrictionEquations; i < np.frictionEquations.length; i++) {
+            FrictionEquation f = np.frictionEquations[i];
             f.setSlipForce(f.getSlipForce() / numFrictionEquations);
           }
         }
@@ -978,18 +977,18 @@ class World extends EventEmitter {
   }
 
 
-  List v2a(List v) {
-    if (v == null) {
-      return v;
-    }
-    return [v[0], v[1]];
-  }
-
-  extend(a, b) {
-    for (var key in b) {
-      a[key] = b[key];
-    }
-  }
+//  List v2a(List v) {
+//    if (v == null) {
+//      return v;
+//    }
+//    return [v[0], v[1]];
+//  }
+//
+//  extend(a, b) {
+//    for (var key in b) {
+//      a[key] = b[key];
+//    }
+//  }
 
   Map contactMaterialToJSON(ContactMaterial cm) {
     return {
@@ -1057,7 +1056,7 @@ class World extends EventEmitter {
 //    return world;
 //  }
 
-  var hitTest_tmp1 = vec2.create(),
+  List hitTest_tmp1 = vec2.create(),
       hitTest_zero = vec2.fromValues(0, 0),
       hitTest_tmp2 = vec2.fromValues(0, 0);
 

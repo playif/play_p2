@@ -108,13 +108,13 @@ class AABB {
     int i = 2;
     while (i-- > 0) {
       // Extend lower bound
-      var l = aabb.lowerBound[i];
+      num l = aabb.lowerBound[i];
       if (this.lowerBound[i] > l) {
         this.lowerBound[i] = l;
       }
 
       // Upper
-      var u = aabb.upperBound[i];
+      num u = aabb.upperBound[i];
       if (this.upperBound[i] < u) {
         this.upperBound[i] = u;
       }
@@ -128,7 +128,7 @@ class AABB {
    * @return {Boolean}
    */
 
-  overlaps(AABB aabb) {
+  bool overlaps(AABB aabb) {
     List l1 = this.lowerBound,
         u1 = this.upperBound,
         l2 = aabb.lowerBound,

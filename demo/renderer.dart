@@ -1,7 +1,14 @@
-import "package:play_p2/p2.dart" as p2;
+library demo;
+
+import "package:p2/p2.dart" as p2;
 import "package:datgui/datgui.dart" as dat;
 import "dart:html";
-//import "dart:math" as Math;
+import "package:play_pixi/pixi.dart" as PIXI;
+import "dart:math" as Math;
+@MirrorsUsed(targets: const ['datgui', 'demo'], override: '*')
+import "dart:mirrors";
+
+part "webgl_renderer.dart";
 
 abstract class Renderer extends p2.EventEmitter {
   dat.GUI gui;
@@ -148,7 +155,7 @@ abstract class Renderer extends p2.EventEmitter {
       'iterations': 10,
       'stiffness': 1000000,
       'relaxation': 4,
-      'tolerance': 0.0001,
+      'tolerance': 0.01,
       'hideGUI': hideGUI
     };
 
@@ -347,7 +354,7 @@ abstract class Renderer extends p2.EventEmitter {
     var solverFolder = gui.addFolder('Solver');
     solverFolder.open();
     solverFolder.add(settings, 'iterations', 1, 100).step(1).onChange((obj, it) {
-      (this.world.solver as p2.GSSolver).iterations = it;
+      this.world.solver.iterations = it;
     });
     solverFolder.add(settings, 'stiffness', 10).onChange((obj, k) {
       this.setEquationParameters();
@@ -356,16 +363,16 @@ abstract class Renderer extends p2.EventEmitter {
       this.setEquationParameters();
     });
     solverFolder.add(settings, 'tolerance', 0, 10).step(0.01).onChange((obj, t) {
-      (this.world.solver as p2.GSSolver).tolerance = t;
+      this.world.solver.tolerance = t;
     });
 
     // Scene picker
-    var sceneFolder = gui.addFolder('Scenes');
+    dat.GUI sceneFolder = gui.addFolder('Scenes');
     sceneFolder.open();
 
     // Add scenes
-    var i = 1;
-    for (var sceneName in this.scenes.keys) {
+    int i = 1;
+    for (String sceneName in this.scenes.keys) {
       String guiLabel = sceneName + ' [' + (i++).toString() + ']';
       this.settings[guiLabel] = () {
         this.setScene(this.scenes[sceneName]);
@@ -468,7 +475,7 @@ abstract class Renderer extends p2.EventEmitter {
 
     // Set the GUI parameters from the loaded world
     Map settings = this.settings;
-    p2.GSSolver solver = world.solver as p2.GSSolver;
+    p2.GSSolver solver = world.solver;
     settings['iterations'] = solver.iterations;
     settings['tolerance'] = solver.tolerance;
     settings['gravityX'] = this.world.gravity[0];

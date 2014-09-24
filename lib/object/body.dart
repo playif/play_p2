@@ -571,7 +571,7 @@ class Body extends EventEmitter {
     List offset = tmp;
     num bodyAngle = this.angle;
 
-    for (var i = 0; i != N; i++) {
+    for (int i = 0; i != N; i++) {
       Shape shape = shapes[i];
       num angle = shapeAngles[i] + bodyAngle;
 
@@ -793,7 +793,7 @@ class Body extends EventEmitter {
     }
 
     var p = new decomp.Polygon();
-    p.vertices = path;
+    p.vertices = path.map((v)=>v.map((s)=>s.toDouble()).toList()).toList();
 
     // Make it counter-clockwise
     p.makeCCW();

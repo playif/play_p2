@@ -43,6 +43,10 @@ class Equation {
 
   /// Whether this equation is enabled or not. If true, it will be added to the solver.
   bool enabled = true;
+  
+  Function replacedGq;
+  Function replacedGW;
+  Function updateJacobian;
 
   Equation(Body bodyA, Body bodyB, [num minForce = -double.MAX_FINITE, num maxForce = double.MAX_FINITE]) {
 
@@ -87,7 +91,7 @@ class Equation {
 
   /// Compute SPOOK parameters .a, .b and .epsilon according to the current parameters.
   update() {
-    var k = this.stiffness,
+    num k = this.stiffness,
         d = this.relaxation,
         h = this.timeStep;
 
@@ -105,9 +109,9 @@ class Equation {
 
   /// Computes the RHS of the SPOOK equation
   num computeB(num a, num b, num h) {
-    var GW = this.computeGW();
-    var Gq = this.computeGq();
-    var GiMf = this.computeGiMf();
+    num GW = this.replacedGW== null? this.computeGW():this.replacedGW();
+    num Gq = this.replacedGq== null? this.computeGq():this.replacedGq();
+    num GiMf = this.computeGiMf();
     return -Gq * a - GW * b - GiMf * h;
   }
 

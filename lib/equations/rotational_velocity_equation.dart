@@ -2,7 +2,7 @@ part of p2;
 
 class RotationalVelocityEquation extends Equation {
   num ratio;
-  RotationalVelocityEquation(Body bodyA, Body bodyB):super(bodyA, bodyB) {
+  RotationalVelocityEquation(Body bodyA, Body bodyB, {num minForce : -double.MAX_FINITE, num maxForce : double.MAX_FINITE}) :super(bodyA, bodyB, minForce, maxForce) {
     this.relativeVelocity = 1.0;
     this.ratio = 1.0;
   }

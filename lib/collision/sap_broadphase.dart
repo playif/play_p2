@@ -18,16 +18,15 @@ class SAPBroadphase extends Broadphase {
 
     this.axisIndex = 0;
 
-    var that = this;
     this._addBodyHandler = (Map e) {
-      that.axisList.add(e['body']);
+      axisList.add(e['body']);
     };
 
     this._removeBodyHandler = (Map e) {
       // Remove from list
-      int idx = that.axisList.indexOf(e['body']);
+      int idx = axisList.indexOf(e['body']);
       if (idx != -1) {
-        that.axisList.removeAt(idx);
+        axisList.removeAt(idx);
       }
     };
   }
@@ -78,7 +77,7 @@ class SAPBroadphase extends Broadphase {
     // Update all AABBs if needed
     int l = bodies.length;
     while (l-- > 0) {
-      var b = bodies[l];
+      Body b = bodies[l];
       if (b.aabbNeedsUpdate) {
         b.updateAABB();
       }
@@ -92,7 +91,7 @@ class SAPBroadphase extends Broadphase {
         N = bodies.length | 0; i != N; i++) {
       Body bi = bodies[i];
 
-      for (var j = i + 1; j < N; j++) {
+      for (int j = i + 1; j < N; j++) {
         Body bj = bodies[j];
 
         // Bounds overlap?

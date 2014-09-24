@@ -1,13 +1,13 @@
-import "package:play_p2/p2.dart" as p2;
-import "webgl_renderer.dart";
+import "package:p2/p2.dart" as p2;
+import "renderer.dart";
 import "dart:math" as Math;
 
 main() {
 
   Math.Random random = new Math.Random();
 
-  var enablePositionNoise = false, // Add some noise in circle positions
-  N = 15, // Number of circles in x direction
+  bool enablePositionNoise = true; // Add some noise in circle positions
+  num N = 15, // Number of circles in x direction
   M = 15, // and in y
   r = 0.07, // circle radius
   d = 2.2; // Distance between circle centers
@@ -17,7 +17,8 @@ main() {
 
 // Create the world
     p2.World world = new p2.World(
-        gravity : [0, -5]
+        gravity : [0, -5],
+        broadphase: new p2.NaiveBroadphase()
     );
 
     app.setWorld(world);
@@ -29,13 +30,13 @@ main() {
     world.solver.iterations = 20;
 
 // Solver error tolerance
-    world.solver.tolerance = 0.02;
+    world.solver.tolerance = 0.001;
 
 // Enables sleeping of bodies
     world.sleepMode = p2.World.BODY_SLEEPING;
 
 // Create circle bodies
-    var shape = new p2.Circle(r);
+    p2.Shape shape = new p2.Circle(r);
     for (var i = 0; i < N; i++) {
       for (var j = M - 1; j >= 0; j--) {
         var x = (i - N / 2) * r * d + (enablePositionNoise ? random.nextDouble() * r : r);
@@ -59,7 +60,7 @@ main() {
     ymax = ( M / 2 * r * d);
 
 // Create bottom plane
-    var planeShape = new p2.Plane();
+    p2.Shape planeShape = new p2.Plane();
     var plane = new p2.Body(
         position : [0, ymin]
     );
@@ -67,7 +68,7 @@ main() {
     world.addBody(plane);
 
 // Left plane
-    var planeLeft = new p2.Body(
+    p2.Body planeLeft = new p2.Body(
         angle: -Math.PI / 2,
         position: [xmin, 0]
     );

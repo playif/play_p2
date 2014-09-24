@@ -36,19 +36,19 @@ class ContactEquation extends Equation {
   }
 
   num computeB(num a, num b, num h) {
-    var bi = this.bodyA,
-    bj = this.bodyB,
-    ri = this.contactPointA,
+    Body bi = this.bodyA,
+    bj = this.bodyB;
+    List ri = this.contactPointA,
     rj = this.contactPointB,
     xi = bi.position,
     xj = bj.position;
 
-    var penetrationVec = this.penetrationVec,
+    List penetrationVec = this.penetrationVec,
     n = this.normalA,
     G = this.G;
 
     // Caluclate cross products
-    var rixn = vec2.crossLength(ri, n),
+    num rixn = vec2.crossLength(ri, n),
     rjxn = vec2.crossLength(rj, n);
 
     // G = [-n -rixn n rjxn]
@@ -65,7 +65,7 @@ class ContactEquation extends Equation {
     vec2.sub(penetrationVec, penetrationVec, ri);
 
     // Compute iteration
-    var GW, Gq;
+    num GW, Gq;
     if (this.firstImpact && this.restitution != 0) {
       Gq = 0;
       GW = (1 / b) * (1 + this.restitution) * this.computeGW();
@@ -74,8 +74,8 @@ class ContactEquation extends Equation {
       GW = this.computeGW();
     }
 
-    var GiMf = this.computeGiMf();
-    var B = -Gq * a - GW * b - h * GiMf;
+    num GiMf = this.computeGiMf();
+    num B = -Gq * a - GW * b - h * GiMf;
 
     return B;
   }

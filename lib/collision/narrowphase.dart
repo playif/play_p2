@@ -76,48 +76,47 @@ class Narrowphase {
 
     this.collidingBodiesLastStep = new TupleDictionary();
     this.contactSkinSize = 0.01;
-    
+
     compareMap[Shape.LINE | Shape.CONVEX] = convexLine;
     compareMap[Shape.LINE | Shape.RECTANGLE] = lineRectangle;
 
-    compareMap[Shape.CAPSULE | Shape.CONVEX] = 
-    compareMap[Shape.CAPSULE | Shape.RECTANGLE] = convexCapsule;
-    
+    compareMap[Shape.CAPSULE | Shape.CONVEX] = compareMap[Shape.CAPSULE | Shape.RECTANGLE] = convexCapsule;
+
     compareMap[Shape.CAPSULE | Shape.CAPSULE] = capsuleCapsule;
-    
+
     compareMap[Shape.LINE | Shape.LINE] = lineLine;
-    
+
     compareMap[Shape.PLANE | Shape.LINE] = planeLine;
-    
+
     compareMap[Shape.PARTICLE | Shape.CAPSULE] = particleCapsule;
-    
+
     compareMap[Shape.CIRCLE | Shape.LINE] = circleLine;
-    
+
     compareMap[Shape.CIRCLE | Shape.CAPSULE] = circleCapsule;
-    
-    compareMap[Shape.CIRCLE | Shape.CONVEX] = 
-    compareMap[Shape.CIRCLE | Shape.RECTANGLE] = circleConvex;
-    
-    compareMap[Shape.PARTICLE | Shape.CONVEX] = 
-    compareMap[Shape.PARTICLE | Shape.RECTANGLE] = particleConvex;
-    
+
+    compareMap[Shape.CIRCLE | Shape.CONVEX] = compareMap[Shape.CIRCLE | Shape.RECTANGLE] = circleConvex;
+
+    compareMap[Shape.PARTICLE | Shape.CONVEX] = compareMap[Shape.PARTICLE | Shape.RECTANGLE] = particleConvex;
+
     compareMap[Shape.CIRCLE] = circleCircle;
-    
-    compareMap[Shape.PLANE | Shape.CONVEX]=
-    compareMap[Shape.PLANE | Shape.RECTANGLE] = planeConvex;
-    
+
+    compareMap[Shape.PLANE | Shape.CONVEX] = compareMap[Shape.PLANE | Shape.RECTANGLE] = planeConvex;
+
     compareMap[Shape.PARTICLE | Shape.PLANE] = particlePlane;
-    
+
     compareMap[Shape.CIRCLE | Shape.PARTICLE] = circleParticle;
 
     compareMap[Shape.PLANE | Shape.CAPSULE] = planeCapsule;
-    
-    compareMap[Shape.CIRCLE | Shape.PLANE] = circlePlane;
-    
-    compareMap[Shape.CONVEX] = 
-    compareMap[Shape.CONVEX | Shape.RECTANGLE] = 
-    compareMap[Shape.RECTANGLE] = convexConvex;
 
+    compareMap[Shape.CIRCLE | Shape.PLANE] = circlePlane;
+
+    compareMap[Shape.CONVEX] = compareMap[Shape.CONVEX | Shape.RECTANGLE] = compareMap[Shape.RECTANGLE] = convexConvex;
+
+
+    compareMap[Shape.CIRCLE | Shape.HEIGHTFIELD] = circleHeightfield;
+
+
+    compareMap[Shape.RECTANGLE | Shape.HEIGHTFIELD] = compareMap[Shape.CONVEX | Shape.HEIGHTFIELD] = convexHeightfield;
   }
 
   /// Check if the bodies were in contact since the last reset().
@@ -341,9 +340,9 @@ class Narrowphase {
     }
 
     // Check center rect
-    var r = convexCapsule_tempRect;
+    Rectangle r = convexCapsule_tempRect;
     setConvexToCapsuleShapeMiddle(r, capsuleShape);
-    var result = this.convexConvex(convexBody, convexShape, convexPosition, convexAngle, capsuleBody, r, capsulePosition, capsuleAngle, justTest);
+    int result = this.convexConvex(convexBody, convexShape, convexPosition, convexAngle, capsuleBody, r, capsulePosition, capsuleAngle, justTest);
 
     return result + result1 + result2;
   }
@@ -649,7 +648,7 @@ class Narrowphase {
         verts = tmpArray;
 
     // Get start and end points
-    vec2.set(worldVertex0, - lineShape.length / 2, 0);
+    vec2.set(worldVertex0, -lineShape.length / 2, 0);
     vec2.set(worldVertex1, lineShape.length / 2, 0);
 
     // Not sure why we have to use worldVertex*1 here, but it won't work otherwise. Tired.
@@ -676,7 +675,7 @@ class Narrowphase {
 
     vec2.sub(lineToCircle, circleOffset, lineOffset);
 
-    var radiusSum = circleRadius + lineRadius;
+    num radiusSum = circleRadius + lineRadius;
 
     if (d.abs() < radiusSum) {
 
@@ -853,7 +852,7 @@ class Narrowphase {
       vec2.rotate90cw(worldNormal, worldEdgeUnit);
 
 // Get point on circle, closest to the polygon
-      vec2.scale(candidate, worldNormal, - circleShape.radius);
+      vec2.scale(candidate, worldNormal, -circleShape.radius);
       vec2.add(candidate, candidate, circleOffset);
 
       if (pointInConvex(candidate, convexShape, convexOffset, convexAngle) != 0) {
@@ -948,7 +947,7 @@ class Narrowphase {
 /*
  * Check if a point is in a polygon
  */
-  num pointInConvex(worldPoint, convexShape, convexOffset, convexAngle) {
+  num pointInConvex(List worldPoint, Convex convexShape, List convexOffset, num convexAngle) {
     var worldVertex0 = pic_worldVertex0,
         worldVertex1 = pic_worldVertex1,
         r0 = pic_r0,
@@ -969,7 +968,7 @@ class Narrowphase {
 
       vec2.sub(r0, worldVertex0, point);
       vec2.sub(r1, worldVertex1, point);
-      var cross = vec2.crossLength(r0, r1);
+      num cross = vec2.crossLength(r0, r1);
 
       if (lastCross == null) {
         lastCross = cross;
@@ -1928,8 +1927,8 @@ class Narrowphase {
  * @param  {Array}          xj
  * @param  {Number}         aj
  */
-//Narrowphase.prototype[Shape.CIRCLE | Shape.HEIGHTFIELD] =
-  circleHeightfield(circleBody, circleShape, circlePos, circleAngle, hfBody, hfShape, hfPos, hfAngle, justTest, radius) {
+
+  num circleHeightfield(circleBody, circleShape, circlePos, circleAngle, hfBody, hfShape, hfPos, hfAngle, justTest, [radius]) {
     var data = hfShape.data,
 
         w = hfShape.elementWidth,
@@ -2013,7 +2012,7 @@ class Narrowphase {
       if (candidate[0] >= v0[0] && candidate[0] < v1[0] && d <= 0) {
 
         if (justTest) {
-          return true;
+          return 1;
         }
 
         found = true;
@@ -2058,7 +2057,7 @@ class Narrowphase {
         if (vec2.squaredLength(dist) < pow(radius, 2)) {
 
           if (justTest) {
-            return true;
+            return 1;
           }
 
           found = true;
@@ -2110,7 +2109,7 @@ class Narrowphase {
  */
 //Narrowphase.prototype[Shape.RECTANGLE | Shape.HEIGHTFIELD] =
 //Narrowphase.prototype[Shape.CONVEX | Shape.HEIGHTFIELD] =
-  convexHeightfield(convexBody, convexShape, convexPos, convexAngle, hfBody, hfShape, hfPos, hfAngle, justTest) {
+  num convexHeightfield(convexBody, convexShape, convexPos, convexAngle, hfBody, hfShape, hfPos, hfAngle, justTest) {
     var data = hfShape.data,
         w = hfShape.elementWidth,
         v0 = convexHeightfield_v0,
@@ -2142,7 +2141,7 @@ class Narrowphase {
     }
 
     if (convexBody.aabb.lowerBound[1] > max) {
-      return justTest ? false : 0;
+      return 0;
     }
 
     bool found = false;

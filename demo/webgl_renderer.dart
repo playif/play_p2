@@ -1,16 +1,18 @@
-import "renderer.dart";
-import "package:play_p2/p2.dart" as p2;
-import "package:play_pixi/pixi.dart" as PIXI;
-import "dart:math" as Math;
-import "dart:html";
-
+//import "renderer.dart";
+//import "package:p2/p2.dart" as p2;
+//import "package:play_pixi/pixi.dart" as PIXI;
+//import "dart:math" as Math;
+//import "dart:html";
+ 
+part of demo;
+ 
 class Graphics extends PIXI.Graphics {
   bool cleared = false;
   bool drawnSleeping = false;
   num drawnColor;
   num drawnLineColor;
 }
-
+ 
 //typedef FrameFunc(num dt);
 class WebGLRenderer extends Renderer {
   num lineWidth;
@@ -108,7 +110,7 @@ class WebGLRenderer extends Renderer {
       this.drawRectangle(g, start[0] - width / 2, start[1] - height / 2, 0, width, height, 1, 0xffffff, this.lineWidth, false);
     });
 
-
+ 
     init();
   }
 
@@ -132,8 +134,8 @@ class WebGLRenderer extends Renderer {
         h = this.h;
     Map s = this.settings;
     //var that = this;
-    PIXI.Renderer renderer = this.renderer = new PIXI.CanvasRenderer(s['width'], s['height'], null, false, true);
-    //PIXI.Renderer renderer = this.renderer = PIXI.autoDetectRenderer(s['width'], s['height'], null, false, true);
+    //PIXI.Renderer renderer = this.renderer = new PIXI.CanvasRenderer(s['width'], s['height'], null, false, true);
+    PIXI.Renderer renderer = this.renderer = PIXI.autoDetectRenderer(s['width'], s['height'], null, false, true);
     PIXI.DisplayObjectContainer stage = this.stage = new PIXI.DisplayObjectContainer();
     PIXI.Stage container = this.container = new PIXI.Stage(0x707070, true);
 
@@ -301,7 +303,7 @@ class WebGLRenderer extends Renderer {
       // cross-browser wheel delta
       //e = window.event || e; // old IE support
       //var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-
+ 
       WheelEvent o = e;
       num d = o.detail,
           w = o.wheelDeltaY,
@@ -326,7 +328,7 @@ class WebGLRenderer extends Renderer {
     el.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
 
     this.centerCamera(0, 0);
-
+ 
     super.init();
   }
 
@@ -777,23 +779,17 @@ class WebGLRenderer extends Renderer {
 
           if (child is p2.Circle) {
             this.drawCircle(graphics, offset[0], offset[1], angle, child.radius, color, lw, isSleeping);
-
           } else if (child is p2.Particle) {
             this.drawCircle(graphics, offset[0], offset[1], angle, 2 * lw, lineColor, 0);
-
           } else if (child is p2.Plane) {
             // TODO use shape angle
             WebGLRenderer.drawPlane(graphics, -10, 10, color, lineColor, lw, lw * 10, lw * 10, 100);
-
           } else if (child is p2.Line) {
             WebGLRenderer.drawLine(graphics, offset, angle, child.length, lineColor, lw);
-
           } else if (child is p2.Rectangle) {
             this.drawRectangle(graphics, offset[0], offset[1], angle, child.width, child.height, lineColor, color, lw, isSleeping);
-
           } else if (child is p2.Capsule) {
             this.drawCapsule(graphics, offset[0], offset[1], angle, child.length, child.radius, lineColor, color, lw, isSleeping);
-
           } else if (child is p2.Convex) {
             // Scale verts
             List verts = [],
@@ -804,7 +800,6 @@ class WebGLRenderer extends Renderer {
               verts.add([(vrot[0] + offset[0]), (vrot[1] + offset[1])]);
             }
             this.drawConvex(graphics, verts, child.triangles, lineColor, color, lw, this.debugPolygons, [offset[0], -offset[1]], isSleeping);
-
           } else if (child is p2.Heightfield) {
             List path = [[0, -100]];
             for (var j = 0; j != child.data.length; j++) {

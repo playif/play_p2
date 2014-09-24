@@ -52,8 +52,8 @@ class Heightfield extends Shape {
     if (minValue == null || maxValue == null) {
       maxValue = data[0];
       minValue = data[0];
-      for (var i = 0; i != data.length; i++) {
-        var v = data[i];
+      for (int i = 0; i != data.length; i++) {
+        num v = data[i];
         if (v > maxValue) {
           maxValue = v;
         }

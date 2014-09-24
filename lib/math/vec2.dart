@@ -36,8 +36,8 @@ class vec2 {
       out[0] = c * x - s * y;
       out[1] = s * x + c * y;
     } else {
-      out[0] = a[0];
-      out[1] = a[1];
+      out[0] = a[0].toDouble();
+      out[1] = a[1].toDouble();
     }
   }
 
@@ -133,7 +133,7 @@ class vec2 {
     out[1] = a[1] - b[1];
     return out;
   }
-
+ 
   /// Alias for vec2.subtract
   static Vec2Operation sub = subtract;
 

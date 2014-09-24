@@ -47,7 +47,7 @@ class Convex extends Shape {
         List worldPoint1 = vertices[(i + 1) % vertices.length];
 
         List normal = vec2.create();
-        vec2.sub(normal, worldPoint1, worldPoint0);
+        vec2.sub(normal, worldPoint1, worldPoint0); 
 
         // Get normal - just rotate 90 degrees since vertices are given in CCW
         vec2.rotate90cw(normal, normal);
