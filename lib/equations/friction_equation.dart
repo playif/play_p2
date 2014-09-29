@@ -22,7 +22,7 @@ class FrictionEquation extends Equation {
   /// The friction coefficient to use.
   num frictionCoefficient = 0.3;
 
-  FrictionEquation(Body bodyA, Body bodyB, [num slipForce=0]) : super(bodyA, bodyB, -slipForce, slipForce) {
+  FrictionEquation(Body bodyA, Body bodyB, {num slipForce:0}) : super(bodyA, bodyB, -slipForce, slipForce) {
     this.contactPointA = vec2.create();
     this.contactPointB = vec2.create();
     this.t = vec2.create();

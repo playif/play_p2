@@ -246,7 +246,7 @@ class Body extends EventEmitter {
 
   static int _idCounter = 0;
 
-  Body({int type: Body.STATIC, num mass: 0, List position, List velocity, num angle: 0, num angularVelocity:0, List force, num angularForce: 0, bool fixedRotation: false, num damping: 0.1, num angularDamping: 0.1}) : super() {
+  Body({int type, num mass:0, List position, List velocity, num angle: 0, num angularVelocity:0, List force, num angularForce: 0, bool fixedRotation: false, num damping: 0.1, num angularDamping: 0.1}) : super() {
 
     this.id = ++Body._idCounter;
 
@@ -421,9 +421,12 @@ class Body extends EventEmitter {
      *         type: Body.KINEMATIC // Type can be set via the options object.
      *     });
      */
-    this.type = type;
+    
 
-    if (mass == 0) {
+    if(type != null){
+      this.type = type;
+    }
+    else if (mass == 0) {
       this.type = Body.STATIC;
     } else {
       this.type = Body.DYNAMIC;

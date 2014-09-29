@@ -10,30 +10,51 @@ The parameter setting UI can be found in [datgui](https://github.com/playif/datg
 
 Demos
 =========
-Implemented:
 * [Car](https://playif.github.io/p2_demo/car.html)
+
 * [Circle container](https://playif.github.io/p2_demo/circles.html)
+
 * [Collision tests](https://playif.github.io/p2_demo/collisions.html)
+
 * [Compound objects](https://playif.github.io/p2_demo/compound.html)
+
 * [Concave objects](https://playif.github.io/p2_demo/concave.html)
+
 * [Constraints](https://playif.github.io/p2_demo/constraints.html)
+
 * [DistanceConstraint](https://playif.github.io/p2_demo/distanceConstraint.html)
+
 * [Fixed rotation](https://playif.github.io/p2_demo/fixedRotation.html)
+
 * [Friction](https://playif.github.io/p2_demo/friction.html)
+
 * [Gear constraint](https://playif.github.io/p2_demo/gearConstraint.html)
+
 * [Heightfield](https://playif.github.io/p2_demo/heightfield.html)
 
-Not yet implemented:
-* [Island solver](http://schteppe.github.io/p2.js/demos/islandSolver.html)
-* [Kinematic body](http://schteppe.github.io/p2.js/demos/kinematic.html)
-* [Lock constraint](http://schteppe.github.io/p2.js/demos/lock.html)
-* [Piston](http://schteppe.github.io/p2.js/demos/piston.html)
-* [Prismatic constraint](http://schteppe.github.io/p2.js/demos/prismatic.html)
-* [Ragdoll](http://schteppe.github.io/p2.js/demos/ragdoll.html)
-* [Sensor](http://schteppe.github.io/p2.js/demos/removeSensor.html)
-* [Restitution](http://schteppe.github.io/p2.js/demos/restitution.html)
-* [Sleep](http://schteppe.github.io/p2.js/demos/sleep.html)
-* [Springs](http://schteppe.github.io/p2.js/demos/springs.html)
-* [Surface velocity](http://schteppe.github.io/p2.js/demos/surfaceVelocity.html)
-* [Suspension](http://schteppe.github.io/p2.js/demos/suspension.html)
-* [Tearable constraints](http://schteppe.github.io/p2.js/demos/tearable.html)
+* [Island solver](https://playif.github.io/p2_demo/islandSolver.html)
+
+* [Kinematic body](https://playif.github.io/p2_demo/kinematic.html)
+
+* [Lock constraint](https://playif.github.io/p2_demo/lock.html)
+
+* [Piston](https://playif.github.io/p2_demo/piston.html)
+
+* [Prismatic constraint](https://playif.github.io/p2_demo/prismatic.html)
+
+* [Ragdoll](https://playif.github.io/p2_demo/ragdoll.html)
+
+* [Sensor](https://playif.github.io/p2_demo/removeSensor.html)
+
+* [Restitution](https://playif.github.io/p2_demo/restitution.html)
+
+* [Sleep](https://playif.github.io/p2_demo/sleep.html)
+
+* [Springs](https://playif.github.io/p2_demo/springs.html)
+
+* [Surface velocity](https://playif.github.io/p2_demo/surfaceVelocity.html)
+
+* [Suspension](https://playif.github.io/p2_demo/suspension.html)
+
+* [Tearable constraints](https://playif.github.io/p2_demo/tearable.html)
+

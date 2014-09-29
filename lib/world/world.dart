@@ -128,7 +128,7 @@ class World extends EventEmitter {
   OverlapKeeper overlapKeeper;
 
 
-  World({Solver solver, List gravity, bool doProfiling: false, Broadphase broadphase, bool islandSplit: false, bool fake:false}) : super() {
+  World({Solver solver, List gravity, bool doProfiling: false, Broadphase broadphase, bool islandSplit: false, bool fake: false}) : super() {
 
     this.springs = [];
     this.bodies = [];
@@ -759,7 +759,7 @@ class World extends EventEmitter {
    * @param  {Number} mu
    */
 
-  runNarrowphase(Narrowphase np,Body bi,Shape si,List xi,num ai, Body bj, Shape sj, List xj, num aj, ContactMaterial cm, num glen) {
+  runNarrowphase(Narrowphase np, Body bi, Shape si, List xi, num ai, Body bj, Shape sj, List xj, num aj, ContactMaterial cm, num glen) {
 
     // Check collision groups and masks
     if (!((si.collisionGroup & sj.collisionMask) != 0 && (sj.collisionGroup & si.collisionMask) != 0)) {
@@ -837,8 +837,12 @@ class World extends EventEmitter {
           e['contactEquations'].clear();
 
           if (numContacts != 0) {
-            for (var i = np.contactEquations.length - numContacts; i < np.contactEquations.length; i++) {
-              e['contactEquations'].add(np.contactEquations[i]);
+            for (int i = np.contactEquations.length - numContacts; i < np.contactEquations.length; i++) {
+              if (np.contactEquations.length > i && i >= 0) {
+                e['contactEquations'].add(np.contactEquations[i]);
+              } else {
+                break;
+              }
             }
           }
 
@@ -881,7 +885,7 @@ class World extends EventEmitter {
    */
 
   removeSpring(Spring s) {
-    var idx = this.springs.indexOf(s);
+    int idx = this.springs.indexOf(s);
     if (idx != -1) {
       Utils.splice(this.springs, idx, 1);
     }

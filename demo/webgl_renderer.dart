@@ -12,7 +12,7 @@ class Graphics extends PIXI.Graphics {
   num drawnColor;
   num drawnLineColor;
 }
- 
+  
 //typedef FrameFunc(num dt);
 class WebGLRenderer extends Renderer {
   num lineWidth;

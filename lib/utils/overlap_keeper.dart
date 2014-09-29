@@ -157,7 +157,7 @@ class OverlapKeeper {
     var last = this.overlappingShapesLastState;
     var current = this.overlappingShapesCurrentState;
     // Not in last but in new
-    return !!!last.get(idA, idB) && !!current.get(idA, idB);
+    return last.get(idA, idB) == null && current.get(idA, idB) != null;
   }
 
   getNewBodyOverlaps(List result) {
