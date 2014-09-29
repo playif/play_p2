@@ -22,17 +22,17 @@ Demos
 
 * [Constraints](https://playif.github.io/p2_demo/constraints.html)
 
-* [DistanceConstraint](https://playif.github.io/p2_demo/distanceConstraint.html)
+* [DistanceConstraint](https://playif.github.io/p2_demo/distance_constraint.html)
 
-* [Fixed rotation](https://playif.github.io/p2_demo/fixedRotation.html)
+* [Fixed rotation](https://playif.github.io/p2_demo/fixed_rotation.html)
 
 * [Friction](https://playif.github.io/p2_demo/friction.html)
 
-* [Gear constraint](https://playif.github.io/p2_demo/gearConstraint.html)
+* [Gear constraint](https://playif.github.io/p2_demo/gear_constraint.html)
 
 * [Heightfield](https://playif.github.io/p2_demo/heightfield.html)
 
-* [Island solver](https://playif.github.io/p2_demo/islandSolver.html)
+* [Island solver](https://playif.github.io/p2_demo/island_solver.html)
 
 * [Kinematic body](https://playif.github.io/p2_demo/kinematic.html)
 
@@ -44,7 +44,7 @@ Demos
 
 * [Ragdoll](https://playif.github.io/p2_demo/ragdoll.html)
 
-* [Sensor](https://playif.github.io/p2_demo/removeSensor.html)
+* [Sensor](https://playif.github.io/p2_demo/remove_sensor.html)
 
 * [Restitution](https://playif.github.io/p2_demo/restitution.html)
 
@@ -52,7 +52,7 @@ Demos
 
 * [Springs](https://playif.github.io/p2_demo/springs.html)
 
-* [Surface velocity](https://playif.github.io/p2_demo/surfaceVelocity.html)
+* [Surface velocity](https://playif.github.io/p2_demo/surface_velocity.html)
 
 * [Suspension](https://playif.github.io/p2_demo/suspension.html)
 
