@@ -4,9 +4,8 @@ description:
   A Dart port for P2.js 2D physics library.
 author: playif <playif@gmail.com>
 homepage: https://github.com/playif/play_p2
-dependencies:
-  browser: any
 
 dev_dependencies:
+  browser: any
   play_pixi: any
   datgui: any
