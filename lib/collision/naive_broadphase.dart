@@ -5,20 +5,21 @@ class NaiveBroadphase extends Broadphase {
   NaiveBroadphase() :super(Broadphase.NAIVE);
 
   /// Get the colliding pairs
-  List getCollisionPairs (World world){
-    var bodies = world.bodies,
+  List<Body> getCollisionPairs (World world){
+    List<Body> bodies = world.bodies,
     result = this.result;
 
-    result.length = 0;
+    result.clear();
 
-    for(var i=0, Ncolliding=bodies.length; i!=Ncolliding; i++){
-      var bi = bodies[i];
+    for(int i=0, Ncolliding=bodies.length; i!=Ncolliding; i++){
+      Body bi = bodies[i];
 
-      for(var j=0; j<i; j++){
-        var bj = bodies[j];
+      for(int j=0; j<i; j++){
+        Body bj = bodies[j];
 
         if(Broadphase.canCollide(bi,bj) && this.boundingVolumeCheck(bi,bj)){
-          result.addAll([bi,bj]);
+          result.add(bi);
+          result.add(bj);
         }
       }
     }

@@ -8,7 +8,7 @@ class RotationalVelocityEquation extends Equation {
   }
 
   num computeB(num a, num b, num h) {
-    List G = this.G;
+    List<num> G = this.G;
     G[2] = -1.0;
     G[5] = this.ratio;
 

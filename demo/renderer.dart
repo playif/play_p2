@@ -5,8 +5,8 @@ import "package:datgui/datgui.dart" as dat;
 import "dart:html";
 import "package:play_pixi/pixi.dart" as PIXI;
 import "dart:math" as Math;
-@MirrorsUsed(targets: const ['datgui', 'demo'], override: '*')
-import "dart:mirrors";
+//@MirrorsUsed(targets: const ['datgui', 'demo'], override: '*')
+//import "dart:mirrors";
 
 part "webgl_renderer.dart";
 
@@ -23,14 +23,14 @@ abstract class Renderer extends p2.EventEmitter {
   num pickPrecision;
 
   bool useInterpolatedPositions;
-  List<List> drawPoints;
+  List<p2.vec2> drawPoints;
   Map drawPointsChangeEvent;
-  List drawCircleCenter;
-  List drawCirclePoint;
+  final p2.vec2 drawCircleCenter= p2.vec2.create();
+  final p2.vec2 drawCirclePoint= p2.vec2.create();
   Map drawCircleChangeEvent;
   Map drawRectangleChangeEvent;
-  List drawRectStart;
-  List drawRectEnd;
+  final p2.vec2 drawRectStart= p2.vec2.create();
+  final p2.vec2 drawRectEnd= p2.vec2.create();
   Map stateChangeEvent;
 
   num newShapeCollisionMask;
@@ -57,23 +57,6 @@ abstract class Renderer extends p2.EventEmitter {
   Map currentScene;
 
   Renderer(Function scenes, {bool hideGUI: true}) {
-    // Expose globally
-    //window.app = this;
-
-    var that = this;
-
-//    if (scenes['setup']) {
-//      // Only one scene given, without name
-//      scenes = {
-//        'default': scenes
-//      };
-//    } else if (scenes is Function) {
-//      scenes = {
-//        'default': {
-//          'setup': scenes
-//        }
-//      };
-//    }
 
     this.scenes = {
       'default': {
@@ -100,16 +83,13 @@ abstract class Renderer extends p2.EventEmitter {
     this.drawPointsChangeEvent = {
       'type': "drawPointsChange"
     };
-    this.drawCircleCenter = p2.vec2.create();
-    this.drawCirclePoint = p2.vec2.create();
+
     this.drawCircleChangeEvent = {
       'type': "drawCircleChange"
     };
     this.drawRectangleChangeEvent = {
       'type': "drawRectangleChange"
     };
-    this.drawRectStart = p2.vec2.create();
-    this.drawRectEnd = p2.vec2.create();
 
     this.stateChangeEvent = {
       'type': "stateChange",
@@ -140,7 +120,7 @@ abstract class Renderer extends p2.EventEmitter {
 
       'paused [p]': false,
       'manualStep [s]': () {
-        that.world.step(that.world.lastTimeStep);
+        this.world.step(this.world.lastTimeStep);
       },
       'fps': 60,
       'maxSubSteps': 3,
@@ -195,7 +175,7 @@ abstract class Renderer extends p2.EventEmitter {
 
     this.startRenderingLoop();
 
-    for (var key in Renderer.toolStateMap.keys) {
+    for (String key in Renderer.toolStateMap.keys) {
       Renderer.stateToolMap[Renderer.toolStateMap[key]] = key;
     }
   }
@@ -282,10 +262,10 @@ abstract class Renderer extends p2.EventEmitter {
   }
 
   resizeToFit() {
-    var dpr = this.getDevicePixelRatio();
-    var rect = this.elementContainer.getBoundingClientRect();
-    var w = rect.width * dpr;
-    var h = rect.height * dpr;
+    num dpr = this.getDevicePixelRatio();
+    Rectangle rect = this.elementContainer.getBoundingClientRect();
+    num w = rect.width * dpr;
+    num h = rect.height * dpr;
     this.resize(w, h);
   }
 
@@ -296,11 +276,6 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   setupGUI() {
-//    if(dat) == 'undefined'){
-//      return;
-//    }
-
-    //var that = this;
 
     dat.GUI gui = this.gui = new dat.GUI();
     //gui.domElement.setAttribute('style', disableSelectionCSS.join(';'));
@@ -341,7 +316,7 @@ abstract class Renderer extends p2.EventEmitter {
     });
 
     // Rendering
-    var renderingFolder = gui.addFolder('Rendering');
+    dat.GUI renderingFolder = gui.addFolder('Rendering');
     renderingFolder.open();
     renderingFolder.add(settings, 'drawContacts [c]').onChange((obj, draw) {
       this.drawContacts = draw;
@@ -351,7 +326,7 @@ abstract class Renderer extends p2.EventEmitter {
     });
 
     // Solver
-    var solverFolder = gui.addFolder('Solver');
+    dat.GUI solverFolder = gui.addFolder('Solver');
     solverFolder.open();
     solverFolder.add(settings, 'iterations', 1, 100).step(1).onChange((obj, it) {
       this.world.solver.iterations = it;
@@ -409,8 +384,6 @@ abstract class Renderer extends p2.EventEmitter {
 
     //window.world = world; // For debugging.
 
-    //var that = this;
-
     world.on("postStep", (Map e) {
       updateStats();
     }).on("addBody", (Map e) {
@@ -434,9 +407,6 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   setScene(Map sceneDefinition) {
-//    if (sceneDefinition is String) {
-//      sceneDefinition = this.scenes[sceneDefinition];
-//    }
 
     this.removeAllVisuals();
     if (this.currentScene != null && this.currentScene['teardown'] != null) {
@@ -446,12 +416,6 @@ abstract class Renderer extends p2.EventEmitter {
       this.world.clear();
     }
 
-//    for (var i = 0; i < this.addedGlobals.length; i++) {
-//      delete window[this.addedGlobals];
-//    }
-
-    //var preGlobalVars = Object.keys(window);
-
     this.currentScene = sceneDefinition;
     this.world = null;
     sceneDefinition['setup'](this);
@@ -459,13 +423,8 @@ abstract class Renderer extends p2.EventEmitter {
       throw new Exception('The .setup function in the scene definition must run this.setWorld(world);');
     }
 
-    //var postGlobalVars = Object.keys(window);
-    var added = [];
-//    for (var i = 0; i < postGlobalVars.length; i++) {
-//      if (preGlobalVars.indexOf(postGlobalVars[i]) == -1 && postGlobalVars[i] != 'world') {
-//        added.push(postGlobalVars[i]);
-//      }
-//    }
+    List added = [];
+
     if (added.length != 0) {
       added.sort();
       window.console.log(['The following variables were exposed globally from this physics scene.', '', '  ' + added.join(', '), ''].join('\n'));
@@ -478,8 +437,8 @@ abstract class Renderer extends p2.EventEmitter {
     p2.GSSolver solver = world.solver;
     settings['iterations'] = solver.iterations;
     settings['tolerance'] = solver.tolerance;
-    settings['gravityX'] = this.world.gravity[0];
-    settings['gravityY'] = this.world.gravity[1];
+    settings['gravityX'] = this.world.gravity.x;
+    settings['gravityY'] = this.world.gravity.y;
     settings['sleepMode'] = this.world.sleepMode;
     this.updateGUI();
   }
@@ -491,7 +450,7 @@ abstract class Renderer extends p2.EventEmitter {
 
   setSceneByIndex(int index) {
     int i = 0;
-    for (var key in this.scenes.keys) {
+    for (String key in this.scenes.keys) {
       if (i == index) {
         this.setScene(this.scenes[key]);
         break;
@@ -508,42 +467,41 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   setUpKeyboard() {
-    var that = this;
 
     this.elementContainer.onKeyDown.listen((e) {
 //      if (!e.keyCode) {
 //        return;
 //      }
-      num s = that.state;
+      num s = this.state;
       String ch = new String.fromCharCode(e.keyCode);
       switch (ch) {
         case "P": // pause
-          that.paused = !that.paused;
+          this.paused = !this.paused;
           break;
         case "S": // step
-          that.world.step(that.world.lastTimeStep);
+          this.world.step(this.world.lastTimeStep);
           break;
         case "R": // restart
-          that.setScene(that.currentScene);
+          this.setScene(this.currentScene);
           break;
         case "C": // toggle draw contacts & constraints
-          that.drawContacts = !that.drawContacts;
-          that.drawConstraints = !that.drawConstraints;
+          this.drawContacts = !this.drawContacts;
+          this.drawConstraints = !this.drawConstraints;
           break;
         case "T": // toggle draw AABBs
-          that.drawAABBs = !that.drawAABBs;
+          this.drawAABBs = !this.drawAABBs;
           break;
         case "D": // toggle draw polygon mode
-          that.setState(s == Renderer.DRAWPOLYGON ? Renderer.DEFAULT : s = Renderer.DRAWPOLYGON);
+          this.setState(s == Renderer.DRAWPOLYGON ? Renderer.DEFAULT : s = Renderer.DRAWPOLYGON);
           break;
         case "A": // toggle draw circle mode
-          that.setState(s == Renderer.DRAWCIRCLE ? Renderer.DEFAULT : s = Renderer.DRAWCIRCLE);
+          this.setState(s == Renderer.DRAWCIRCLE ? Renderer.DEFAULT : s = Renderer.DRAWCIRCLE);
           break;
         case "F": // toggle draw rectangle mode
-          that.setState(s == Renderer.DRAWRECTANGLE ? Renderer.DEFAULT : s = Renderer.DRAWRECTANGLE);
+          this.setState(s == Renderer.DRAWRECTANGLE ? Renderer.DEFAULT : s = Renderer.DRAWRECTANGLE);
           break;
         case "Q": // set default
-          that.setState(Renderer.DEFAULT);
+          this.setState(Renderer.DEFAULT);
           break;
         case "1":
         case "2":
@@ -554,15 +512,15 @@ abstract class Renderer extends p2.EventEmitter {
         case "7":
         case "8":
         case "9":
-          that.setSceneByIndex(int.parse(ch) - 1);
+          this.setSceneByIndex(int.parse(ch) - 1);
           break;
         default:
           Renderer.keydownEvent['keyCode'] = e.keyCode;
           Renderer.keydownEvent['originalEvent'] = e;
-          that.emit(Renderer.keydownEvent);
+          this.emit(Renderer.keydownEvent);
           break;
       }
-      that.updateGUI();
+      this.updateGUI();
     });
 
     this.elementContainer.onKeyUp.listen((e) {
@@ -570,7 +528,7 @@ abstract class Renderer extends p2.EventEmitter {
         default:
           Renderer.keyupEvent['keyCode'] = e.keyCode;
           Renderer.keyupEvent['originalEvent'] = e;
-          that.emit(Renderer.keyupEvent);
+          this.emit(Renderer.keyupEvent);
           break;
       }
     });
@@ -581,17 +539,17 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   startRenderingLoop() {
-    var demo = this,
+num
         lastCallTime = new DateTime.now().millisecondsSinceEpoch / 1000;
 
     update(dt) {
-      if (!demo.paused) {
+      if (!this.paused) {
         num now = new DateTime.now().millisecondsSinceEpoch / 1000,
             timeSinceLastCall = now - lastCallTime;
         lastCallTime = now;
-        demo.world.step(demo.timeStep, timeSinceLastCall, demo.settings['maxSubSteps']);
+        this.world.step(this.timeStep, timeSinceLastCall, this.settings['maxSubSteps']);
       }
-      demo.render();
+      this.render();
       window.requestAnimationFrame(update);
     }
     window.requestAnimationFrame(update);
@@ -616,7 +574,7 @@ abstract class Renderer extends p2.EventEmitter {
    * Should be called by subclasses whenever there's a mousedown event
    */
 
-  handleMouseDown(List physicsPosition) {
+  handleMouseDown(p2.vec2 physicsPosition) {
     switch (this.state) {
 
       case Renderer.DEFAULT:
@@ -639,7 +597,7 @@ abstract class Renderer extends p2.EventEmitter {
           b.wakeUp();
           this.setState(Renderer.DRAGGING);
           // Add mouse joint to the body
-          var localPoint = p2.vec2.create();
+          p2.vec2 localPoint = p2.vec2.create();
           b.toLocalFrame(localPoint, physicsPosition);
           this.world.addBody(this.nullBody);
           this.mouseConstraint = new p2.RevoluteConstraint(this.nullBody, b, localPivotA: physicsPosition, localPivotB: localPoint);
@@ -653,7 +611,7 @@ abstract class Renderer extends p2.EventEmitter {
         // Start drawing a polygon
         this.setState(Renderer.DRAWINGPOLYGON);
         this.drawPoints = [];
-        List copy = p2.vec2.create();
+        p2.vec2 copy = p2.vec2.create();
         p2.vec2.copy(copy, physicsPosition);
         this.drawPoints.add(copy);
         this.emit(this.drawPointsChangeEvent);
@@ -682,7 +640,7 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   handleMouseMove(physicsPosition) {
-    var sampling = 0.4;
+    num sampling = 0.4;
     switch (this.state) {
       case Renderer.DEFAULT:
       case Renderer.DRAGGING:
@@ -695,9 +653,9 @@ abstract class Renderer extends p2.EventEmitter {
 
       case Renderer.DRAWINGPOLYGON:
         // drawing a polygon - add new point
-        var sqdist = p2.vec2.dist(physicsPosition, this.drawPoints[this.drawPoints.length - 1]);
+        num sqdist = p2.vec2.dist(physicsPosition, this.drawPoints[this.drawPoints.length - 1]);
         if (sqdist > sampling * sampling) {
-          var copy = [0, 0];
+          p2.vec2 copy = p2.vec2.create();
           p2.vec2.copy(copy, physicsPosition);
           this.drawPoints.add(copy);
           this.emit(this.drawPointsChangeEvent);
@@ -722,7 +680,7 @@ abstract class Renderer extends p2.EventEmitter {
    * Should be called by subclasses whenever there's a mouseup event
    */
 
-  handleMouseUp(List physicsPosition) {
+  handleMouseUp(p2.vec2 physicsPosition) {
 
     p2.Body b;
 
@@ -760,11 +718,11 @@ abstract class Renderer extends p2.EventEmitter {
       case Renderer.DRAWINGCIRCLE:
         // End this drawing state
         this.setState(Renderer.DRAWCIRCLE);
-        var R = p2.vec2.dist(this.drawCircleCenter, this.drawCirclePoint);
+        num R = p2.vec2.dist(this.drawCircleCenter, this.drawCirclePoint);
         if (R > 0) {
           // Create circle
           b = new p2.Body(mass: 1, position: this.drawCircleCenter);
-          var circle = new p2.Circle(R);
+          p2.Circle circle = new p2.Circle(R);
           b.addShape(circle);
           this.world.addBody(b);
         }
@@ -776,21 +734,34 @@ abstract class Renderer extends p2.EventEmitter {
         // End this drawing state
         this.setState(Renderer.DRAWRECTANGLE);
         // Make sure first point is upper left
-        var start = this.drawRectStart;
-        var end = this.drawRectEnd;
-        for (var i = 0; i < 2; i++) {
-          if (start[i] > end[i]) {
-            var tmp = end[i];
-            end[i] = start[i];
-            start[i] = tmp;
-          }
+        p2.vec2 start = this.drawRectStart;
+        p2.vec2 end = this.drawRectEnd;
+        
+        if (start.x > end.x) {
+          num tmp = end.x;
+          end.x = start.x;
+          start.x = tmp;
         }
-        var width = (start[0] - end[0]).abs();
-        var height = (start[1] - end[1]).abs();
+        
+        if (start.y > end.y) {
+          num tmp = end.y;
+          end.y = start.y;
+          start.y = tmp;
+        }
+        
+//        for (int i = 0; i < 2; i++) {
+//          if (start[i] > end[i]) {
+//            num tmp = end[i];
+//            end[i] = start[i];
+//            start[i] = tmp;
+//          }
+//        }
+        num width = (start.x - end.x).abs();
+        num height = (start.y - end.y).abs();
         if (width > 0 && height > 0) {
           // Create box
-          b = new p2.Body(mass: 1, position: [this.drawRectStart[0] + width * 0.5, this.drawRectStart[1] + height * 0.5]);
-          var rectangleShape = new p2.Rectangle(width, height);
+          b = new p2.Body(mass: 1, position: new p2.vec2(this.drawRectStart.x + width * 0.5, this.drawRectStart.y + height * 0.5));
+          p2.Rectangle rectangleShape = new p2.Rectangle(width, height);
           b.addShape(rectangleShape);
           this.world.addBody(b);
         }
@@ -801,8 +772,8 @@ abstract class Renderer extends p2.EventEmitter {
 
     if (b != null) {
       b.wakeUp();
-      for (var i = 0; i < b.shapes.length; i++) {
-        var s = b.shapes[i];
+      for (int i = 0; i < b.shapes.length; i++) {
+        p2.Shape s = b.shapes[i];
         s.collisionMask = this.newShapeCollisionMask;
         s.collisionGroup = this.newShapeCollisionGroup;
       }
@@ -853,8 +824,8 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   removeAllVisuals() {
-    var bodies = this.bodies,
-        springs = this.springs;
+    List<p2.Body> bodies = this.bodies;
+    List<p2.Spring>    springs = this.springs;
     while (bodies.length != 0) {
       this.removeVisual(bodies[bodies.length - 1]);
     }
@@ -871,12 +842,12 @@ abstract class Renderer extends p2.EventEmitter {
   removeVisual(obj) {
     this.removeRenderable(obj);
     if (obj is p2.LinearSpring) {
-      var idx = this.springs.indexOf(obj);
+      int idx = this.springs.indexOf(obj);
       if (idx != -1) {
         this.springs.removeAt(idx);
       }
     } else if (obj is p2.Body) {
-      var idx = this.bodies.indexOf(obj);
+      int idx = this.bodies.indexOf(obj);
       if (idx != -1) {
         this.bodies.removeAt(idx);
       }
@@ -891,46 +862,8 @@ abstract class Renderer extends p2.EventEmitter {
    */
 
   createStats() {
-    /*
-    var stepDiv = document.createElement("div");
-    var vecsDiv = document.createElement("div");
-    var matsDiv = document.createElement("div");
-    var contactsDiv = document.createElement("div");
-    stepDiv.setAttribute("id","step");
-    vecsDiv.setAttribute("id","vecs");
-    matsDiv.setAttribute("id","mats");
-    contactsDiv.setAttribute("id","contacts");
-    document.body.appendChild(stepDiv);
-    document.body.appendChild(vecsDiv);
-    document.body.appendChild(matsDiv);
-    document.body.appendChild(contactsDiv);
-    this.stats_stepdiv = stepDiv;
-    this.stats_contactsdiv = contactsDiv;
-    */
   }
 
-//  Renderer.prototype.addLogo = function(){
-//    var css = [
-//        'position:absolute',
-//        'left:10px',
-//        'top:15px',
-//        'text-align:center',
-//        'font: 13px Helvetica, arial, freesans, clean, sans-serif',
-//    ].concat(disableSelectionCSS);
-//
-//    var div = document.createElement('div');
-//    div.innerHTML = [
-//        "<div style='"+css.join(';')+"' user-select='none'>",
-//        "<h1 style='margin:0px'><a href='http://github.com/schteppe/p2.js' style='color:black; text-decoration:none;'>p2.js</a></h1>",
-//        "<p style='margin:5px'>Physics Engine</p>",
-//        '<a style="color:black; text-decoration:none;" href="https://twitter.com/share" class="twitter-share-button" data-via="schteppe" data-count="none" data-hashtags="p2js">Tweet</a>',
-//        "</div>"
-//    ].join("");
-//    this.elementContainer.appendChild(div);
-//
-//    // Twitter button script
-//    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-//};
 
   static Map zoomInEvent = {
     'type': "zoomin"

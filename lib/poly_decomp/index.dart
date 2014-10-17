@@ -1,7 +1,7 @@
 library poly_decomp;
 
 import "dart:math";
-import "dart:typed_data";
+import "../p2.dart";
 
 part "line.dart";
 part "point.dart";

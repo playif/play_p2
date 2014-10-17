@@ -19,6 +19,8 @@ abstract class Constraint {
 
   /// Set to true if you want the connected bodies to collide.
   bool collideConnected;
+  
+  Object parent;
 
   Constraint(Body bodyA, Body bodyB, num type, {bool collideConnected: true, bool wakeUpBodies: true}) {
 
@@ -30,7 +32,7 @@ abstract class Constraint {
 //        wakeUpBodies : true,
 //    });
 
-    this.equations = [];
+    this.equations = new List<Equation>();
 
     this.bodyA = bodyA;
 

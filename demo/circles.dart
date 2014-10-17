@@ -17,8 +17,8 @@ main() {
 
 // Create the world
     p2.World world = new p2.World(
-        gravity : [0, -5],
-        broadphase: new p2.NaiveBroadphase()
+        gravity : new p2.vec2(0.0, -5.0),
+        broadphase: new p2.SAPBroadphase()
     );
 
     app.setWorld(world);
@@ -37,32 +37,32 @@ main() {
 
 // Create circle bodies
     p2.Shape shape = new p2.Circle(r);
-    for (var i = 0; i < N; i++) {
-      for (var j = M - 1; j >= 0; j--) {
-        var x = (i - N / 2) * r * d + (enablePositionNoise ? random.nextDouble() * r : r);
-        var y = (j - M / 2) * r * d;
-        var p = new p2.Body(
+    for (int i = 0; i < N; i++) {
+      for (int j = M - 1; j >= 0; j--) {
+        num x = (i - N / 2) * r * d + (enablePositionNoise ? random.nextDouble() * r : r);
+        num y = (j - M / 2) * r * d;
+        p2.Body p = new p2.Body(
             mass: 1,
-            position: [x, y]
+            position: new p2.vec2(x, y)
         );
         p.addShape(shape);
         p.allowSleep = true;
-        p.sleepSpeedLimit = 1; // Body will feel sleepy if speed<1 (speed is the norm of velocity)
-        p.sleepTimeLimit = 1; // Body falls asleep after 1s of sleepiness
+        p.sleepSpeedLimit = 1.0; // Body will feel sleepy if speed<1 (speed is the norm of velocity)
+        p.sleepTimeLimit = 1.0; // Body falls asleep after 1s of sleepiness
         world.addBody(p);
       }
     }
 
 // Compute max/min positions of circles
-    var xmin = (-N / 2 * r * d),
+    num xmin = (-N / 2 * r * d),
     xmax = ( N / 2 * r * d),
     ymin = (-M / 2 * r * d),
     ymax = ( M / 2 * r * d);
 
 // Create bottom plane
     p2.Shape planeShape = new p2.Plane();
-    var plane = new p2.Body(
-        position : [0, ymin]
+    p2.Body plane = new p2.Body(
+        position : new p2.vec2(0.0, ymin)
     );
     plane.addShape(planeShape);
     world.addBody(plane);
@@ -70,15 +70,15 @@ main() {
 // Left plane
     p2.Body planeLeft = new p2.Body(
         angle: -Math.PI / 2,
-        position: [xmin, 0]
+        position: new p2.vec2(xmin, 0.0)
     );
     planeLeft.addShape(planeShape);
     world.addBody(planeLeft);
 
 // Right plane
-    var planeRight = new p2.Body(
+    p2.Body planeRight = new p2.Body(
         angle: Math.PI / 2,
-        position: [xmax, 0]
+        position: new p2.vec2(xmax, 0.0)
     );
     planeRight.addShape(planeShape);
     world.addBody(planeRight);

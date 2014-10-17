@@ -58,3 +58,7 @@ Demos
 
 * [Tearable constraints](https://playif.github.io/p2_demo/tearable.html)
 
+Change log
+==========
+0.5.4
+* Improve performance.

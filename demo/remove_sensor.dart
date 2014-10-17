@@ -11,19 +11,19 @@ main() {
   new WebGLRenderer((WebGLRenderer app) {
     //setup: function(){
 
-    var world = new p2.World(gravity: [0, -10]);
+    var world = new p2.World(gravity: new p2.vec2(0.0, -10.0));
 
     app.setWorld(world);
 
     // Create circle sensor
     var shape = new p2.Circle(0.4);
     shape.sensor = true;
-    var body = new p2.Body(mass: 1, position: [0, 3]);
+    var body = new p2.Body(mass: 1, position: new p2.vec2(0.0, 3.0));
     body.addShape(shape);
 
     // Create ground.
     var planeShape = new p2.Plane();
-    var plane = new p2.Body(position: [0, -1]);
+    var plane = new p2.Body(position: new p2.vec2(0.0, -1.0));
     plane.addShape(planeShape);
     world.addBody(plane);
 
@@ -47,10 +47,10 @@ main() {
     });
 
     spawnBody() {
-      body.position[0] = 0.0;
-      body.position[1] = 2.0;
-      body.velocity[0] = 0.0;
-      body.velocity[1] = 0.0;
+      body.position.x = 0.0;
+      body.position.y = 2.0;
+      body.velocity.x = 0.0;
+      body.velocity.y = 0.0;
       world.addBody(body);
     }
 

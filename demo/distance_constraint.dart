@@ -8,22 +8,22 @@ main() {
   new WebGLRenderer((WebGLRenderer app) {
 
     // Create physics world
-    var world = new p2.World(gravity: [0, -10]);
+    p2.World world = new p2.World(gravity: new p2.vec2(0.0, -10.0));
 
     app.setWorld(world);
 
     // Create two circles
-    var circleShape = new p2.Circle(0.5);
-    var bodyA = new p2.Body(mass: 1, position: [-2, 1]);
+    p2.Circle circleShape = new p2.Circle(0.5);
+    p2.Body bodyA = new p2.Body(mass: 1, position: new p2.vec2(-2.0, 1.0));
     bodyA.addShape(circleShape);
     world.addBody(bodyA);
-    var bodyB = new p2.Body(mass: 1, position: [-0.5, 1]);
+    p2.Body bodyB = new p2.Body(mass: 1, position: new p2.vec2(-0.5, 1.0));
     bodyB.addShape(circleShape);
     world.addBody(bodyB);
 
     // Create constraint.
     // If target distance is not given as an option, then the current distance between the bodies is used.
-    var constraint1 = new p2.DistanceConstraint(bodyA, bodyB);
+    p2.DistanceConstraint constraint1 = new p2.DistanceConstraint(bodyA, bodyB);
     world.addConstraint(constraint1);
     constraint1.upperLimitEnabled = true;
     constraint1.lowerLimitEnabled = true;
@@ -31,22 +31,22 @@ main() {
     constraint1.lowerLimit = 1.5;
 
     // Create two boxes that must have distance 0 between their corners
-    var boxShape = new p2.Rectangle(0.5, 0.5);
-    var boxBodyA = new p2.Body(mass: 1, position: [1.5, 1]);
+    p2.Rectangle boxShape = new p2.Rectangle(0.5, 0.5);
+    p2.Body boxBodyA = new p2.Body(mass: 1, position: new p2.vec2(1.5, 1.0));
     boxBodyA.addShape(boxShape);
     world.addBody(boxBodyA);
-    var boxBodyB = new p2.Body(mass: 1, position: [2, 1]);
+    p2.Body boxBodyB = new p2.Body(mass: 1, position: new p2.vec2(2.0, 1.0));
     boxBodyB.addShape(boxShape);
     world.addBody(boxBodyB);
 
     // Create constraint.
-    var constraint2 = new p2.DistanceConstraint(boxBodyA, boxBodyB, localAnchorA: [boxShape.width / 2, boxShape.height / 2], localAnchorB: [-boxShape.width / 2, boxShape.height / 2]);
+    p2.DistanceConstraint constraint2 = new p2.DistanceConstraint(boxBodyA, boxBodyB, localAnchorA: new p2.vec2(boxShape.width / 2, boxShape.height / 2), localAnchorB: new p2.vec2(-boxShape.width / 2, boxShape.height / 2));
     world.addConstraint(constraint2);
 
 
     // Create ground
-    var planeShape = new p2.Plane();
-    var plane = new p2.Body(position: [0, -1]);
+    p2.Plane planeShape = new p2.Plane();
+    p2.Body plane = new p2.Body(position: new p2.vec2(0.0, -1.0));
     plane.addShape(planeShape);
     world.addBody(plane);
   });

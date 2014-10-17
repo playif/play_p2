@@ -1,9 +1,9 @@
 part of p2;
 
 class PrismaticConstraint extends Constraint {
-  List localAnchorA;
-  List localAnchorB;
-  List localAxisA;
+  final vec2 localAnchorA = vec2.create();
+  final vec2 localAnchorB = vec2.create();
+  final vec2 localAxisA = vec2.create();
 
   num maxForce;
 
@@ -24,15 +24,23 @@ class PrismaticConstraint extends Constraint {
   num motorSpeed;
 
 
-  PrismaticConstraint(Body bodyA, Body bodyB, {List localAnchorA: const [0, 0], List localAnchorB: const [0, 0], List localAxisA: const [1, 0], bool disableRotationalLock: false, num upperLimit, num lowerLimit, num maxForce: double.MAX_FINITE, bool collideConnected: true, bool wakeUpBodies: true}) : super(bodyA, bodyB, Constraint.PRISMATIC, collideConnected: collideConnected, wakeUpBodies: wakeUpBodies) {
-
-    this.localAnchorA = vec2.create();
+  PrismaticConstraint(Body bodyA, Body bodyB, {vec2 localAnchorA, vec2 localAnchorB,vec2 localAxisA, bool disableRotationalLock: false, num upperLimit, num lowerLimit, num maxForce: double.MAX_FINITE, bool collideConnected: true, bool wakeUpBodies: true}) : super(bodyA, bodyB, Constraint.PRISMATIC, collideConnected: collideConnected, wakeUpBodies: wakeUpBodies) {
+    if(localAnchorA == null){
+      localAnchorA= new vec2(0.0,0.0);
+    }
+    
+    if(localAnchorB == null){
+      localAnchorB= new vec2(0.0,0.0);
+    }
+    
+    if(localAxisA == null){
+      localAxisA= new vec2(0.0,0.0);
+    }
+    
     vec2.copy(this.localAnchorA, localAnchorA);
 
-    this.localAnchorB = vec2.create();
     vec2.copy(this.localAnchorB, localAnchorB);
 
-    this.localAxisA = vec2.create();
     vec2.copy(this.localAxisA, localAxisA);
 
     /*
@@ -57,7 +65,7 @@ class PrismaticConstraint extends Constraint {
 
     // Translational part
     Equation trans = new Equation(bodyA, bodyB, -maxForce, maxForce);
-    List ri = vec2.create(),
+    vec2 ri = vec2.create(),
         rj = vec2.create(),
         gg = vec2.create(),
         t = vec2.create();
@@ -66,9 +74,9 @@ class PrismaticConstraint extends Constraint {
       return vec2.dot(gg, t);
     };
     trans.updateJacobian = () {
-      List G = trans.G;
-      List xi = bodyA.position;
-      List xj = bodyB.position;
+      Float32List G = trans.G;
+      vec2 xi = bodyA.position;
+      vec2 xj = bodyB.position;
       vec2.rotate(ri, localAnchorA, bodyA.angle);
       vec2.rotate(rj, localAnchorB, bodyB.angle);
       vec2.add(gg, xj, rj);
@@ -76,18 +84,18 @@ class PrismaticConstraint extends Constraint {
       vec2.sub(gg, gg, ri);
       vec2.rotate(t, localAxisA, bodyA.angle + PI / 2);
 
-      G[0] = -t[0];
-      G[1] = -t[1];
+      G[0] = -t.x;
+      G[1] = -t.y;
       G[2] = -vec2.crossLength(ri, t) + vec2.crossLength(t, gg);
-      G[3] = t[0];
-      G[4] = t[1];
+      G[3] = t.x;
+      G[4] = t.y;
       G[5] = vec2.crossLength(rj, t);
     };
     this.equations.add(trans);
 
     // Rotational part
     if (!disableRotationalLock) {
-      RotationalLockEquation rot = new RotationalLockEquation(bodyA, bodyB, minForce:-maxForce, maxForce:maxForce);
+      RotationalLockEquation rot = new RotationalLockEquation(bodyA, bodyB, minForce: -maxForce, maxForce: maxForce);
       this.equations.add(rot);
     }
 
@@ -158,19 +166,16 @@ class PrismaticConstraint extends Constraint {
   */
     this.motorSpeed = 0;
 
-    //var that = this;
-    //var motorEquation = this.motorEquation;
-    //var old = motorEquation.computeGW;
     motorEquation.replacedGq = () {
       return 0;
     };
     motorEquation.replacedGW = () {
-      var G = motorEquation.G,
-          bi = motorEquation.bodyA,
-          bj = motorEquation.bodyB,
-          vi = bi.velocity,
-          vj = bj.velocity,
-          wi = bi.angularVelocity,
+      Body bi = motorEquation.bodyA,
+          bj = motorEquation.bodyB;
+      Float32List G = motorEquation.G;
+      vec2 vi = bi.velocity,
+          vj = bj.velocity;
+      num wi = bi.angularVelocity,
           wj = bj.angularVelocity;
       return motorEquation.gmult(G, vi, wi, vj, wj) + this.motorSpeed;
     };
@@ -180,7 +185,7 @@ class PrismaticConstraint extends Constraint {
 
 
 
-  List worldAxisA = vec2.create(),
+  static final vec2 worldAxisA = vec2.create(),
       worldAnchorA = vec2.create(),
       worldAnchorB = vec2.create(),
       orientedAnchorA = vec2.create(),
@@ -218,12 +223,12 @@ class PrismaticConstraint extends Constraint {
     // Motor
     if (this.motorEnabled) {
       // G = [ a     a x ri   -a   -a x rj ]
-      List G = this.motorEquation.G;
-      G[0] = worldAxisA[0];
-      G[1] = worldAxisA[1];
+      Float32List G = this.motorEquation.G;
+      G[0] = worldAxisA.x;
+      G[1] = worldAxisA.y;
       G[2] = vec2.crossLength(worldAxisA, orientedAnchorB);
-      G[3] = -worldAxisA[0];
-      G[4] = -worldAxisA[1];
+      G[3] = -worldAxisA.x;
+      G[4] = -worldAxisA.y;
       G[5] = -vec2.crossLength(worldAxisA, orientedAnchorA);
     }
 
@@ -251,7 +256,7 @@ class PrismaticConstraint extends Constraint {
 
     if (this.upperLimitEnabled && relPosition > upperLimit) {
       // Update contact constraint normal, etc
-      vec2.scale(upperLimitEquation.normalA, worldAxisA, -1);
+      vec2.scale(upperLimitEquation.normalA, worldAxisA, -1.0);
       vec2.sub(upperLimitEquation.contactPointA, worldAnchorA, bodyA.position);
       vec2.sub(upperLimitEquation.contactPointB, worldAnchorB, bodyB.position);
       vec2.scale(tmp, worldAxisA, upperLimit);
@@ -260,7 +265,7 @@ class PrismaticConstraint extends Constraint {
         eqs.add(upperLimitEquation);
       }
     } else {
-      var idx = eqs.indexOf(upperLimitEquation);
+      int idx = eqs.indexOf(upperLimitEquation);
       if (idx != -1) {
         eqs.removeAt(idx);
       }
@@ -268,7 +273,7 @@ class PrismaticConstraint extends Constraint {
 
     if (this.lowerLimitEnabled && relPosition < lowerLimit) {
       // Update contact constraint normal, etc
-      vec2.scale(lowerLimitEquation.normalA, worldAxisA, 1);
+      vec2.scale(lowerLimitEquation.normalA, worldAxisA, 1.0);
       vec2.sub(lowerLimitEquation.contactPointA, worldAnchorA, bodyA.position);
       vec2.sub(lowerLimitEquation.contactPointB, worldAnchorB, bodyB.position);
       vec2.scale(tmp, worldAxisA, lowerLimit);
@@ -277,7 +282,7 @@ class PrismaticConstraint extends Constraint {
         eqs.add(lowerLimitEquation);
       }
     } else {
-      var idx = eqs.indexOf(lowerLimitEquation);
+      int idx = eqs.indexOf(lowerLimitEquation);
       if (idx != -1) {
         eqs.removeAt(idx);
       }
@@ -304,7 +309,7 @@ class PrismaticConstraint extends Constraint {
     if (!this.motorEnabled) {
       return;
     }
-    var i = this.equations.indexOf(this.motorEquation);
+    int i = this.equations.indexOf(this.motorEquation);
     this.equations.removeAt(i);
     this.motorEnabled = false;
   }

@@ -2,27 +2,15 @@ part of p2;
 
 class LinearSpring extends Spring {
   /// Anchor for bodyA in local bodyA coordinates.
-  List localAnchorA;
+  final vec2 localAnchorA=vec2.create();
 
   /// Anchor for bodyB in local bodyB coordinates.
-  List localAnchorB;
+  final vec2 localAnchorB=vec2.create();
 
   /// Rest length of the spring.
   num restLength;
 
-  LinearSpring(Body bodyA, Body bodyB, {
-  num restLength,
-  num stiffness:100,
-  num damping:1,
-  List worldAnchorA,
-  List worldAnchorB,
-  List localAnchorA,
-  List localAnchorB
-  }) : super(bodyA, bodyB, stiffness:stiffness, damping:damping) {
-
-    this.localAnchorA = vec2.fromValues(0, 0);
-
-    this.localAnchorB = vec2.fromValues(0, 0);
+  LinearSpring(Body bodyA, Body bodyB, {num restLength, num stiffness: 100, num damping: 1, vec2 worldAnchorA, vec2 worldAnchorB, vec2 localAnchorA, vec2 localAnchorB}) : super(bodyA, bodyB, stiffness: stiffness, damping: damping) {
 
     if (localAnchorA != null) {
       vec2.copy(this.localAnchorA, localAnchorA);
@@ -38,13 +26,12 @@ class LinearSpring extends Spring {
     }
 
     if (restLength == null) {
-      var worldAnchorA = vec2.create();
-      var worldAnchorB = vec2.create();
+      vec2 worldAnchorA = vec2.create();
+      vec2 worldAnchorB = vec2.create();
       this.getWorldAnchorA(worldAnchorA);
       this.getWorldAnchorB(worldAnchorB);
-      var worldDistance = vec2.distance(worldAnchorA, worldAnchorB);
-    }
-    else {
+      num worldDistance = vec2.distance(worldAnchorA, worldAnchorB);
+    } else {
       this.restLength = restLength;
     }
   }
@@ -52,56 +39,56 @@ class LinearSpring extends Spring {
 
   /// Set the anchor point on body A, using world coordinates.
 
-  setWorldAnchorA(List worldAnchorA) {
+  setWorldAnchorA(vec2 worldAnchorA) {
     this.bodyA.toLocalFrame(this.localAnchorA, worldAnchorA);
   }
 
   /// Set the anchor point on body B, using world coordinates.
 
-  setWorldAnchorB(List worldAnchorB) {
+  setWorldAnchorB(vec2 worldAnchorB) {
     this.bodyB.toLocalFrame(this.localAnchorB, worldAnchorB);
   }
 
   /// Get the anchor point on body A, in world coordinates.
 
-  getWorldAnchorA(List result) {
+  getWorldAnchorA(vec2 result) {
     this.bodyA.toWorldFrame(result, this.localAnchorA);
   }
 
   /// Get the anchor point on body B, in world coordinates.
 
-  getWorldAnchorB(List result) {
+  getWorldAnchorB(vec2 result) {
     this.bodyB.toWorldFrame(result, this.localAnchorB);
   }
 
-  List applyForce_r = vec2.create(),
-  applyForce_r_unit = vec2.create(),
-  applyForce_u = vec2.create(),
-  applyForce_f = vec2.create(),
-  applyForce_worldAnchorA = vec2.create(),
-  applyForce_worldAnchorB = vec2.create(),
-  applyForce_ri = vec2.create(),
-  applyForce_rj = vec2.create(),
-  applyForce_tmp = vec2.create();
+  static final vec2 applyForce_r = vec2.create(),
+      applyForce_r_unit = vec2.create(),
+      applyForce_u = vec2.create(),
+      applyForce_f = vec2.create(),
+      applyForce_worldAnchorA = vec2.create(),
+      applyForce_worldAnchorB = vec2.create(),
+      applyForce_ri = vec2.create(),
+      applyForce_rj = vec2.create(),
+      applyForce_tmp = vec2.create();
 
   /// Apply the spring force to the connected bodies.
 
   applyForce() {
-    var k = this.stiffness,
-    d = this.damping,
-    l = this.restLength,
-    bodyA = this.bodyA,
-    bodyB = this.bodyB,
-    r = applyForce_r,
-    r_unit = applyForce_r_unit,
-    u = applyForce_u,
-    f = applyForce_f,
-    tmp = applyForce_tmp;
+    num k = this.stiffness,
+        d = this.damping,
+        l = this.restLength;
+    Body bodyA = this.bodyA,
+        bodyB = this.bodyB;
+    vec2 r = applyForce_r,
+        r_unit = applyForce_r_unit,
+        u = applyForce_u,
+        f = applyForce_f,
+        tmp = applyForce_tmp;
 
-    var worldAnchorA = applyForce_worldAnchorA,
-    worldAnchorB = applyForce_worldAnchorB,
-    ri = applyForce_ri,
-    rj = applyForce_rj;
+    vec2 worldAnchorA = applyForce_worldAnchorA,
+        worldAnchorB = applyForce_worldAnchorB,
+        ri = applyForce_ri,
+        rj = applyForce_rj;
 
     // Get world anchors
     this.getWorldAnchorA(worldAnchorA);
@@ -113,7 +100,7 @@ class LinearSpring extends Spring {
 
     // Compute distance vector between world anchor points
     vec2.sub(r, worldAnchorB, worldAnchorA);
-    var rlen = vec2.len(r);
+    num rlen = vec2.len(r);
     vec2.normalize(r_unit, r);
 
     //console.log(rlen)
@@ -134,8 +121,8 @@ class LinearSpring extends Spring {
     vec2.add(bodyB.force, bodyB.force, f);
 
     // Angular force
-    var ri_x_f = vec2.crossLength(ri, f);
-    var rj_x_f = vec2.crossLength(rj, f);
+    num ri_x_f = vec2.crossLength(ri, f);
+    num rj_x_f = vec2.crossLength(rj, f);
     bodyA.angularForce -= ri_x_f;
     bodyB.angularForce += rj_x_f;
   }

@@ -6,19 +6,16 @@ class IslandNode {
   Body body;
 
   /// Neighboring IslandNodes
-  List<IslandNode> neighbors;
+  final List<IslandNode> neighbors = new List<IslandNode>();
 
   /// Equations connected to this node.
-  List<Equation> equations;
+  final List<Equation> equations= new List<Equation>();
 
   /// If this node was visiting during the graph traversal.
-  bool visited;
+  bool visited = false;
 
   IslandNode(Body body) {
     this.body = body;
-    this.neighbors = [];
-    this.equations = [];
-    this.visited = false;
   }
 
   /// Clean this node from bodies and equations.

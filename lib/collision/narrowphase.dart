@@ -5,9 +5,9 @@ part of p2;
 /// Narrowphase. Creates contacts and friction given shapes and transforms.
 class Narrowphase {
   /// Temp things
-  List yAxis = vec2.fromValues(0, 1);
+  static final vec2 yAxis = vec2.fromValues(0, 1);
 
-  List tmp1 = vec2.fromValues(0, 0),
+  static final vec2 tmp1 = vec2.fromValues(0, 0),
       tmp2 = vec2.fromValues(0, 0),
       tmp3 = vec2.fromValues(0, 0),
       tmp4 = vec2.fromValues(0, 0),
@@ -24,8 +24,8 @@ class Narrowphase {
       tmp15 = vec2.fromValues(0, 0),
       tmp16 = vec2.fromValues(0, 0),
       tmp17 = vec2.fromValues(0, 0),
-      tmp18 = vec2.fromValues(0, 0),
-      tmpArray = new List(2);
+      tmp18 = vec2.fromValues(0, 0);
+  static final List<vec2> tmpArray = new List(2);
 
 
   List<ContactEquation> contactEquations;
@@ -56,16 +56,16 @@ class Narrowphase {
   num contactSkinSize;
 
   Narrowphase() {
-    this.contactEquations = [];
-    this.frictionEquations = [];
+    this.contactEquations = new List<ContactEquation>();
+    this.frictionEquations = new List<FrictionEquation>();
     this.enableFriction = true;
     this.slipForce = 10.0;
     this.frictionCoefficient = 0.3;
     this.surfaceVelocity = 0;
 
     this.reuseObjects = true;
-    this.reusableContactEquations = [];
-    this.reusableFrictionEquations = [];
+    this.reusableContactEquations = new List<ContactEquation>();
+    this.reusableFrictionEquations = new List<FrictionEquation>();
 
     this.restitution = 0;
     this.stiffness = Equation.DEFAULT_STIFFNESS;
@@ -121,7 +121,7 @@ class Narrowphase {
 
   /// Check if the bodies were in contact since the last reset().
   bool collidedLastStep(Body bodyA, Body bodyB) {
-    var id1 = bodyA.id | 0,
+    int id1 = bodyA.id | 0,
         id2 = bodyB.id | 0;
     return this.collidingBodiesLastStep.get(id1, id2) != null;
   }
@@ -208,7 +208,7 @@ class Narrowphase {
 
   /// Creates a FrictionEquation given the data in the ContactEquation. Uses same offset vectors ri and rj, but the tangent vector will be constructed from the collision normal.
   FrictionEquation createFrictionFromContact(ContactEquation c) {
-    var eq = this.createFrictionEquation(c.bodyA, c.bodyB, c.shapeA, c.shapeB);
+    FrictionEquation eq = this.createFrictionEquation(c.bodyA, c.bodyB, c.shapeA, c.shapeB);
     vec2.copy(eq.contactPointA, c.contactPointA);
     vec2.copy(eq.contactPointB, c.contactPointB);
     vec2.rotate90cw(eq.t, c.normalA);
@@ -225,9 +225,9 @@ class Narrowphase {
     FrictionEquation eq = this.createFrictionEquation(c.bodyA, c.bodyB, c.shapeA, c.shapeB);
     Body bodyA = c.bodyA;
     Body bodyB = c.bodyB;
-    vec2.set(eq.contactPointA, 0, 0);
-    vec2.set(eq.contactPointB, 0, 0);
-    vec2.set(eq.t, 0, 0);
+    vec2.set(eq.contactPointA, 0.0, 0.0);
+    vec2.set(eq.contactPointB, 0.0, 0.0);
+    vec2.set(eq.t, 0.0, 0.0);
     for (int i = 0; i != numContacts; i++) {
       c = this.contactEquations[this.contactEquations.length - 1 - i];
       if (c.bodyA == bodyA) {
@@ -266,7 +266,7 @@ class Narrowphase {
    * @param {boolean}     justTest
    * @todo Implement me!
    */
-  num convexLine(Body convexBody, Shape convexShape, convexOffset, convexAngle, lineBody, lineShape, lineOffset, lineAngle, justTest) {
+  num convexLine(Body convexBody, Shape convexShape, vec2 convexOffset, num convexAngle, Body lineBody, Line lineShape, vec2 lineOffset, num lineAngle, bool justTest) {
     // TODO
     if (justTest) {
       return 0;
@@ -289,7 +289,7 @@ class Narrowphase {
    * @param  {Boolean}    justTest
    * @todo Implement me!
    */
-  num lineRectangle(lineBody, lineShape, lineOffset, lineAngle, rectangleBody, rectangleShape, rectangleOffset, rectangleAngle, justTest) {
+  num lineRectangle(Body lineBody, Line lineShape, vec2 lineOffset, num lineAngle, Body rectangleBody, Rectangle rectangleShape, vec2 rectangleOffset, num rectangleAngle, bool justTest) {
     // TODO
     if (justTest) {
       return 0;
@@ -305,8 +305,8 @@ class Narrowphase {
     vec2.set(convexShape.vertices[3], -capsuleShape.length * 0.5, capsuleShape.radius);
   }
 
-  Rectangle convexCapsule_tempRect = new Rectangle(1, 1);
-  List convexCapsule_tempVec = vec2.create();
+  static final Rectangle convexCapsule_tempRect = new Rectangle(1, 1);
+  static final vec2 convexCapsule_tempVec = vec2.create();
 
   /**
    * Convex/capsule narrowphase
@@ -320,11 +320,11 @@ class Narrowphase {
    * @param  {Array}      capsulePosition
    * @param  {Number}     capsuleAngle
    */
-  num convexCapsule(Body convexBody, Convex convexShape, List convexPosition, num convexAngle, Body capsuleBody, Capsule capsuleShape, List capsulePosition, num capsuleAngle, bool justTest) {
+  num convexCapsule(Body convexBody, Convex convexShape, vec2 convexPosition, num convexAngle, Body capsuleBody, Capsule capsuleShape, vec2 capsulePosition, num capsuleAngle, bool justTest) {
 
     // Check the circles
     // Add offsets!
-    List circlePos = convexCapsule_tempVec;
+    vec2 circlePos = convexCapsule_tempVec;
     vec2.set(circlePos, capsuleShape.length / 2, 0);
     vec2.rotate(circlePos, circlePos, capsuleAngle);
     vec2.add(circlePos, circlePos, capsulePosition);
@@ -361,7 +361,7 @@ class Narrowphase {
    * @todo Implement me!
    */
   //Narrowphase.prototype[Shape.CAPSULE | Shape.LINE] =
-  num lineCapsule(Body lineBody, Shape lineShape, linePosition, lineAngle, capsuleBody, capsuleShape, capsulePosition, capsuleAngle, justTest) {
+  num lineCapsule(Body lineBody, Shape lineShape, vec2 linePosition, num lineAngle, Body capsuleBody, Capsule capsuleShape, vec2 capsulePosition, num capsuleAngle, bool justTest) {
     // TODO
     if (justTest) {
       return 0;
@@ -370,9 +370,9 @@ class Narrowphase {
     }
   }
 
-  List capsuleCapsule_tempVec1 = vec2.create();
-  List capsuleCapsule_tempVec2 = vec2.create();
-  Rectangle capsuleCapsule_tempRect1 = new Rectangle(1, 1);
+  static final vec2 capsuleCapsule_tempVec1 = vec2.create();
+  static final vec2 capsuleCapsule_tempVec2 = vec2.create();
+  static final Rectangle capsuleCapsule_tempRect1 = new Rectangle(1, 1);
 
   /**
    * Capsule/capsule narrowphase
@@ -386,13 +386,13 @@ class Narrowphase {
    * @param  {Array}      xj
    * @param  {Number}     aj
    */
-  num capsuleCapsule(Body bi, Capsule si, List xi, num ai, Body bj, Capsule sj, List xj, num aj, bool justTest) {
+  num capsuleCapsule(Body bi, Capsule si, vec2 xi, num ai, Body bj, Capsule sj, vec2 xj, num aj, bool justTest) {
 
     bool enableFrictionBefore;
 
     // Check the circles
     // Add offsets!
-    List circlePosi = capsuleCapsule_tempVec1,
+    vec2 circlePosi = capsuleCapsule_tempVec1,
         circlePosj = capsuleCapsule_tempVec2;
 
     num numContacts = 0;
@@ -492,7 +492,7 @@ class Narrowphase {
    * @todo Implement me!
    */
 
-  num lineLine(Body bodyA, Line shapeA, List positionA, num angleA, Body bodyB, Line shapeB, List positionB, num angleB, bool justTest) {
+  num lineLine(Body bodyA, Line shapeA, vec2 positionA, num angleA, Body bodyB, Line shapeB, vec2 positionB, num angleB, bool justTest) {
     // TODO
     if (justTest) {
       return 0;
@@ -514,8 +514,8 @@ class Narrowphase {
    * @param  {Number} lineAngle
    */
 
-  planeLine(Body planeBody, Plane planeShape, List planeOffset, num planeAngle, Body lineBody, Line lineShape, List lineOffset, num lineAngle, bool justTest) {
-    var worldVertex0 = tmp1,
+  planeLine(Body planeBody, Plane planeShape, vec2 planeOffset, num planeAngle, Body lineBody, Line lineShape, vec2 lineOffset, num lineAngle, bool justTest) {
+    vec2 worldVertex0 = tmp1,
         worldVertex1 = tmp2,
         worldVertex01 = tmp3,
         worldVertex11 = tmp4,
@@ -523,9 +523,10 @@ class Narrowphase {
         worldEdgeUnit = tmp6,
         dist = tmp7,
         worldNormal = tmp8,
-        worldTangent = tmp9,
-        verts = tmpArray,
-        numContacts = 0;
+        worldTangent = tmp9;
+
+    num numContacts = 0;
+    List<vec2> verts = tmpArray;
 
     // Get start and end points
     vec2.set(worldVertex0, -lineShape.length / 2, 0);
@@ -553,8 +554,8 @@ class Narrowphase {
     // Check line ends
     verts[0] = worldVertex0;
     verts[1] = worldVertex1;
-    for (var i = 0; i < verts.length; i++) {
-      var v = verts[i];
+    for (int i = 0; i < verts.length; i++) {
+      final vec2 v = verts[i];
 
       vec2.sub(dist, v, planeOffset);
 
@@ -599,7 +600,7 @@ class Narrowphase {
     }
 
     if (!this.enableFrictionReduction) {
-      if (numContacts && this.enableFriction) {
+      if ((numContacts != 0) && this.enableFriction) {
         this.frictionEquations.add(this.createFrictionFromAverage(numContacts));
       }
     }
@@ -607,7 +608,7 @@ class Narrowphase {
     return numContacts;
   }
 
-  num particleCapsule(Body particleBody, Particle particleShape, List particlePosition, num particleAngle, Body capsuleBody, Capsule capsuleShape, List capsulePosition, num capsuleAngle, bool justTest) {
+  num particleCapsule(Body particleBody, Particle particleShape, vec2 particlePosition, num particleAngle, Body capsuleBody, Capsule capsuleShape, vec2 capsulePosition, num capsuleAngle, bool justTest) {
     return this.circleLine(particleBody, particleShape, particlePosition, particleAngle, capsuleBody, capsuleShape, capsulePosition, capsuleAngle, justTest, capsuleShape.radius, 0);
   }
 
@@ -626,11 +627,11 @@ class Narrowphase {
    * @param {Number} lineRadius Radius to add to the line. Can be used to test Capsules.
    * @param {Number} circleRadius If set, this value overrides the circle shape radius.
    */
-  num circleLine(Body circleBody, Shape circleShape, List circleOffset, num circleAngle, Body lineBody, lineShape, List lineOffset, num lineAngle, bool justTest, [num lineRadius = 0, num circleRadius]) {
-    // var lineRadius = lineRadius || 0,
+  num circleLine(Body circleBody, Shape circleShape, vec2 circleOffset, num circleAngle, Body lineBody, lineShape, vec2 lineOffset, num lineAngle, bool justTest, [num lineRadius = 0, num circleRadius]) {
+
     circleRadius = circleRadius != null ? circleRadius : (circleShape as Circle).radius;
 
-    List orthoDist = tmp1,
+    final vec2 orthoDist = tmp1,
         lineToCircleOrthoUnit = tmp2,
         projectedPoint = tmp3,
         centerDist = tmp4,
@@ -643,9 +644,9 @@ class Narrowphase {
         worldVertex11 = tmp11,
         dist = tmp12,
         lineToCircle = tmp13,
-        lineEndToLineRadius = tmp14,
+        lineEndToLineRadius = tmp14;
 
-        verts = tmpArray;
+    List<vec2> verts = tmpArray;
 
     // Get start and end points
     vec2.set(worldVertex0, -lineShape.length / 2, 0);
@@ -703,7 +704,7 @@ class Narrowphase {
 
         ContactEquation c = this.createContactEquation(circleBody, lineBody, circleShape, lineShape);
 
-        vec2.scale(c.normalA, orthoDist, -1);
+        vec2.scale(c.normalA, orthoDist, -1.0);
         vec2.normalize(c.normalA, c.normalA);
 
         vec2.scale(c.contactPointA, c.normalA, circleRadius);
@@ -728,8 +729,8 @@ class Narrowphase {
     verts[0] = worldVertex0;
     verts[1] = worldVertex1;
 
-    for (var i = 0; i < verts.length; i++) {
-      List v = verts[i];
+    for (int i = 0; i < verts.length; i++) {
+      final vec2 v = verts[i];
 
       vec2.sub(dist, v, circleOffset);
 
@@ -739,7 +740,7 @@ class Narrowphase {
           return 1;
         }
 
-        var c = this.createContactEquation(circleBody, lineBody, circleShape, lineShape);
+        ContactEquation c = this.createContactEquation(circleBody, lineBody, circleShape, lineShape);
 
         vec2.copy(c.normalA, dist);
         vec2.normalize(c.normalA, c.normalA);
@@ -799,10 +800,10 @@ class Narrowphase {
  * @param  {Number} circleRadius
  */
 
-  num circleConvex(Body circleBody, circleShape, List circleOffset, num circleAngle, Body convexBody, convexShape, List convexOffset, num convexAngle, bool justTest, [num circleRadius]) {
+  num circleConvex(Body circleBody, circleShape, vec2 circleOffset, num circleAngle, Body convexBody, convexShape, vec2 convexOffset, num convexAngle, bool justTest, [num circleRadius]) {
     circleRadius = circleRadius == null ? (circleShape as Circle).radius : circleRadius;
 
-    List worldVertex0 = tmp1,
+    vec2 worldVertex0 = tmp1,
         worldVertex1 = tmp2,
         worldEdge = tmp3,
         worldEdgeUnit = tmp4,
@@ -814,18 +815,18 @@ class Narrowphase {
         dist = tmp10,
         worldVertex = tmp11;
 
-    var closestEdge = -1,
-        closestEdgeDistance = null,
-        closestEdgeOrthoDist = tmp12,
+    num closestEdge = -1,
+        closestEdgeDistance = null;
+    vec2 closestEdgeOrthoDist = tmp12,
         closestEdgeProjectedPoint = tmp13,
         candidate = tmp14,
         candidateDist = tmp15,
-        minCandidate = tmp16,
+        minCandidate = tmp16;
 
-        found = false,
-        minCandidateDistance = double.MAX_FINITE;
+    bool found = false;
+    num minCandidateDistance = double.MAX_FINITE;
 
-    var numReported = 0;
+    num numReported = 0;
 
 // New algorithm:
 // 1. Check so center of circle is not inside the polygon. If it is, this wont work...
@@ -833,11 +834,11 @@ class Narrowphase {
 // 2. 1. Get point on circle that is closest to the edge (scale normal with -radius)
 // 2. 2. Check if point is inside.
 
-    List<List> verts = convexShape.vertices;
+    List<vec2> verts = convexShape.vertices;
 
 // Check all edges first
-    for (var i = 0; i != verts.length + 1; i++) {
-      var v0 = verts[i % verts.length],
+    for (int i = 0; i != verts.length + 1; i++) {
+      vec2 v0 = verts[i % verts.length],
           v1 = verts[(i + 1) % verts.length];
 
       vec2.rotate(worldVertex0, v0, convexAngle);
@@ -858,7 +859,7 @@ class Narrowphase {
       if (pointInConvex(candidate, convexShape, convexOffset, convexAngle) != 0) {
 
         vec2.sub(candidateDist, worldVertex0, candidate);
-        var candidateDistance = (vec2.dot(candidateDist, worldNormal)).abs();
+        num candidateDistance = (vec2.dot(candidateDist, worldNormal)).abs();
 
         if (candidateDistance < minCandidateDistance) {
           vec2.copy(minCandidate, candidate);
@@ -876,7 +877,7 @@ class Narrowphase {
         return 1;
       }
 
-      var c = this.createContactEquation(circleBody, convexBody, circleShape, convexShape);
+      ContactEquation c = this.createContactEquation(circleBody, convexBody, circleShape, convexShape);
       vec2.sub(c.normalA, minCandidate, circleOffset);
       vec2.normalize(c.normalA, c.normalA);
 
@@ -899,8 +900,8 @@ class Narrowphase {
 
 // Check all vertices
     if (circleRadius > 0) {
-      for (var i = 0; i < verts.length; i++) {
-        var localVertex = verts[i];
+      for (int i = 0; i < verts.length; i++) {
+        vec2 localVertex = verts[i];
         vec2.rotate(worldVertex, localVertex, convexAngle);
         vec2.add(worldVertex, worldVertex, convexOffset);
 
@@ -939,7 +940,7 @@ class Narrowphase {
     return 0;
   }
 
-  List pic_worldVertex0 = vec2.create(),
+  static final vec2 pic_worldVertex0 = vec2.create(),
       pic_worldVertex1 = vec2.create(),
       pic_r0 = vec2.create(),
       pic_r1 = vec2.create();
@@ -947,16 +948,16 @@ class Narrowphase {
 /*
  * Check if a point is in a polygon
  */
-  num pointInConvex(List worldPoint, Convex convexShape, List convexOffset, num convexAngle) {
-    var worldVertex0 = pic_worldVertex0,
+  num pointInConvex(vec2 worldPoint, Convex convexShape, vec2 convexOffset, num convexAngle) {
+    vec2 worldVertex0 = pic_worldVertex0,
         worldVertex1 = pic_worldVertex1,
         r0 = pic_r0,
         r1 = pic_r1,
-        point = worldPoint,
-        verts = convexShape.vertices,
-        lastCross = null;
-    for (var i = 0; i != verts.length + 1; i++) {
-      var v0 = verts[i % verts.length],
+        point = worldPoint;
+    List<vec2> verts = convexShape.vertices;
+    num lastCross= null;
+    for (int i = 0; i != verts.length + 1; i++) {
+      vec2 v0 = verts[i % verts.length],
           v1 = verts[(i + 1) % verts.length];
 
       // Transform vertices to world
@@ -999,8 +1000,8 @@ class Narrowphase {
  * @todo don't transform each vertex, but transform the particle position to convex-local instead
  */
 
-  num particleConvex(particleBody, particleShape, particleOffset, particleAngle, convexBody, convexShape, convexOffset, convexAngle, justTest) {
-    var worldVertex0 = tmp1,
+  num particleConvex(particleBody, particleShape, vec2 particleOffset, particleAngle, convexBody, convexShape, vec2 convexOffset, convexAngle, justTest) {
+    vec2 worldVertex0 = tmp1,
         worldVertex1 = tmp2,
         worldEdge = tmp3,
         worldEdgeUnit = tmp4,
@@ -1010,21 +1011,21 @@ class Narrowphase {
         orthoDist = tmp8,
         projectedPoint = tmp9,
         dist = tmp10,
-        worldVertex = tmp11,
-        closestEdge = -1,
-        closestEdgeDistance = null,
-        closestEdgeOrthoDist = tmp12,
+        worldVertex = tmp11;
+    num closestEdge = -1,
+        closestEdgeDistance = null;
+    vec2 closestEdgeOrthoDist = tmp12,
         closestEdgeProjectedPoint = tmp13,
         r0 = tmp14, // vector from particle to vertex0
         r1 = tmp15,
         localPoint = tmp16,
         candidateDist = tmp17,
-        minEdgeNormal = tmp18,
-        minCandidateDistance = double.MAX_FINITE;
+        minEdgeNormal = tmp18;
+    num minCandidateDistance = double.MAX_FINITE;
 
-    var numReported = 0,
-        found = false,
-        verts = convexShape.vertices;
+    num numReported = 0;
+    bool found = false;
+    List<vec2> verts = convexShape.vertices;
 
     // Check if the particle is in the polygon at all
     if (pointInConvex(particleOffset, convexShape, convexOffset, convexAngle) == 0) {
@@ -1036,9 +1037,9 @@ class Narrowphase {
     }
 
     // Check edges first
-    var lastCross = null;
-    for (var i = 0; i != verts.length + 1; i++) {
-      var v0 = verts[i % verts.length],
+    int lastCross = null;
+    for (int i = 0; i != verts.length + 1; i++) {
+      vec2 v0 = verts[i % verts.length],
           v1 = verts[(i + 1) % verts.length];
 
       // Transform vertices to world
@@ -1056,13 +1057,13 @@ class Narrowphase {
 
       // Check distance from the infinite line (spanned by the edge) to the particle
       vec2.sub(dist, particleOffset, worldVertex0);
-      var d = vec2.dot(dist, worldTangent);
+      num d = vec2.dot(dist, worldTangent);
       vec2.sub(centerDist, worldVertex0, convexOffset);
 
       vec2.sub(convexToparticle, particleOffset, convexOffset);
 
       vec2.sub(candidateDist, worldVertex0, particleOffset);
-      var candidateDistance = (vec2.dot(candidateDist, worldTangent)).abs();
+      num candidateDistance = (vec2.dot(candidateDist, worldTangent)).abs();
 
       if (candidateDistance < minCandidateDistance) {
         minCandidateDistance = candidateDistance;
@@ -1074,9 +1075,9 @@ class Narrowphase {
     }
 
     if (found) {
-      var c = this.createContactEquation(particleBody, convexBody, particleShape, convexShape);
+      ContactEquation c = this.createContactEquation(particleBody, convexBody, particleShape, convexShape);
 
-      vec2.scale(c.normalA, minEdgeNormal, -1);
+      vec2.scale(c.normalA, minEdgeNormal, -1.0);
       vec2.normalize(c.normalA, c.normalA);
 
       // Particle has no extent to the contact point
@@ -1118,9 +1119,9 @@ class Narrowphase {
  * @param {Number} [radiusB] Optional radius to use for shapeB
  */
 
-  num circleCircle(Body bodyA, Shape shapeA, List offsetA, num angleA, Body bodyB, Shape shapeB, List offsetB, num angleB, bool justTest, [num radiusA, num radiusB]) {
+  num circleCircle(Body bodyA, Shape shapeA, vec2 offsetA, num angleA, Body bodyB, Shape shapeB, vec2 offsetB, num angleB, bool justTest, [num radiusA, num radiusB]) {
 
-    List dist = tmp1;
+    vec2 dist = tmp1;
     radiusA = radiusA == null ? (shapeA as Circle).radius : radiusA;
     radiusB = radiusB == null ? (shapeB as Circle).radius : radiusB;
 
@@ -1168,16 +1169,16 @@ class Narrowphase {
  * @param  {Number} convexAngle
  * @param {Boolean} justTest
  */
-  planeConvex(planeBody, planeShape, planeOffset, planeAngle, convexBody, convexShape, convexOffset, convexAngle, justTest) {
-    var worldVertex = tmp1,
+  num planeConvex(planeBody, planeShape, vec2 planeOffset, planeAngle, convexBody, convexShape, vec2 convexOffset, convexAngle, justTest) {
+    vec2 worldVertex = tmp1,
         worldNormal = tmp2,
         dist = tmp3;
 
-    var numReported = 0;
+    num numReported = 0;
     vec2.rotate(worldNormal, yAxis, planeAngle);
 
-    for (var i = 0; i != convexShape.vertices.length; i++) {
-      var v = convexShape.vertices[i];
+    for (int i = 0; i != convexShape.vertices.length; i++) {
+      vec2 v = convexShape.vertices[i];
       vec2.rotate(worldVertex, v, convexAngle);
       vec2.add(worldVertex, worldVertex, convexOffset);
 
@@ -1186,7 +1187,7 @@ class Narrowphase {
       if (vec2.dot(dist, worldNormal) <= 0) {
 
         if (justTest) {
-          return true;
+          return 1;
         }
 
         // Found vertex
@@ -1198,7 +1199,7 @@ class Narrowphase {
 
         vec2.copy(c.normalA, worldNormal);
 
-        var d = vec2.dot(dist, c.normalA);
+        num d = vec2.dot(dist, c.normalA);
         vec2.scale(dist, c.normalA, d);
 
         // rj is from convex center to contact
@@ -1241,8 +1242,8 @@ class Narrowphase {
  * @param  {Number}     planeAngle
  * @param {Boolean}     justTest
  */
-  num particlePlane(particleBody, particleShape, particleOffset, particleAngle, planeBody, planeShape, planeOffset, planeAngle, justTest) {
-    var dist = tmp1,
+  num particlePlane(particleBody, particleShape, vec2 particleOffset, particleAngle, planeBody, planeShape, vec2 planeOffset, planeAngle, justTest) {
+    vec2 dist = tmp1,
         worldNormal = tmp2;
 
     //planeAngle = planeAngle || 0;
@@ -1250,7 +1251,7 @@ class Narrowphase {
     vec2.sub(dist, particleOffset, planeOffset);
     vec2.rotate(worldNormal, yAxis, planeAngle);
 
-    var d = vec2.dot(dist, worldNormal);
+    num d = vec2.dot(dist, worldNormal);
 
     if (d > 0) {
       return 0;
@@ -1259,7 +1260,7 @@ class Narrowphase {
       return 1;
     }
 
-    var c = this.createContactEquation(planeBody, particleBody, planeShape, particleShape);
+    ContactEquation c = this.createContactEquation(planeBody, particleBody, planeShape, particleShape);
 
     vec2.copy(c.normalA, worldNormal);
     vec2.scale(dist, c.normalA, d);
@@ -1293,8 +1294,8 @@ class Narrowphase {
  * @param  {Number} particleAngle
  * @param  {Boolean} justTest
  */
-  num circleParticle(circleBody, circleShape, circleOffset, circleAngle, particleBody, particleShape, particleOffset, particleAngle, justTest) {
-    var dist = tmp1;
+  num circleParticle(circleBody, circleShape, vec2 circleOffset, circleAngle, particleBody, particleShape, vec2 particleOffset, particleAngle, justTest) {
+    vec2 dist = tmp1;
 
     vec2.sub(dist, particleOffset, circleOffset);
     if (vec2.squaredLength(dist) > pow(circleShape.radius, 2)) {
@@ -1325,8 +1326,8 @@ class Narrowphase {
     return 1;
   }
 
-  Circle planeCapsule_tmpCircle = new Circle(1);
-  List planeCapsule_tmp1 = vec2.create(),
+  static final Circle planeCapsule_tmpCircle = new Circle(1);
+  static final vec2 planeCapsule_tmp1 = vec2.create(),
       planeCapsule_tmp2 = vec2.create(),
       planeCapsule_tmp3 = vec2.create();
 
@@ -1342,11 +1343,11 @@ class Narrowphase {
  * @param  {Number} capsuleAngle
  * @param {Boolean} justTest
  */
-  planeCapsule(planeBody, planeShape, planeOffset, planeAngle, capsuleBody, capsuleShape, capsuleOffset, capsuleAngle, justTest) {
-    var end1 = planeCapsule_tmp1,
+  num planeCapsule(planeBody, planeShape, vec2 planeOffset, planeAngle, capsuleBody, capsuleShape, vec2 capsuleOffset, capsuleAngle, justTest) {
+    vec2 end1 = planeCapsule_tmp1,
         end2 = planeCapsule_tmp2,
-        circle = planeCapsule_tmpCircle,
         dst = planeCapsule_tmp3;
+    Circle circle = planeCapsule_tmpCircle;
 
     // Compute world end positions
     vec2.set(end1, -capsuleShape.length / 2, 0);
@@ -1359,7 +1360,7 @@ class Narrowphase {
 
     circle.radius = capsuleShape.radius;
 
-    var enableFrictionBefore;
+    bool enableFrictionBefore;
 
     // Temporarily turn off friction
     if (this.enableFrictionReduction) {
@@ -1368,7 +1369,7 @@ class Narrowphase {
     }
 
     // Do Narrowphase as two circles
-    var numContacts1 = this.circlePlane(capsuleBody, circle, end1, 0, planeBody, planeShape, planeOffset, planeAngle, justTest),
+    num numContacts1 = this.circlePlane(capsuleBody, circle, end1, 0, planeBody, planeShape, planeOffset, planeAngle, justTest),
         numContacts2 = this.circlePlane(capsuleBody, circle, end2, 0, planeBody, planeShape, planeOffset, planeAngle, justTest);
 
     // Restore friction
@@ -1377,9 +1378,9 @@ class Narrowphase {
     }
 
     if (justTest) {
-      return numContacts1 || numContacts2;
+      return (numContacts1 != 0 || numContacts2 != 0) ? 1 : 0;
     } else {
-      var numTotal = numContacts1 + numContacts2;
+      num numTotal = numContacts1 + numContacts2;
       if (this.enableFrictionReduction) {
         if (numTotal != 0) {
           this.frictionEquations.add(this.createFrictionFromAverage(numTotal));
@@ -1402,18 +1403,18 @@ class Narrowphase {
  */
 
   num circlePlane(bi, si, xi, ai, bj, sj, xj, aj, justTest) {
-    var circleBody = bi,
-        circleShape = si,
-        circleOffset = xi, // Offset from body center, rotated!
-        planeBody = bj,
-        shapeB = sj,
-        planeOffset = xj,
-        planeAngle = aj;
+    Body circleBody = bi;
+    Circle circleShape = si;
+    vec2 circleOffset = xi; // Offset from body center, rotated!
+    Body planeBody = bj;
+    Shape shapeB = sj;
+    vec2 planeOffset = xj;
+    num planeAngle = aj;
 
     //planeAngle = planeAngle == 0? ;
 
     // Vector from plane to circle
-    var planeToCircle = tmp1,
+    vec2 planeToCircle = tmp1,
         worldNormal = tmp2,
         temp = tmp3;
 
@@ -1423,7 +1424,7 @@ class Narrowphase {
     vec2.rotate(worldNormal, yAxis, planeAngle);
 
     // Normal direction distance
-    var d = vec2.dot(worldNormal, planeToCircle);
+    num d = vec2.dot(worldNormal, planeToCircle);
 
     if (d > circleShape.radius) {
       return 0; // No overlap. Abort.
@@ -1434,7 +1435,7 @@ class Narrowphase {
     }
 
     // Create contact
-    var contact = this.createContactEquation(planeBody, circleBody, sj, si);
+    ContactEquation contact = this.createContactEquation(planeBody, circleBody, sj, si);
 
     // ni is the plane world normal
     vec2.copy(contact.normalA, worldNormal);
@@ -1474,8 +1475,8 @@ class Narrowphase {
 //Narrowphase.prototype[Shape.CONVEX] =
 //Narrowphase.prototype[Shape.CONVEX | Shape.RECTANGLE] =
 //Narrowphase.prototype[Shape.RECTANGLE] =
-  num convexConvex(bi, si, xi, ai, bj, sj, xj, aj, justTest, [num precision = 0]) {
-    var sepAxis = tmp1,
+  num convexConvex(bi, si, vec2 xi, ai, bj, sj, vec2 xj, aj, justTest, [num precision = 0]) {
+    vec2 sepAxis = tmp1,
         worldPoint = tmp2,
         worldPoint0 = tmp3,
         worldPoint1 = tmp4,
@@ -1483,11 +1484,11 @@ class Narrowphase {
         projected = tmp6,
         penetrationVec = tmp7,
         dist = tmp8,
-        worldNormal = tmp9,
-        numContacts = 0;
+        worldNormal = tmp9;
+    num numContacts = 0;
     //precision = recision) == 'number' ? precision : 0;
 
-    var found = Narrowphase.findSeparatingAxis(si, xi, ai, sj, xj, aj, sepAxis);
+    bool found = Narrowphase.findSeparatingAxis(si, xi, ai, sj, xj, aj, sepAxis);
     if (!found) {
       return 0;
     }
@@ -1495,11 +1496,11 @@ class Narrowphase {
 // Make sure the separating axis is directed from shape i to shape j
     vec2.sub(dist, xj, xi);
     if (vec2.dot(sepAxis, dist) > 0) {
-      vec2.scale(sepAxis, sepAxis, -1);
+      vec2.scale(sepAxis, sepAxis, -1.0);
     }
 
 // Find edges with normals closest to the separating axis
-    var closestEdge1 = Narrowphase.getClosestEdge(si, ai, sepAxis, true), // Flipped axis
+    num closestEdge1 = Narrowphase.getClosestEdge(si, ai, sepAxis, true), // Flipped axis
         closestEdge2 = Narrowphase.getClosestEdge(sj, aj, sepAxis);
 
     if (closestEdge1 == -1 || closestEdge2 == -1) {
@@ -1507,17 +1508,17 @@ class Narrowphase {
     }
 
 // Loop over the shapes
-    for (var k = 0; k < 2; k++) {
+    for (int k = 0; k < 2; k++) {
 
-      var closestEdgeA = closestEdge1,
-          closestEdgeB = closestEdge2,
-          shapeA = si,
-          shapeB = sj,
-          offsetA = xi,
-          offsetB = xj,
-          angleA = ai,
-          angleB = aj,
-          bodyA = bi,
+      num closestEdgeA = closestEdge1,
+          closestEdgeB = closestEdge2;
+      Convex shapeA = si,
+          shapeB = sj;
+      vec2 offsetA = xi,
+          offsetB = xj;
+      num angleA = ai,
+          angleB = aj;
+      Body bodyA = bi,
           bodyB = bj;
 
       if (k == 0) {
@@ -1545,19 +1546,19 @@ class Narrowphase {
       }
 
 // Loop over 2 points in convex B
-      for (var j = closestEdgeB; j < closestEdgeB + 2; j++) {
+      for (int j = closestEdgeB; j < closestEdgeB + 2; j++) {
 
 // Get world point
-        var v = shapeB.vertices[(j + shapeB.vertices.length) % shapeB.vertices.length];
+        vec2 v = shapeB.vertices[(j + shapeB.vertices.length) % shapeB.vertices.length];
         vec2.rotate(worldPoint, v, angleB);
         vec2.add(worldPoint, worldPoint, offsetB);
 
-        var insideNumEdges = 0;
+        num insideNumEdges = 0;
 
 // Loop over the 3 closest edges in convex A
-        for (var i = closestEdgeA - 1; i < closestEdgeA + 2; i++) {
+        for (int i = closestEdgeA - 1; i < closestEdgeA + 2; i++) {
 
-          var v0 = shapeA.vertices[(i + shapeA.vertices.length) % shapeA.vertices.length],
+          vec2 v0 = shapeA.vertices[(i + shapeA.vertices.length) % shapeA.vertices.length],
               v1 = shapeA.vertices[(i + 1 + shapeA.vertices.length) % shapeA.vertices.length];
 
 // Construct the edge
@@ -1573,7 +1574,7 @@ class Narrowphase {
 
           vec2.sub(dist, worldPoint, worldPoint0);
 
-          var d = vec2.dot(worldNormal, dist);
+          num d = vec2.dot(worldNormal, dist);
 
           if ((i == closestEdgeA && d <= precision) || (i != closestEdgeA && d <= 0)) {
             insideNumEdges++;
@@ -1590,11 +1591,11 @@ class Narrowphase {
 // Project it to the center edge and use the projection direction as normal
 
 // Create contact
-          var c = this.createContactEquation(bodyA, bodyB, shapeA, shapeB);
+          ContactEquation c = this.createContactEquation(bodyA, bodyB, shapeA, shapeB);
           numContacts++;
 
 // Get center edge from body A
-          var v0 = shapeA.vertices[(closestEdgeA) % shapeA.vertices.length],
+          vec2 v0 = shapeA.vertices[(closestEdgeA) % shapeA.vertices.length],
               v1 = shapeA.vertices[(closestEdgeA + 1) % shapeA.vertices.length];
 
 // Construct the edge
@@ -1609,7 +1610,7 @@ class Narrowphase {
           vec2.normalize(c.normalA, c.normalA);
 
           vec2.sub(dist, worldPoint, worldPoint0); // From edge point to the penetrating point
-          var d = vec2.dot(c.normalA, dist); // Penetration
+          num d = vec2.dot(c.normalA, dist); // Penetration
           vec2.scale(penetrationVec, c.normalA, d); // Vector penetration
 
           vec2.sub(c.contactPointA, worldPoint, offsetA);
@@ -1643,7 +1644,7 @@ class Narrowphase {
   }
 
 // .projectConvex is called by other functions, need local tmp vectors
-  static List pcoa_tmp1 = vec2.fromValues(0, 0);
+  static final vec2 pcoa_tmp1 = vec2.fromValues(0, 0);
 
 /**
  * Project a Convex onto a world-oriented axis
@@ -1655,18 +1656,18 @@ class Narrowphase {
  * @param  {Array} worldAxis
  * @param  {Array} result
  */
-  static projectConvexOntoAxis(convexShape, convexOffset, convexAngle, worldAxis, result) {
-    var max = null,
-        min = null,
-        v,
-        value,
-        localAxis = pcoa_tmp1;
+  static projectConvexOntoAxis(Convex convexShape, vec2 convexOffset, num convexAngle, vec2 worldAxis, vec2 result) {
+    num max = null,
+        min = null;
+    vec2 v;
+    num value;
+    vec2 localAxis = pcoa_tmp1;
 
     // Convert the axis to local coords of the body
     vec2.rotate(localAxis, worldAxis, -convexAngle);
 
     // Get projected position of all vertices
-    for (var i = 0; i < convexShape.vertices.length; i++) {
+    for (int i = 0; i < convexShape.vertices.length; i++) {
       v = convexShape.vertices[i];
       value = vec2.dot(v, localAxis);
       if (max == null || value > max) {
@@ -1678,19 +1679,19 @@ class Narrowphase {
     }
 
     if (min > max) {
-      var t = min;
+      num t = min;
       min = max;
       max = t;
     }
 
     // Project the position of the body onto the axis - need to add this to the result
-    var offset = vec2.dot(convexOffset, worldAxis);
+    num offset = vec2.dot(convexOffset, worldAxis);
 
     vec2.set(result, min + offset, max + offset);
   }
 
 // .findSeparatingAxis is called by other functions, need local tmp vectors
-  static List fsa_tmp1 = vec2.fromValues(0, 0),
+  static final vec2 fsa_tmp1 = vec2.fromValues(0, 0),
       fsa_tmp2 = vec2.fromValues(0, 0),
       fsa_tmp3 = vec2.fromValues(0, 0),
       fsa_tmp4 = vec2.fromValues(0, 0),
@@ -1710,11 +1711,11 @@ class Narrowphase {
  * @param  {Array}      sepAxis     The resulting axis
  * @return {Boolean}                Whether the axis could be found.
  */
-  static findSeparatingAxis(c1, offset1, angle1, c2, offset2, angle2, sepAxis) {
-    var maxDist = null,
-        overlap = false,
-        found = false,
-        edge = fsa_tmp1,
+  static findSeparatingAxis(c1, vec2 offset1, angle1, c2, vec2 offset2, angle2, sepAxis) {
+    num maxDist = null;
+    bool overlap = false,
+        found = false;
+    vec2 edge = fsa_tmp1,
         worldPoint0 = fsa_tmp2,
         worldPoint1 = fsa_tmp3,
         normal = fsa_tmp4,
@@ -1723,21 +1724,21 @@ class Narrowphase {
 
     if (c1 is Rectangle && c2 is Rectangle) {
 
-      for (var j = 0; j != 2; j++) {
-        var c = c1,
-            angle = angle1;
+      for (int j = 0; j != 2; j++) {
+        Rectangle c = c1;
+        num angle = angle1;
         if (j == 1) {
           c = c2;
           angle = angle2;
         }
 
-        for (var i = 0; i != 2; i++) {
+        for (int i = 0; i != 2; i++) {
 
           // Get the world edge
           if (i == 0) {
-            vec2.set(normal, 0, 1);
+            vec2.set(normal, 0.0, 1.0);
           } else if (i == 1) {
-            vec2.set(normal, 1, 0);
+            vec2.set(normal, 1.0, 0.0);
           }
           if (angle != 0) {
             vec2.rotate(normal, normal, angle);
@@ -1748,17 +1749,17 @@ class Narrowphase {
           Narrowphase.projectConvexOntoAxis(c2, offset2, angle2, normal, span2);
 
           // Order by span position
-          var a = span1,
-              b = span2,
-              swapped = false;
-          if (span1[0] > span2[0]) {
+          vec2 a = span1,
+              b = span2;
+          bool swapped = false;
+          if (span1.x > span2.x) {
             b = span1;
             a = span2;
             swapped = true;
           }
 
           // Get separating distance
-          var dist = b[0] - a[1];
+          num dist = b.x - a.y;
           overlap = (dist <= 0);
 
           if (maxDist == null || dist > maxDist) {
@@ -1771,15 +1772,15 @@ class Narrowphase {
 
     } else {
 
-      for (var j = 0; j != 2; j++) {
-        var c = c1,
-            angle = angle1;
+      for (int j = 0; j != 2; j++) {
+        Convex c = c1;
+        num angle = angle1;
         if (j == 1) {
           c = c2;
           angle = angle2;
         }
 
-        for (var i = 0; i != c.vertices.length; i++) {
+        for (int i = 0; i != c.vertices.length; i++) {
           // Get the world edge
           vec2.rotate(worldPoint0, c.vertices[i], angle);
           vec2.rotate(worldPoint1, c.vertices[(i + 1) % c.vertices.length], angle);
@@ -1795,17 +1796,17 @@ class Narrowphase {
           Narrowphase.projectConvexOntoAxis(c2, offset2, angle2, normal, span2);
 
           // Order by span position
-          var a = span1,
-              b = span2,
-              swapped = false;
-          if (span1[0] > span2[0]) {
+          vec2 a = span1,
+              b = span2;
+          bool swapped = false;
+          if (span1.x > span2.x) {
             b = span1;
             a = span2;
             swapped = true;
           }
 
           // Get separating distance
-          var dist = b[0] - a[1];
+          num dist = b.x - a.y;
           overlap = (dist <= 0);
 
           if (maxDist == null || dist > maxDist) {
@@ -1817,53 +1818,11 @@ class Narrowphase {
       }
     }
 
-
-    /*
-    // Needs to be tested some more
-    for(var j=0; j!==2; j++){
-        var c = c1,
-            angle = angle1;
-        if(j===1){
-            c = c2;
-            angle = angle2;
-        }
-
-        for(var i=0; i!==c.axes.length; i++){
-
-            var normal = c.axes[i];
-
-            // Project hulls onto that normal
-            Narrowphase.projectConvexOntoAxis(c1, offset1, angle1, normal, span1);
-            Narrowphase.projectConvexOntoAxis(c2, offset2, angle2, normal, span2);
-
-            // Order by span position
-            var a=span1,
-                b=span2,
-                swapped = false;
-            if(span1[0] > span2[0]){
-                b=span1;
-                a=span2;
-                swapped = true;
-            }
-
-            // Get separating distance
-            var dist = b[0] - a[1];
-            overlap = (dist <= Narrowphase.convexPrecision);
-
-            if(maxDist===null || dist > maxDist){
-                vec2.copy(sepAxis, normal);
-                maxDist = dist;
-                found = overlap;
-            }
-        }
-    }
-    */
-
     return found;
   }
 
 // .getClosestEdge is called by other functions, need local tmp vectors
-  static List gce_tmp1 = vec2.fromValues(0, 0),
+  static final vec2 gce_tmp1 = vec2.fromValues(0, 0),
       gce_tmp2 = vec2.fromValues(0, 0),
       gce_tmp3 = vec2.fromValues(0, 0);
 
@@ -1877,21 +1836,21 @@ class Narrowphase {
  * @param  {Boolean}    flip
  * @return {Number}             Index of the edge that is closest. This index and the next spans the resulting edge. Returns -1 if failed.
  */
-  static num getClosestEdge(c, angle, axis, [bool flip = false]) {
-    var localAxis = gce_tmp1,
+  static num getClosestEdge(Convex c, num angle, vec2 axis, [bool flip = false]) {
+    vec2 localAxis = gce_tmp1,
         edge = gce_tmp2,
         normal = gce_tmp3;
 
     // Convert the axis to local coords of the body
     vec2.rotate(localAxis, axis, -angle);
     if (flip) {
-      vec2.scale(localAxis, localAxis, -1);
+      vec2.scale(localAxis, localAxis, -1.0);
     }
 
-    var closestEdge = -1,
+    num closestEdge = -1,
         N = c.vertices.length,
         maxDot = -1;
-    for (var i = 0; i != N; i++) {
+    for (int i = 0; i != N; i++) {
       // Get the edge
       vec2.sub(edge, c.vertices[(i + 1) % N], c.vertices[i % N]);
 
@@ -1899,7 +1858,7 @@ class Narrowphase {
       vec2.rotate90cw(normal, edge);
       vec2.normalize(normal, normal);
 
-      var d = vec2.dot(normal, localAxis);
+      num d = vec2.dot(normal, localAxis);
       if (closestEdge == -1 || d > maxDot) {
         closestEdge = i % N;
         maxDot = d;
@@ -1909,7 +1868,7 @@ class Narrowphase {
     return closestEdge;
   }
 
-  List circleHeightfield_candidate = vec2.create(),
+  static final vec2 circleHeightfield_candidate = vec2.create(),
       circleHeightfield_dist = vec2.create(),
       circleHeightfield_v0 = vec2.create(),
       circleHeightfield_v1 = vec2.create(),
@@ -1928,11 +1887,11 @@ class Narrowphase {
  * @param  {Number}         aj
  */
 
-  num circleHeightfield(circleBody, circleShape, circlePos, circleAngle, hfBody, hfShape, hfPos, hfAngle, justTest, [radius]) {
-    var data = hfShape.data,
+  num circleHeightfield(Body circleBody, Circle circleShape, vec2 circlePos, circleAngle, Body hfBody, Heightfield hfShape, vec2 hfPos, num hfAngle, bool justTest, [num radius]) {
+    List<num> data = hfShape.data;
 
-        w = hfShape.elementWidth,
-        dist = circleHeightfield_dist,
+    num w = hfShape.elementWidth;
+    vec2 dist = circleHeightfield_dist,
         candidate = circleHeightfield_candidate,
         minCandidate = circleHeightfield_minCandidate,
         minCandidateNormal = circleHeightfield_minCandidateNormal,
@@ -1943,8 +1902,8 @@ class Narrowphase {
     radius = radius == null ? circleShape.radius : radius;
 
     // Get the index of the points to test against
-    var idxA = ((circlePos[0] - radius - hfPos[0]) / w).floor(),
-        idxB = ((circlePos[0] + radius - hfPos[0]) / w).ceil();
+    num idxA = ((circlePos.x - radius - hfPos.x) / w).floor(),
+        idxB = ((circlePos.x + radius - hfPos.x) / w).ceil();
 
     /*if(idxB < 0 || idxA >= data.length)
         return justTest ? false : 0;*/
@@ -1957,9 +1916,9 @@ class Narrowphase {
     }
 
     // Get max and min
-    var max = data[idxA],
+    num max = data[idxA],
         min = data[idxB];
-    for (var i = idxA; i < idxB; i++) {
+    for (int i = idxA; i < idxB; i++) {
       if (data[i] < min) {
         min = data[i];
       }
@@ -1968,7 +1927,7 @@ class Narrowphase {
       }
     }
 
-    if (circlePos[1] - radius > max) {
+    if (circlePos.y - radius > max) {
       return justTest ? false : 0;
     }
 
@@ -1984,10 +1943,10 @@ class Narrowphase {
     // 2. 1. Get point on circle that is closest to the edge (scale normal with -radius)
     // 2. 2. Check if point is inside.
 
-    var found = false;
+    bool found = false;
 
     // Check all edges first
-    for (var i = idxA; i < idxB; i++) {
+    for (num i = idxA; i < idxB; i++) {
 
       // Get points
       vec2.set(v0, i * w, data[i]);
@@ -2008,8 +1967,8 @@ class Narrowphase {
       vec2.sub(dist, candidate, v0);
 
       // Check if it is in the element "stick"
-      var d = vec2.dot(dist, worldNormal);
-      if (candidate[0] >= v0[0] && candidate[0] < v1[0] && d <= 0) {
+      num d = vec2.dot(dist, worldNormal);
+      if (candidate.x >= v0.x && candidate.x < v1.x && d <= 0) {
 
         if (justTest) {
           return 1;
@@ -2046,7 +2005,7 @@ class Narrowphase {
     // Check all vertices
     found = false;
     if (radius > 0) {
-      for (var i = idxA; i <= idxB; i++) {
+      for (int i = idxA; i <= idxB; i++) {
 
         // Get point
         vec2.set(v0, i * w, data[i]);
@@ -2062,7 +2021,7 @@ class Narrowphase {
 
           found = true;
 
-          var c = this.createContactEquation(hfBody, circleBody, hfShape, circleShape);
+          ContactEquation c = this.createContactEquation(hfBody, circleBody, hfShape, circleShape);
 
           // Construct normal - out of heightfield
           vec2.copy(c.normalA, dist);
@@ -2093,10 +2052,10 @@ class Narrowphase {
 
   }
 
-  List convexHeightfield_v0 = vec2.create(),
+  static final vec2 convexHeightfield_v0 = vec2.create(),
       convexHeightfield_v1 = vec2.create(),
       convexHeightfield_tilePos = vec2.create();
-  Convex convexHeightfield_tempConvexShape = new Convex([vec2.create(), vec2.create(), vec2.create(), vec2.create()]);
+  static final Convex convexHeightfield_tempConvexShape = new Convex([vec2.create(), vec2.create(), vec2.create(), vec2.create()]);
 /**
  * @method circleHeightfield
  * @param  {Body}           bi
@@ -2109,17 +2068,17 @@ class Narrowphase {
  */
 //Narrowphase.prototype[Shape.RECTANGLE | Shape.HEIGHTFIELD] =
 //Narrowphase.prototype[Shape.CONVEX | Shape.HEIGHTFIELD] =
-  num convexHeightfield(convexBody, convexShape, convexPos, convexAngle, hfBody, hfShape, hfPos, hfAngle, justTest) {
-    var data = hfShape.data,
-        w = hfShape.elementWidth,
-        v0 = convexHeightfield_v0,
+  num convexHeightfield(Body convexBody, Convex convexShape, vec2 convexPos, num convexAngle, Body hfBody, Heightfield hfShape, vec2 hfPos, num hfAngle, bool justTest) {
+    List<num> data = hfShape.data;
+    num w = hfShape.elementWidth;
+    vec2 v0 = convexHeightfield_v0,
         v1 = convexHeightfield_v1,
-        tilePos = convexHeightfield_tilePos,
-        tileConvex = convexHeightfield_tempConvexShape;
+        tilePos = convexHeightfield_tilePos;
+    Convex tileConvex = convexHeightfield_tempConvexShape;
 
     // Get the index of the points to test against
-    var idxA = ((convexBody.aabb.lowerBound[0] - hfPos[0]) / w).floor(),
-        idxB = ((convexBody.aabb.upperBound[0] - hfPos[0]) / w).ceil();
+    num idxA = ((convexBody.aabb.lowerBound.x - hfPos.x) / w).floor(),
+        idxB = ((convexBody.aabb.upperBound.x - hfPos.x) / w).ceil();
 
     if (idxA < 0) {
       idxA = 0;
@@ -2129,9 +2088,9 @@ class Narrowphase {
     }
 
     // Get max and min
-    var max = data[idxA],
+    num max = data[idxA],
         min = data[idxB];
-    for (var i = idxA; i < idxB; i++) {
+    for (int i = idxA; i < idxB; i++) {
       if (data[i] < min) {
         min = data[i];
       }
@@ -2140,7 +2099,7 @@ class Narrowphase {
       }
     }
 
-    if (convexBody.aabb.lowerBound[1] > max) {
+    if (convexBody.aabb.lowerBound.y > max) {
       return 0;
     }
 
@@ -2159,14 +2118,14 @@ class Narrowphase {
 
       // Construct a convex
       num tileHeight = 100; // todo
-      vec2.set(tilePos, (v1[0] + v0[0]) * 0.5, (v1[1] + v0[1] - tileHeight) * 0.5);
+      vec2.set(tilePos, (v1.x + v0.x) * 0.5, (v1.y + v0.y - tileHeight) * 0.5);
 
       vec2.sub(tileConvex.vertices[0], v1, tilePos);
       vec2.sub(tileConvex.vertices[1], v0, tilePos);
       vec2.copy(tileConvex.vertices[2], tileConvex.vertices[1]);
       vec2.copy(tileConvex.vertices[3], tileConvex.vertices[0]);
-      tileConvex.vertices[2][1] -= tileHeight;
-      tileConvex.vertices[3][1] -= tileHeight;
+      tileConvex.vertices[2].y -= tileHeight;
+      tileConvex.vertices[3].y -= tileHeight;
 
       // Do convex collision
       numContacts += this.convexConvex(convexBody, convexShape, convexPos, convexAngle, hfBody, tileConvex, tilePos, 0, justTest);

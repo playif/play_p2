@@ -29,7 +29,7 @@ class Capsule extends Shape {
     this.area = PI * this.radius * this.radius + this.radius * 2 * this.length;
   }
 
-  List r = vec2.create();
+  static final vec2 r = vec2.create();
 
   /**
    * @method computeAABB
@@ -37,7 +37,7 @@ class Capsule extends Shape {
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB (AABB out, [List position, num angle]){
+  computeAABB (AABB out, [vec2 position, num angle]){
     num radius = this.radius;
 
     // Compute center position of one of the the circles, world oriented, but with local offset
@@ -47,10 +47,10 @@ class Capsule extends Shape {
     }
 
     // Get bounds
-    vec2.set(out.upperBound,  max(r[0]+radius, -r[0]+radius),
-    max(r[1]+radius, -r[1]+radius));
-    vec2.set(out.lowerBound,  min(r[0]-radius, -r[0]-radius),
-    min(r[1]-radius, -r[1]-radius));
+    vec2.set(out.upperBound,  max(r.x+radius, -r.x+radius),
+    max(r.y+radius, -r.y+radius));
+    vec2.set(out.lowerBound,  min(r.x-radius, -r.x-radius),
+    min(r.y-radius, -r.y-radius));
 
     // Add offset
     vec2.add(out.lowerBound, out.lowerBound, position);

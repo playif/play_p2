@@ -44,7 +44,7 @@ main() {
       s.collisionMask = GROUND | OTHER;
     }
 
-    var world = new p2.World(gravity: [0, -10]);
+    var world = new p2.World(gravity: new p2.vec2(0.0, -10.0));
 
     app.setWorld(world);
 
@@ -52,47 +52,47 @@ main() {
     world.solver.tolerance = 0.002;
 
     // Lower legs
-    var lowerLeftLeg = new p2.Body(mass: 1, position: [-shouldersDistance / 2, lowerLegLength / 2]);
-    var lowerRightLeg = new p2.Body(mass: 1, position: [shouldersDistance / 2, lowerLegLength / 2]);
+    var lowerLeftLeg = new p2.Body(mass: 1, position: new p2.vec2(-shouldersDistance / 2, lowerLegLength / 2));
+    var lowerRightLeg = new p2.Body(mass: 1, position: new p2.vec2(shouldersDistance / 2, lowerLegLength / 2));
     lowerLeftLeg.addShape(lowerLegShape);
     lowerRightLeg.addShape(lowerLegShape);
     world.addBody(lowerLeftLeg);
     world.addBody(lowerRightLeg);
 
     // Upper legs
-    var upperLeftLeg = new p2.Body(mass: 1, position: [-shouldersDistance / 2, lowerLeftLeg.position[1] + lowerLegLength / 2 + upperLegLength / 2]);
-    var upperRightLeg = new p2.Body(mass: 1, position: [shouldersDistance / 2, lowerRightLeg.position[1] + lowerLegLength / 2 + upperLegLength / 2]);
+    var upperLeftLeg = new p2.Body(mass: 1, position: new p2.vec2(-shouldersDistance / 2, lowerLeftLeg.position.y + lowerLegLength / 2 + upperLegLength / 2));
+    var upperRightLeg = new p2.Body(mass: 1, position: new p2.vec2(shouldersDistance / 2, lowerRightLeg.position.y + lowerLegLength / 2 + upperLegLength / 2));
     upperLeftLeg.addShape(upperLegShape);
     upperRightLeg.addShape(upperLegShape);
     world.addBody(upperLeftLeg);
     world.addBody(upperRightLeg);
 
     // Pelvis
-    var pelvis = new p2.Body(mass: 1, position: [0, upperLeftLeg.position[1] + upperLegLength / 2 + pelvisLength / 2]);
+    var pelvis = new p2.Body(mass: 1, position: new p2.vec2(0.0, upperLeftLeg.position.y + upperLegLength / 2 + pelvisLength / 2));
     pelvis.addShape(pelvisShape);
     world.addBody(pelvis);
 
     // Upper body
-    var upperBody = new p2.Body(mass: 1, position: [0, pelvis.position[1] + pelvisLength / 2 + upperBodyLength / 2]);
+    var upperBody = new p2.Body(mass: 1, position: new p2.vec2(0.0, pelvis.position.y + pelvisLength / 2 + upperBodyLength / 2));
     upperBody.addShape(upperBodyShape);
     world.addBody(upperBody);
 
     // Head
-    var head = new p2.Body(mass: 1, position: [0, upperBody.position[1] + upperBodyLength / 2 + headRadius + neckLength]);
+    var head = new p2.Body(mass: 1, position: new p2.vec2(0.0, upperBody.position.y + upperBodyLength / 2 + headRadius + neckLength));
     head.addShape(headShape);
     world.addBody(head);
 
     // Upper arms
-    var upperLeftArm = new p2.Body(mass: 1, position: [-shouldersDistance / 2 - upperArmLength / 2, upperBody.position[1] + upperBodyLength / 2]);
-    var upperRightArm = new p2.Body(mass: 1, position: [shouldersDistance / 2 + upperArmLength / 2, upperBody.position[1] + upperBodyLength / 2]);
+    var upperLeftArm = new p2.Body(mass: 1, position: new p2.vec2(-shouldersDistance / 2 - upperArmLength / 2, upperBody.position.y + upperBodyLength / 2));
+    var upperRightArm = new p2.Body(mass: 1, position: new p2.vec2(shouldersDistance / 2 + upperArmLength / 2, upperBody.position.y + upperBodyLength / 2));
     upperLeftArm.addShape(upperArmShape);
     upperRightArm.addShape(upperArmShape);
     world.addBody(upperLeftArm);
     world.addBody(upperRightArm);
 
     // lower arms
-    var lowerLeftArm = new p2.Body(mass: 1, position: [upperLeftArm.position[0] - lowerArmLength / 2 - upperArmLength / 2, upperLeftArm.position[1]]);
-    var lowerRightArm = new p2.Body(mass: 1, position: [upperRightArm.position[0] + lowerArmLength / 2 + upperArmLength / 2, upperRightArm.position[1]]);
+    var lowerLeftArm = new p2.Body(mass: 1, position: new p2.vec2(upperLeftArm.position.x - lowerArmLength / 2 - upperArmLength / 2, upperLeftArm.position.y));
+    var lowerRightArm = new p2.Body(mass: 1, position: new p2.vec2(upperRightArm.position.x + lowerArmLength / 2 + upperArmLength / 2, upperRightArm.position.y));
     lowerLeftArm.addShape(lowerArmShape);
     lowerRightArm.addShape(lowerArmShape);
     world.addBody(lowerLeftArm);
@@ -100,42 +100,42 @@ main() {
 
 
     // Neck joint
-    var neckJoint = new p2.RevoluteConstraint(head, upperBody, localPivotA: [0, -headRadius - neckLength / 2], localPivotB: [0, upperBodyLength / 2]);
+    var neckJoint = new p2.RevoluteConstraint(head, upperBody, localPivotA: new p2.vec2(0.0, -headRadius - neckLength / 2), localPivotB: new p2.vec2(0.0, upperBodyLength / 2));
     neckJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     world.addConstraint(neckJoint);
 
     // Knee joints
-    var leftKneeJoint = new p2.RevoluteConstraint(lowerLeftLeg, upperLeftLeg, localPivotA: [0, lowerLegLength / 2], localPivotB: [0, -upperLegLength / 2]);
-    var rightKneeJoint = new p2.RevoluteConstraint(lowerRightLeg, upperRightLeg, localPivotA: [0, lowerLegLength / 2], localPivotB: [0, -upperLegLength / 2]);
+    var leftKneeJoint = new p2.RevoluteConstraint(lowerLeftLeg, upperLeftLeg, localPivotA: new p2.vec2(0.0, lowerLegLength / 2), localPivotB: new p2.vec2(0.0, -upperLegLength / 2));
+    var rightKneeJoint = new p2.RevoluteConstraint(lowerRightLeg, upperRightLeg, localPivotA: new p2.vec2(0.0, lowerLegLength / 2), localPivotB: new p2.vec2(0.0, -upperLegLength / 2));
     leftKneeJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     rightKneeJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     world.addConstraint(leftKneeJoint);
     world.addConstraint(rightKneeJoint);
 
     // Hip joints
-    var leftHipJoint = new p2.RevoluteConstraint(upperLeftLeg, pelvis, localPivotA: [0, upperLegLength / 2], localPivotB: [-shouldersDistance / 2, -pelvisLength / 2]);
-    var rightHipJoint = new p2.RevoluteConstraint(upperRightLeg, pelvis, localPivotA: [0, upperLegLength / 2], localPivotB: [shouldersDistance / 2, -pelvisLength / 2]);
+    var leftHipJoint = new p2.RevoluteConstraint(upperLeftLeg, pelvis, localPivotA: new p2.vec2(0.0, upperLegLength / 2), localPivotB: new p2.vec2(-shouldersDistance / 2, -pelvisLength / 2));
+    var rightHipJoint = new p2.RevoluteConstraint(upperRightLeg, pelvis, localPivotA: new p2.vec2(0.0, upperLegLength / 2), localPivotB: new p2.vec2(shouldersDistance / 2, -pelvisLength / 2));
     leftHipJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     rightHipJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     world.addConstraint(leftHipJoint);
     world.addConstraint(rightHipJoint);
 
     // Spine
-    var spineJoint = new p2.RevoluteConstraint(pelvis, upperBody, localPivotA: [0, pelvisLength / 2], localPivotB: [0, -upperBodyLength / 2]);
+    var spineJoint = new p2.RevoluteConstraint(pelvis, upperBody, localPivotA: new p2.vec2(0.0, pelvisLength / 2), localPivotB: new p2.vec2(0.0, -upperBodyLength / 2));
     spineJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     world.addConstraint(spineJoint);
 
     // Shoulders
-    var leftShoulder = new p2.RevoluteConstraint(upperBody, upperLeftArm, localPivotA: [-shouldersDistance / 2, upperBodyLength / 2], localPivotB: [upperArmLength / 2, 0]);
-    var rightShoulder = new p2.RevoluteConstraint(upperBody, upperRightArm, localPivotA: [shouldersDistance / 2, upperBodyLength / 2], localPivotB: [-upperArmLength / 2, 0]);
+    var leftShoulder = new p2.RevoluteConstraint(upperBody, upperLeftArm, localPivotA: new p2.vec2(-shouldersDistance / 2, upperBodyLength / 2), localPivotB: new p2.vec2(upperArmLength / 2, 0.0));
+    var rightShoulder = new p2.RevoluteConstraint(upperBody, upperRightArm, localPivotA: new p2.vec2(shouldersDistance / 2, upperBodyLength / 2), localPivotB: new p2.vec2(-upperArmLength / 2, 0.0));
     leftShoulder.setLimits(-Math.PI / 3, Math.PI / 3);
     rightShoulder.setLimits(-Math.PI / 3, Math.PI / 3);
     world.addConstraint(leftShoulder);
     world.addConstraint(rightShoulder);
 
     // Elbow joint
-    var leftElbowJoint = new p2.RevoluteConstraint(lowerLeftArm, upperLeftArm, localPivotA: [lowerArmLength / 2, 0], localPivotB: [-upperArmLength / 2, 0]);
-    var rightElbowJoint = new p2.RevoluteConstraint(lowerRightArm, upperRightArm, localPivotA: [-lowerArmLength / 2, 0], localPivotB: [upperArmLength / 2, 0]);
+    var leftElbowJoint = new p2.RevoluteConstraint(lowerLeftArm, upperLeftArm, localPivotA: new p2.vec2(lowerArmLength / 2, 0.0), localPivotB: new p2.vec2(-upperArmLength / 2, 0.0));
+    var rightElbowJoint = new p2.RevoluteConstraint(lowerRightArm, upperRightArm, localPivotA: new p2.vec2(-lowerArmLength / 2, 0.0), localPivotB: new p2.vec2(upperArmLength / 2, 0.0));
     leftElbowJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     rightElbowJoint.setLimits(-Math.PI / 8, Math.PI / 8);
     world.addConstraint(leftElbowJoint);
@@ -143,7 +143,7 @@ main() {
 
     // Create ground
     var planeShape = new p2.Plane();
-    var plane = new p2.Body(position: [0, -1]);
+    var plane = new p2.Body(position: new p2.vec2(0.0, -1.0));
     plane.addShape(planeShape);
     planeShape.collisionGroup = GROUND;
     planeShape.collisionMask = BODYPARTS | OTHER;

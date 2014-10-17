@@ -10,21 +10,21 @@ class Line {
    * @param  {Number} precision   Precision to use when checking if the lines are parallel
    * @return {Array}              The intersection point.
    */
-  static List lineInt(List l1, List l2, [num precision=0]) {
+  static vec2 lineInt(List<vec2> l1, List<vec2> l2, [num precision=0]) {
 
-    var i = [0, 0]; // point
-    var a1, b1, c1, a2, b2, c2, det; // scalars
-    a1 = l1[1][1] - l1[0][1];
-    b1 = l1[0][0] - l1[1][0];
-    c1 = a1 * l1[0][0] + b1 * l1[0][1];
-    a2 = l2[1][1] - l2[0][1];
-    b2 = l2[0][0] - l2[1][0];
-    c2 = a2 * l2[0][0] + b2 * l2[0][1];
+    vec2 i = new vec2(0.0,0.0); // point
+    num a1, b1, c1, a2, b2, c2, det; // scalars
+    a1 = l1[1].y - l1[0].y;
+    b1 = l1[0].x - l1[1].x;
+    c1 = a1 * l1[0].x + b1 * l1[0].y;
+    a2 = l2[1].y - l2[0].y;
+    b2 = l2[0].x - l2[1].x;
+    c2 = a2 * l2[0].x + b2 * l2[0].y;
     det = a1 * b2 - a2 * b1;
     if (!Scalar.eq(det, 0, precision)) {
       // lines are not parallel
-      i[0] = (b2 * c1 - b1 * c2) / det;
-      i[1] = (a1 * c2 - a2 * c1) / det;
+      i.x = (b2 * c1 - b1 * c2) / det;
+      i.y = (a1 * c2 - a2 * c1) / det;
     }
     return i;
   }
@@ -39,18 +39,18 @@ class Line {
    * @return {Boolean} True if the two line segments intersect
    */
 
-  static bool segmentsIntersect(List p1, List p2, List q1, List q2) {
-    num dx = p2[0] - p1[0];
-    num dy = p2[1] - p1[1];
-    num da = q2[0] - q1[0];
-    num db = q2[1] - q1[1];
+  static bool segmentsIntersect(vec2 p1, vec2 p2, vec2 q1, vec2 q2) {
+    num dx = p2.x - p1.x;
+    num dy = p2.y - p1.y;
+    num da = q2.x - q1.x;
+    num db = q2.y - q1.y;
 
     // segments are parallel
     if (da * dy - db * dx == 0)
       return false;
 
-    num s = (dx * (q1[1] - p1[1]) + dy * (p1[0] - q1[0])) / (da * dy - db * dx);
-    num t = (da * (p1[1] - q1[1]) + db * (q1[0] - p1[0])) / (db * dx - da * dy);
+    num s = (dx * (q1.y - p1.y) + dy * (p1.x - q1.x)) / (da * dy - db * dx);
+    num t = (da * (p1.y - q1.y) + db * (q1.x - p1.x)) / (db * dx - da * dy);
 
     return (s >= 0 && s <= 1 && t >= 0 && t <= 1);
   }

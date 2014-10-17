@@ -23,18 +23,18 @@ class OverlapKeeperRecord {
 
 
 class OverlapKeeper {
-  TupleDictionary overlappingShapesLastState;
-  TupleDictionary overlappingShapesCurrentState;
-  List recordPool;
-  TupleDictionary tmpDict;
-  List tmpArray1;
+  TupleDictionary<OverlapKeeperRecord> overlappingShapesLastState;
+  TupleDictionary<OverlapKeeperRecord> overlappingShapesCurrentState;
+  List<OverlapKeeperRecord> recordPool;
+  TupleDictionary<OverlapKeeperRecord> tmpDict;
+  List<OverlapKeeperRecord> tmpArray1;
 
   OverlapKeeper() {
-    this.overlappingShapesLastState = new TupleDictionary();
-    this.overlappingShapesCurrentState = new TupleDictionary();
-    this.recordPool = [];
-    this.tmpDict = new TupleDictionary();
-    this.tmpArray1 = [];
+    this.overlappingShapesLastState = new TupleDictionary<OverlapKeeperRecord>();
+    this.overlappingShapesCurrentState = new TupleDictionary<OverlapKeeperRecord>();
+    this.recordPool = new List<OverlapKeeperRecord>();
+    this.tmpDict = new TupleDictionary<OverlapKeeperRecord>();
+    this.tmpArray1 = new List<OverlapKeeperRecord>();
   }
 
   /**
@@ -43,16 +43,16 @@ class OverlapKeeper {
    */
 
   tick() {
-    TupleDictionary last = this.overlappingShapesLastState;
-    TupleDictionary current = this.overlappingShapesCurrentState;
+    TupleDictionary<OverlapKeeperRecord> last = this.overlappingShapesLastState;
+    TupleDictionary<OverlapKeeperRecord> current = this.overlappingShapesCurrentState;
 
     // Save old objects into pool
     int l = last.keys.length;
     while (l-- > 0) {
-      var key = last.keys[l];
-      var lastObject = last.getByKey(key);
-      var currentObject = current.getByKey(key);
-      if (lastObject && !currentObject) {
+      int key = last.keys[l];
+      OverlapKeeperRecord lastObject = last.getByKey(key);
+      OverlapKeeperRecord currentObject = current.getByKey(key);
+      if (lastObject != null && currentObject == null) {
         // The record is only used in the "last" dict, and will be removed. We might as well pool it.
         this.recordPool.add(lastObject);
       }
@@ -77,13 +77,13 @@ class OverlapKeeper {
    */
 
   setOverlapping(Body bodyA, Shape shapeA, Body bodyB, Shape shapeB) {
-    var last = this.overlappingShapesLastState;
-    var current = this.overlappingShapesCurrentState;
+    TupleDictionary<OverlapKeeperRecord> last = this.overlappingShapesLastState;
+    TupleDictionary<OverlapKeeperRecord> current = this.overlappingShapesCurrentState;
 
     // Store current contact state
     if (current.get(shapeA.id, shapeB.id) == null) {
 
-      var data;
+      OverlapKeeperRecord data;
       if (this.recordPool.isNotEmpty) {
         data = this.recordPool.removeLast();
         data.set(bodyA, shapeA, bodyB, shapeB);
@@ -95,11 +95,11 @@ class OverlapKeeper {
     }
   }
 
-  getNewOverlaps(List result) {
+  getNewOverlaps(List<OverlapKeeperRecord> result) {
     return this.getDiff(this.overlappingShapesLastState, this.overlappingShapesCurrentState, result);
   }
 
-  getEndOverlaps(List result) {
+  getEndOverlaps(List<OverlapKeeperRecord> result) {
     return this.getDiff(this.overlappingShapesCurrentState, this.overlappingShapesLastState, result);
   }
 
@@ -112,11 +112,11 @@ class OverlapKeeper {
    */
 
   bodiesAreOverlapping(Body bodyA, Body bodyB) {
-    var current = this.overlappingShapesCurrentState;
-    var l = current.keys.length;
-    while (l--) {
-      var key = current.keys[l];
-      var data = current.data[key];
+    TupleDictionary<OverlapKeeperRecord> current = this.overlappingShapesCurrentState;
+    int l = current.keys.length;
+    while (l-- > 0) {
+      int key = current.keys[l];
+      OverlapKeeperRecord data = current.data[key];
       if ((data.bodyA == bodyA && data.bodyB == bodyB) || data.bodyA == bodyB && data.bodyB == bodyA) {
         return true;
       }
@@ -124,25 +124,24 @@ class OverlapKeeper {
     return false;
   }
 
-  getDiff(TupleDictionary dictA, TupleDictionary dictB, [List result]) {
-    if (result == null) result = [];
-    //var result = result || [];
-    TupleDictionary last = dictA;
-    TupleDictionary current = dictB;
+  getDiff(TupleDictionary<OverlapKeeperRecord> dictA, TupleDictionary<OverlapKeeperRecord> dictB, [List<OverlapKeeperRecord> result]) {
+    if (result == null) result = new List<OverlapKeeperRecord>();
+    TupleDictionary<OverlapKeeperRecord> last = dictA;
+    TupleDictionary<OverlapKeeperRecord> current = dictB;
 
     result.length = 0;
 
     int l = current.keys.length;
     while (l-- > 0) {
-      var key = current.keys[l];
-      var data = current.data[key];
+      int key = current.keys[l];
+      OverlapKeeperRecord data = current.data[key];
 
-      if (!data) {
+      if (data == null) {
         throw new Exception('Key $key had no data!');
       }
 
-      var lastData = last.data[key];
-      if (!lastData) {
+      OverlapKeeperRecord lastData = last.data[key];
+      if (lastData == null) {
         // Not overlapping in last state, but in current.
         result.add(data);
       }
@@ -152,34 +151,34 @@ class OverlapKeeper {
   }
 
   isNewOverlap(Shape shapeA, Shape shapeB) {
-    var idA = shapeA.id | 0,
+    int idA = shapeA.id | 0,
         idB = shapeB.id | 0;
-    var last = this.overlappingShapesLastState;
-    var current = this.overlappingShapesCurrentState;
+    TupleDictionary<OverlapKeeperRecord> last = this.overlappingShapesLastState;
+    TupleDictionary<OverlapKeeperRecord> current = this.overlappingShapesCurrentState;
     // Not in last but in new
     return last.get(idA, idB) == null && current.get(idA, idB) != null;
   }
 
-  getNewBodyOverlaps(List result) {
+  getNewBodyOverlaps(List<OverlapKeeperRecord> result) {
     this.tmpArray1.length = 0;
-    var overlaps = this.getNewOverlaps(this.tmpArray1);
+    List<OverlapKeeperRecord> overlaps = this.getNewOverlaps(this.tmpArray1);
     return this.getBodyDiff(overlaps, result);
   }
 
-  getEndBodyOverlaps(List result) {
+  getEndBodyOverlaps(List<OverlapKeeperRecord> result) {
     this.tmpArray1.length = 0;
-    var overlaps = this.getEndOverlaps(this.tmpArray1);
+    List<OverlapKeeperRecord> overlaps = this.getEndOverlaps(this.tmpArray1);
     return this.getBodyDiff(overlaps, result);
   }
 
-  getBodyDiff(List overlaps, [List result]) {
-    if (result == null) result = [];
-    var accumulator = this.tmpDict;
+  getBodyDiff(List<OverlapKeeperRecord> overlaps, [List<OverlapKeeperRecord> result]) {
+    if (result == null) result = new List<OverlapKeeperRecord>();
+    TupleDictionary<OverlapKeeperRecord> accumulator = this.tmpDict;
 
     int l = overlaps.length;
 
     while (l-- > 0) {
-      var data = overlaps[l];
+      OverlapKeeperRecord data = overlaps[l];
 
       // Since we use body id's for the accumulator, these will be a subset of the original one
       accumulator.set(data.bodyA.id | 0, data.bodyB.id | 0, data);
@@ -187,7 +186,7 @@ class OverlapKeeper {
 
     l = accumulator.keys.length;
     while (l-- > 0) {
-      var data = accumulator.getByKey(accumulator.keys[l]);
+      OverlapKeeperRecord data = accumulator.getByKey(accumulator.keys[l]);
       if (data != null) {
         result.addAll([data.bodyA, data.bodyB]);
       }

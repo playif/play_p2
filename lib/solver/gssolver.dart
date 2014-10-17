@@ -10,9 +10,9 @@ class GSSolver extends Solver {
   num tolerance;
 
   int arrayStep;
-  List lambda;
-  List Bs;
-  List invCs;
+  Float32List lambda;
+  Float32List Bs;
+  Float32List invCs;
 
   /// Set to true to set all right hand side terms to zero when solving. Can be handy for a few applications.
   bool useZeroRHS;
@@ -40,7 +40,7 @@ class GSSolver extends Solver {
     this.usedIterations = 0;
   }
 
-  setArrayZero(List array) {
+  setArrayZero(Float32List array) {
     int l = array.length;
     while (l-- > 0) {
       array[l] = 0.0;
@@ -57,24 +57,24 @@ class GSSolver extends Solver {
 
     this.sortEquations();
 
-    var iter = 0,
+    num iter = 0,
         maxIter = this.iterations,
-        maxFrictionIter = this.frictionIterations,
-        equations = this.equations,
-        Neq = equations.length,
-        tolSquared = pow(this.tolerance * Neq, 2),
-        bodies = world.bodies,
-        Nbodies = world.bodies.length,
-        add = vec2.add,
-        set = vec2.set,
-        useZeroRHS = this.useZeroRHS,
-        lambda = this.lambda;
+        maxFrictionIter = this.frictionIterations;
+    List<Equation> equations = this.equations;
+    num Neq = equations.length,
+        tolSquared = pow(this.tolerance * Neq, 2);
+    List<Body> bodies = world.bodies;
+    num Nbodies = world.bodies.length;
+    Function add = vec2.add,
+        set = vec2.set;
+    bool useZeroRHS = this.useZeroRHS;
+    Float32List lambda = this.lambda;
 
     this.usedIterations = 0;
 
     if (Neq != 0) {
-      for (var i = 0; i != Nbodies; i++) {
-        var b = bodies[i];
+      for (int i = 0; i != Nbodies; i++) {
+        Body b = bodies[i];
 
         // Update solve mass
         b.updateSolveMassProperties();
@@ -88,11 +88,11 @@ class GSSolver extends Solver {
       this.invCs = new Float32List(Neq + this.arrayStep);
     }
     setArrayZero(lambda);
-    var invCs = this.invCs,
+    Float32List invCs = this.invCs,
         Bs = this.Bs;
     lambda = this.lambda;
 
-    for (var i = 0; i != equations.length; i++) {
+    for (int i = 0; i != equations.length; i++) {
       Equation c = equations[i];
       if (c.timeStep != h || c.needsUpdate) {
         c.timeStep = h;
@@ -102,12 +102,15 @@ class GSSolver extends Solver {
       invCs[i] = c.computeInvC(c.epsilon);
     }
 
-    var q, B, c, deltalambdaTot, i, j;
+    Float32List q, B;
+    Equation c;
+    num deltalambdaTot;
+    int i, j;
 
     if (Neq != 0) {
 
       for (i = 0; i != Nbodies; i++) {
-        var b = bodies[i];
+        Body b = bodies[i];
 
         // Reset vlambda
         b.resetConstraintVelocity();
@@ -141,8 +144,8 @@ class GSSolver extends Solver {
         for (j = 0; j != Neq; j++) {
           Equation eq = equations[j];
           if (eq is FrictionEquation) {
-            var f = 0.0;
-            for (var k = 0; k != eq.contactEquations.length; k++) {
+            num f = 0.0;
+            for (int k = 0; k != eq.contactEquations.length; k++) {
               f += eq.contactEquations[k].multiplier;
             }
             f *= eq.frictionCoefficient / eq.contactEquations.length;
@@ -161,7 +164,7 @@ class GSSolver extends Solver {
         for (j = 0; j != Neq; j++) {
           c = equations[j];
 
-          var deltalambda = GSSolver.iterateEquation(j, c, c.epsilon, Bs, invCs, lambda, useZeroRHS, h, iter);
+          num deltalambda = GSSolver.iterateEquation(j, c, c.epsilon, Bs, invCs, lambda, useZeroRHS, h, iter);
           deltalambdaTot += (deltalambda).abs();
         }
 
@@ -183,18 +186,18 @@ class GSSolver extends Solver {
   }
 
 // Sets the .multiplier property of each equation
-  static updateMultipliers(equations, lambda, invDt) {
+  static updateMultipliers(List<Equation> equations, Float32List lambda, num invDt) {
     // Set the .multiplier property of each equation
-    var l = equations.length;
+    num l = equations.length;
     while (l-- > 0) {
       equations[l].multiplier = lambda[l] * invDt;
     }
   }
 
-  static num iterateEquation(j, eq, eps, Bs, invCs, lambda, useZeroRHS, dt, iter) {
+  static num iterateEquation(j, eq,  eps, Bs, invCs, lambda, useZeroRHS, dt, iter) {
     // Compute iteration
-    var B = Bs[j],
-        invC = invCs[j],
+    num B = Bs[j];
+    num invC = invCs[j],
         lambdaj = lambda[j],
         GWlambda = eq.computeGWlambda();
 
@@ -202,7 +205,7 @@ class GSSolver extends Solver {
         minForce = eq.minForce;
 
     if (useZeroRHS) {
-      B = 0;
+      B = 0.0;
     }
 
     num deltalambda = invC * (B - GWlambda - eps * lambdaj);

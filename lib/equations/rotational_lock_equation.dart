@@ -9,7 +9,7 @@ class RotationalLockEquation extends Equation {
     G[5] = -1.0;
   }
   
-  List worldVectorA = vec2.create(),
+  static final vec2 worldVectorA = vec2.create(),
       worldVectorB = vec2.create(),
       xAxis = vec2.fromValues(1, 0),
       yAxis = vec2.fromValues(0, 1);

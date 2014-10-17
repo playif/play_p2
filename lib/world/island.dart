@@ -8,8 +8,8 @@ class Island {
   List<Body> bodies;
 
   Island() {
-    this.equations = [];
-    this.bodies = [];
+    this.equations = new List<Equation>();
+    this.bodies = new List<Body>();
   }
 
   /// Clean this island from bodies and equations.
@@ -19,12 +19,12 @@ class Island {
     this.bodies.clear();
   }
 
-  List bodyIds = [];
+  List<int> bodyIds = new List<int>();
 
   /// Get all unique bodies in this island.
 
   List<Body> getBodies(List<Body> result) {
-    List<Body> bodies = result == null ? [] : result;
+    List<Body> bodies = result == null ? new List<Body>() : result;
     List<Equation> eqs = this.equations;
     bodyIds.clear();
     

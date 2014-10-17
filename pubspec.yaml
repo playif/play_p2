@@ -1,7 +1,6 @@
 name: p2
-version: 0.5.2
-description:
-  A Dart port for P2.js 2D physics library.
+version: 0.5.5
+description: A Dart port for P2.js 2D physics library.
 author: playif <playif@gmail.com>
 homepage: https://github.com/playif/play_p2
 
@@ -9,3 +8,13 @@ dev_dependencies:
   browser: any
   play_pixi: any
   datgui: any
+
+transformers:
+- $dart2js:
+    checked: false
+    minify: false
+    suppressWarnings: false
+    suppressHints: false
+    terse: false
+    verbose: true
+    csp: true

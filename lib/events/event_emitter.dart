@@ -24,7 +24,7 @@ class EventEmitter {
     }
     Map<String, List<EventFunc>> listeners = this._listeners;
     if (!listeners.containsKey(type)) {
-      listeners[ type ] = [];
+      listeners[ type ] = new List<EventFunc>();
     }
     if (!listeners[ type ].contains(listener)) {
       listeners[ type ].add(listener);
@@ -94,7 +94,7 @@ class EventEmitter {
     List<EventFunc> listenerArray = listeners[ event['type'] ];
     if (listenerArray != null) {
       event['target'] = this;
-      for (var i = 0, l = listenerArray.length; i < l; i ++) {
+      for (int i = 0, l = listenerArray.length; i < l; i ++) {
         EventFunc listener = listenerArray[ i ];
         listener(event);
       }

@@ -1,10 +1,9 @@
 part of poly_decomp;
 
 class Polygon {
-  List vertices;
+  List<vec2> vertices=new List<vec2>();
 
   Polygon() {
-    vertices = [];
   }
 
   /**
@@ -14,9 +13,9 @@ class Polygon {
    * @return {Array}
    */
 
-  List at(int i) {
-    var v = this.vertices,
-        s = v.length;
+  vec2 at(int i) {
+    List<vec2> v = this.vertices;
+    int s = v.length;
     if (i < 0) i += s;
     return v[i < 0 ? (i % s) + s : i % s];
   }
@@ -37,7 +36,7 @@ class Polygon {
    * @return {Array}
    */
 
-  List last() {
+  vec2 last() {
     return this.vertices.last;
   }
 
@@ -47,7 +46,7 @@ class Polygon {
    * @return {Array}
    */
 
-  List clear() {
+  List<vec2> clear() {
     this.vertices.clear();
     return this.vertices;
   }
@@ -61,7 +60,7 @@ class Polygon {
    * @return {Array}
    */
 
-  List append(Polygon poly, num from, num to) {
+  List<vec2> append(Polygon poly, num from, num to) {
 //    if(from == null) throw new Exception("From is not given!");
 //    if(typeof(to) == "undefined")   throw new Exception("To is not given!");
 
@@ -82,12 +81,12 @@ class Polygon {
    */
 
   makeCCW() {
-    var br = 0,
-        v = this.vertices;
+    num br = 0;
+    List<vec2>    v = this.vertices;
 
     // find bottom right point
-    for (var i = 1; i < this.vertices.length; ++i) {
-      if (v[i][1] < v[br][1] || (v[i][1] == v[br][1] && v[i][0] > v[br][0])) {
+    for (int i = 1; i < this.vertices.length; ++i) {
+      if (v[i].y < v[br].y || (v[i].y == v[br].y && v[i].x > v[br].x)) {
         br = i;
       }
     }
@@ -118,8 +117,8 @@ class Polygon {
     return Point.right(this.at(i - 1), this.at(i), this.at(i + 1));
   }
 
-  List tmpLine1 = [],
-      tmpLine2 = [];
+  static final List<vec2> tmpLine1 = new List<vec2>(),
+      tmpLine2 = new List<vec2>();
 
   /**
    * Check if two vertices in the polygon can see each other
@@ -130,16 +129,15 @@ class Polygon {
    */
 
   bool canSee(int a, int b) {
-    var p,
-        dist,
-        l1 = tmpLine1,
+    vec2 p, dist;
+    List<vec2> l1 = tmpLine1,
         l2 = tmpLine2;
 
     if (Point.leftOn(this.at(a + 1), this.at(a), this.at(b)) && Point.rightOn(this.at(a - 1), this.at(a), this.at(b))) {
       return false;
     }
     dist = Point.sqdist(this.at(a), this.at(b));
-    for (var i = 0; i != this.vertices.length; ++i) {
+    for (int i = 0; i != this.vertices.length; ++i) {
       // for each edge
       if ((i + 1) % this.vertices.length == a || i == a) // ignore incident edges
       continue;
@@ -170,19 +168,19 @@ class Polygon {
    */
 
   Polygon copy(i, j, [Polygon targetPoly]) {
-    var p = targetPoly == null ? new Polygon() : targetPoly;
+    Polygon p = targetPoly == null ? new Polygon() : targetPoly;
     p.clear();
     if (i < j) {
       // Insert all vertices from i to j
-      for (var k = i; k <= j; k++) p.vertices.add(this.vertices[k]);
+      for (int k = i; k <= j; k++) p.vertices.add(this.vertices[k]);
 
     } else {
 
       // Insert vertices 0 to j
-      for (var k = 0; k <= j; k++) p.vertices.add(this.vertices[k]);
+      for (int k = 0; k <= j; k++) p.vertices.add(this.vertices[k]);
 
       // Insert vertices i to end
-      for (var k = i; k < this.vertices.length; k++) p.vertices.add(this.vertices[k]);
+      for (int k = i; k < this.vertices.length; k++) p.vertices.add(this.vertices[k]);
     }
 
     return p;
@@ -196,20 +194,20 @@ class Polygon {
    */
 
   List getCutEdges() {
-    var min = [],
-        tmp1 = [],
-        tmp2 = [],
-        tmpPoly = new Polygon();
-    var nDiags = double.MAX_FINITE;
+    List min = new List(),
+        tmp1 = new List<vec2>(),
+        tmp2 = new List<vec2>();
+    Polygon tmpPoly = new Polygon();
+    num nDiags = double.MAX_FINITE;
 
-    for (var i = 0; i < this.vertices.length; ++i) {
+    for (int i = 0; i < this.vertices.length; ++i) {
       if (this.isReflex(i)) {
-        for (var j = 0; j < this.vertices.length; ++j) {
+        for (int j = 0; j < this.vertices.length; ++j) {
           if (this.canSee(i, j)) {
             tmp1 = this.copy(i, j, tmpPoly).getCutEdges();
             tmp2 = this.copy(j, i, tmpPoly).getCutEdges();
 
-            for (var k = 0; k < tmp2.length; k++) tmp1.add(tmp2[k]);
+            for (int k = 0; k < tmp2.length; k++) tmp1.add(tmp2[k]);
 
             if (tmp1.length < nDiags) {
               min = tmp1;
@@ -231,7 +229,7 @@ class Polygon {
    */
 
   decomp() {
-    var edges = this.getCutEdges();
+    List<vec2> edges = this.getCutEdges();
     if (edges.length > 0) return this.slice(edges); else return [this];
   }
 
@@ -248,13 +246,13 @@ class Polygon {
 
       List polys = [this];
 
-      for (var i = 0; i < cutEdges.length; i++) {
-        var cutEdge = cutEdges[i];
+      for (int i = 0; i < cutEdges.length; i++) {
+        List cutEdge = cutEdges[i];
         // Cut all polys
-        for (var j = 0; j < polys.length; j++) {
-          var poly = polys[j];
-          var result = poly.slice(cutEdge);
-          if (result) {
+        for (int j = 0; j < polys.length; j++) {
+          Polygon poly = polys[j];
+          List result = poly.slice(cutEdge);
+          if (result != null) {
             // Found poly! Cut and quit
             polys.removeAt(j);
             polys.addAll([result[0], result[1]]);
@@ -267,9 +265,9 @@ class Polygon {
     } else {
 
       // Was given one edge
-      var cutEdge = cutEdges;
-      var i = this.vertices.indexOf(cutEdge[0]);
-      var j = this.vertices.indexOf(cutEdge[1]);
+      List cutEdge = cutEdges;
+      int i = this.vertices.indexOf(cutEdge[0]);
+      int j = this.vertices.indexOf(cutEdge[1]);
 
       if (i != -1 && j != -1) {
         return [this.copy(i, j), this.copy(j, i)];
@@ -288,7 +286,7 @@ class Polygon {
    */
 
   bool isSimple() {
-    List path = this.vertices;
+    List<vec2> path = this.vertices;
     // Check
     for (int i = 0; i < path.length - 1; i++) {
       for (int j = 0; j < i - 1; j++) {
@@ -299,7 +297,7 @@ class Polygon {
     }
 
     // Check the segment between the last and the first point to all others
-    for (var i = 1; i < path.length - 2; i++) {
+    for (int i = 1; i < path.length - 2; i++) {
       if (Line.segmentsIntersect(path[0], path[path.length - 1], path[i], path[i + 1])) {
         return false;
       }
@@ -308,17 +306,17 @@ class Polygon {
     return true;
   }
 
-  getIntersectionPoint(List p1, List p2, List q1, List q2, [num delta = 0]) {
+  vec2 getIntersectionPoint(vec2 p1, vec2 p2, vec2 q1, vec2 q2, [num delta = 0]) {
     //delta = delta || 0;
-    var a1 = p2[1] - p1[1];
-    var b1 = p1[0] - p2[0];
-    var c1 = (a1 * p1[0]) + (b1 * p1[1]);
-    var a2 = q2[1] - q1[1];
-    var b2 = q1[0] - q2[0];
-    var c2 = (a2 * q1[0]) + (b2 * q1[1]);
-    var det = (a1 * b2) - (a2 * b1);
+    num a1 = p2.y - p1.y;
+    num b1 = p1.x - p2.x;
+    num c1 = (a1 * p1.x) + (b1 * p1.y);
+    num a2 = q2.y - q1.y;
+    num b2 = q1.x - q2.x;
+    num c2 = (a2 * q1.x) + (b2 * q1.y);
+    num det = (a1 * b2) - (a2 * b1);
 
-    if (!Scalar.eq(det, 0, delta)) return [((b2 * c1) - (b1 * c2)) / det, ((a1 * c2) - (a2 * c1)) / det]; else return [0, 0];
+    if (!Scalar.eq(det, 0, delta)) return new vec2(((b2 * c1) - (b1 * c2)) / det, ((a1 * c2) - (a2 * c1)) / det); else return new vec2(0.0,0.0);
   }
 
   /**
@@ -333,15 +331,15 @@ class Polygon {
    * @return {Array}
    */
 
-  List quickDecomp([List result, List reflexVertices, List steinerPoints, num delta = 25, num maxlevel = 100, num level = 0]) {
+  List<Polygon> quickDecomp([List<Polygon> result, List<vec2> reflexVertices, List<vec2> steinerPoints, num delta = 25, num maxlevel = 100, num level = 0]) {
 
-    result = result != null ? result : [];
-    reflexVertices = reflexVertices != null ? reflexVertices : [];
-    steinerPoints = steinerPoints != null ? steinerPoints : [];
+    result = result != null ? result : new List<Polygon>();
+    reflexVertices = reflexVertices != null ? reflexVertices : new List<vec2>();
+    steinerPoints = steinerPoints != null ? steinerPoints : new List<vec2>();
 
-    List upperInt = [0, 0],
-        lowerInt = [0, 0],
-        p = [0, 0]; // Points
+    vec2 upperInt = new vec2(0.0,0.0),
+        lowerInt = new vec2(0.0,0.0),
+        p = new vec2(0.0,0.0); // Points
     num upperDist = 0,
         lowerDist = 0,
         d = 0,
@@ -352,7 +350,7 @@ class Polygon {
     Polygon lowerPoly = new Polygon(),
         upperPoly = new Polygon(); // polygons
     Polygon poly = this;
-    List v = this.vertices;
+    List<vec2> v = this.vertices;
 
     if (v.length < 3) return result;
 
@@ -362,13 +360,13 @@ class Polygon {
       return result;
     }
 
-    for (var i = 0; i < this.vertices.length; ++i) {
+    for (int i = 0; i < this.vertices.length; ++i) {
       if (poly.isReflex(i)) {
         reflexVertices.add(poly.vertices[i]);
         upperDist = lowerDist = double.MAX_FINITE;
 
 
-        for (var j = 0; j < this.vertices.length; ++j) {
+        for (int j = 0; j < this.vertices.length; ++j) {
           if (Point.left(poly.at(i - 1), poly.at(i), poly.at(j)) && Point.rightOn(poly.at(i - 1), poly.at(i), poly.at(j - 1))) {
             // if line intersects with an edge
             p = getIntersectionPoint(poly.at(i - 1), poly.at(i), poly.at(j), poly.at(j - 1)); // find the point of intersection
@@ -399,8 +397,8 @@ class Polygon {
         // if there are no vertices to connect to, choose a point in the middle
         if (lowerIndex == (upperIndex + 1) % this.vertices.length) {
           //console.log("Case 1: Vertex("+i+"), lowerIndex("+lowerIndex+"), upperIndex("+upperIndex+"), poly.size("+this.vertices.length+")");
-          p[0] = (lowerInt[0] + upperInt[0]) / 2;
-          p[1] = (lowerInt[1] + upperInt[1]) / 2;
+          p.x = (lowerInt.x + upperInt.x) / 2;
+          p.y = (lowerInt.y + upperInt.y) / 2;
           steinerPoints.add(p);
 
           if (i < upperIndex) {
@@ -439,7 +437,7 @@ class Polygon {
             return result;
           }
 
-          for (var j = lowerIndex; j <= upperIndex; ++j) {
+          for (int j = lowerIndex; j <= upperIndex; ++j) {
             if (Point.leftOn(poly.at(i - 1), poly.at(i), poly.at(j)) && Point.rightOn(poly.at(i + 1), poly.at(i), poly.at(j))) {
               d = Point.sqdist(poly.at(i), poly.at(j));
               if (d < closestDist) {
@@ -490,7 +488,7 @@ class Polygon {
 
   num removeCollinearPoints([num precision]) {
     int num = 0;
-    for (var i = this.vertices.length - 1; this.vertices.length > 3 && i >= 0; --i) {
+    for (int i = this.vertices.length - 1; this.vertices.length > 3 && i >= 0; --i) {
       if (Point.collinear(this.at(i - 1), this.at(i), this.at(i + 1), precision)) {
         // Remove the middle point
         this.vertices.removeAt(i % this.vertices.length);

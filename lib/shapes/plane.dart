@@ -30,7 +30,7 @@ class Plane extends Shape {
    * @param  {Number} angle
    */
 
-  computeAABB(AABB out, [List position, num angle]) {
+  computeAABB(AABB out, [vec2 position, num angle]) {
     num a = 0;
     //set = vec2.set;
     if (angle is num) {
@@ -40,19 +40,19 @@ class Plane extends Shape {
     if (a == 0) {
       // y goes from -inf to 0
       vec2.set(out.lowerBound, -double.MAX_FINITE, -double.MAX_FINITE);
-      vec2.set(out.upperBound, double.MAX_FINITE, 0);
+      vec2.set(out.upperBound, double.MAX_FINITE, 0.0);
     } else if (a == PI / 2) {
       // x goes from 0 to inf
-      vec2.set(out.lowerBound, 0, -double.MAX_FINITE);
+      vec2.set(out.lowerBound, 0.0, -double.MAX_FINITE);
       vec2.set(out.upperBound, double.MAX_FINITE, double.MAX_FINITE);
     } else if (a == PI) {
       // y goes from 0 to inf
-      vec2.set(out.lowerBound, -double.MAX_FINITE, 0);
+      vec2.set(out.lowerBound, -double.MAX_FINITE, 0.0);
       vec2.set(out.upperBound, double.MAX_FINITE, double.MAX_FINITE);
     } else if (a == 3 * PI / 2) {
       // x goes from -inf to 0
       vec2.set(out.lowerBound, -double.MAX_FINITE, -double.MAX_FINITE);
-      vec2.set(out.upperBound, 0, double.MAX_FINITE);
+      vec2.set(out.upperBound, 0.0, double.MAX_FINITE);
     } else {
       // Set max bounds
       vec2.set(out.lowerBound, -double.MAX_FINITE, -double.MAX_FINITE);

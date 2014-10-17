@@ -5,8 +5,8 @@ class Rectangle extends Convex {
   num height;
 
   Rectangle([this.width = 1, this.height = 1]) : super._() {
-    List verts = [vec2.fromValues(-width / 2, -height / 2), vec2.fromValues(width / 2, -height / 2), vec2.fromValues(width / 2, height / 2), vec2.fromValues(-width / 2, height / 2)];
-    List axes = [vec2.fromValues(1, 0), vec2.fromValues(0, 1)];
+    List<vec2> verts = [vec2.fromValues(-width / 2, -height / 2), vec2.fromValues(width / 2, -height / 2), vec2.fromValues(width / 2, height / 2), vec2.fromValues(-width / 2, height / 2)];
+    List<vec2> axes = [vec2.fromValues(1, 0), vec2.fromValues(0, 1)];
 
 
     this.type = Shape.RECTANGLE;
@@ -30,12 +30,12 @@ class Rectangle extends Convex {
    * @method updateBoundingRadius
    */
   updateBoundingRadius() {
-    var w = this.width,
+    num w = this.width,
         h = this.height;
     this.boundingRadius = sqrt(w * w + h * h) / 2;
   }
 
-  List corner1 = vec2.create(),
+  static final vec2 corner1 = vec2.create(),
       corner2 = vec2.create(),
       corner3 = vec2.create(),
       corner4 = vec2.create();
@@ -46,7 +46,7 @@ class Rectangle extends Convex {
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB(AABB out, [List position, num angle]) {
+  computeAABB(AABB out, [vec2 position, num angle]) {
     out.setFromPoints(this.vertices, position, angle, 0);
   }
 

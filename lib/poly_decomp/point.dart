@@ -10,28 +10,28 @@ class Point {
    * @param  {Array} c
    * @return {Number}
    */
-  static num area(List a, List b, List c) {
-    return (((b[0] - a[0]) * (c[1] - a[1])) - ((c[0] - a[0]) * (b[1] - a[1])));
+  static num area(vec2 a, vec2 b, vec2 c) {
+    return (((b.x - a.x) * (c.y - a.y)) - ((c.x - a.x) * (b.y - a.y)));
   }
 
-  static bool left(List a, List b, List c) {
+  static bool left(vec2 a, vec2 b, vec2 c) {
     return Point.area(a, b, c) > 0;
   }
 
-  static bool leftOn(List a, List b, List c) {
+  static bool leftOn(vec2 a, vec2 b, vec2 c) {
     return Point.area(a, b, c) >= 0;
   }
 
-  static bool right(List a, List b, List c) {
+  static bool right(vec2 a, vec2 b, vec2 c) {
     return Point.area(a, b, c) < 0;
   }
 
-  static bool rightOn(List a, List b, List c) {
+  static bool rightOn(vec2 a, vec2 b, vec2 c) {
     return Point.area(a, b, c) <= 0;
   }
 
-  static List tmpPoint1 = new Float32List(2),
-  tmpPoint2 = new Float32List(2);
+  static final vec2 tmpPoint1 = new vec2(0.0,0.0),
+  tmpPoint2 = new vec2(0.0,0.0);
 
   /**
    * Check if three points are collinear
@@ -43,29 +43,29 @@ class Point {
    * @return {Boolean}
    */
 
-  static bool collinear(List a, List b, List c, [num thresholdAngle=0]) {
+  static bool collinear(vec2 a, vec2 b, vec2 c, [num thresholdAngle=0]) {
     if (thresholdAngle == 0)
       return Point.area(a, b, c) == 0;
     else {
-      List ab = tmpPoint1,
+      vec2 ab = tmpPoint1,
       bc = tmpPoint2;
 
-      ab[0] = b[0] - a[0];
-      ab[1] = b[1] - a[1];
-      bc[0] = c[0] - b[0];
-      bc[1] = c[1] - b[1];
+      ab.x = b.x - a.x;
+      ab.y = b.y - a.y;
+      bc.x = c.x - b.x;
+      bc.y = c.y - b.y;
 
-      var dot = ab[0] * bc[0] + ab[1] * bc[1],
-      magA = sqrt(ab[0] * ab[0] + ab[1] * ab[1]),
-      magB = sqrt(bc[0] * bc[0] + bc[1] * bc[1]),
+      num dot = ab.x * bc.x + ab.y * bc.y,
+      magA = sqrt(ab.x * ab.x + ab.y * ab.y),
+      magB = sqrt(bc.x * bc.x + bc.y * bc.y),
       angle = acos(dot / (magA * magB));
       return angle < thresholdAngle;
     }
   }
 
-  static sqdist(List a, List b) {
-    num dx = b[0] - a[0];
-    num dy = b[1] - a[1];
+  static sqdist(vec2 a, vec2 b) {
+    num dx = b.x - a.x;
+    num dy = b.y - a.y;
     return dx * dx + dy * dy;
   }
 }

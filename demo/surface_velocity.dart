@@ -11,7 +11,7 @@ main() {
 
             // Create a World
             var world = new p2.World(
-                gravity : [0,-10]
+                gravity : new p2.vec2(0.0,-10.0)
             );
 
             app.setWorld(world);
@@ -25,7 +25,7 @@ main() {
             // Create moving box
             var boxBody = new p2.Body(
                     mass: 1,
-                    position: [1,4]
+                    position: new p2.vec2(1.0,4.0)
                 ),
                 boxShape = new p2.Rectangle(0.5,0.5);
             boxShape.material = new p2.Material();
@@ -35,7 +35,7 @@ main() {
             // Create static platform box
             var platformBody1 = new p2.Body(
                     mass: 0, // static
-                    position: [-0.5,1]
+                    position: new p2.vec2(-0.5,1.0)
                 ),
                 platformShape1 = new p2.Rectangle(3,0.2);
             platformBody1.addShape(platformShape1);
@@ -45,7 +45,7 @@ main() {
             // Create static platform box
             var platformBody2 = new p2.Body(
                     mass: 0, // static
-                    position: [0.5, 2]
+                    position: new p2.vec2(0.5, 2.0)
                 ),
                 platformShape2 = new p2.Rectangle(3,0.2);
             platformBody2.addShape(platformShape2);

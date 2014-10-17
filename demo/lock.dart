@@ -11,7 +11,7 @@ main() {
 
             // Create physics world
             var world = new p2.World(
-                gravity : [0,-10]
+                gravity : new p2.vec2(0.0,-10.0)
             );
 
             app.setWorld(world);
@@ -23,13 +23,13 @@ main() {
             var circleShape = new p2.Circle(0.5);
             var bodyA = new p2.Body(
                 mass: 1,
-                position: [-1, 1]
+                position: new p2.vec2(-1.0, 1.0)
             );
             bodyA.addShape(circleShape);
             world.addBody(bodyA);
             var bodyB = new p2.Body(
                 mass: 1,
-                position: [1, 1]
+                position: new p2.vec2(1.0, 1.0)
             );
             bodyB.addShape(circleShape);
             world.addBody(bodyB);
@@ -47,7 +47,7 @@ main() {
             for(var i=0; i<N; i++){
                 var body = new p2.Body(
                     mass:1,
-                    position:[i*boxShape.width*r - N*boxShape.width*r/2,3]
+                    position:new p2.vec2(i*boxShape.width*r - N*boxShape.width*r/2,3.0)
                 );
                 body.addShape(boxShape);
                 world.addBody(body);
@@ -64,7 +64,7 @@ main() {
             // Create ground
             var planeShape = new p2.Plane();
             var plane = new p2.Body(
-                position : [0,-1]
+                position : new p2.vec2(0.0,-1.0)
             );
             plane.addShape(planeShape);
             world.addBody(plane);

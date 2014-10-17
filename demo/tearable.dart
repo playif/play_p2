@@ -9,7 +9,7 @@ main() {
   new WebGLRenderer((WebGLRenderer app) {
 
     // Create a World
-    var world = new p2.World(gravity: [0, -15]);
+    var world = new p2.World(gravity: new p2.vec2(0.0, -15.0));
 
     app.setWorld(world);
 
@@ -23,21 +23,21 @@ main() {
         lastBody,
         constraints = [];
     for (var i = N - 1; i >= 0; i--) {
-      var x = 0,
+      double x = 0.0,
           y = (N - i - N / 2) * r * 2.1;
-      var p = new p2.Body(mass: i == 0 ? 0 : 1, // top body has mass=0 and is static
-      position: [x, y], angularDamping: 0.5);
+      p2.Body p = new p2.Body(mass: i == 0 ? 0 : 1, // top body has mass=0 and is static
+      position: new p2.vec2(x, y), angularDamping: 0.5);
       p.addShape(shape);
       if (lastBody != null) {
         // Create a DistanceConstraint, it will constrain the
         // current and the last body to have a fixed distance from each other
-        var dist = (p.position[1] - lastBody.position[1]).abs(),
+        var dist = (p.position.y - lastBody.position[1]).abs(),
             c = new p2.DistanceConstraint(p, lastBody, distance: dist);
         world.addConstraint(c);
         constraints.add(c);
       } else {
         // Set horizontal velocity of the last body
-        p.velocity[0] = 1.0;
+        p.velocity.x = 1.0;
       }
       lastBody = p;
       world.addBody(p);
@@ -45,7 +45,7 @@ main() {
 
     // Create ground
     var planeShape = new p2.Plane();
-    var plane = new p2.Body(position: [0, (-N / 2) * r * 2.1]);
+    var plane = new p2.Body(position: new p2.vec2(0.0, (-N / 2) * r * 2.1));
     plane.addShape(planeShape);
     world.addBody(plane);
 

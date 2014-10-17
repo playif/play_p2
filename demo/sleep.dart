@@ -12,7 +12,7 @@ main() {
         new WebGLRenderer((WebGLRenderer app){
 
             var world = new p2.World(
-                gravity : [0,-10]
+                gravity : new p2.vec2(0.0,-10.0)
             );
 
             app.setWorld(world);
@@ -20,11 +20,11 @@ main() {
             for(var i=0; i<N; i++){
                 var circleBody = new p2.Body(
                     mass: 1,
-                    position: [0,i*2*radius]
+                    position: new p2.vec2(0.0,i*2*radius)
                 );
                 circleBody.allowSleep = true;
-                circleBody.sleepSpeedLimit = 1; // Body will feel sleepy if speed<1 (speed is the norm of velocity)
-                circleBody.sleepTimeLimit =  1; // Body falls asleep after 1s of sleepiness
+                circleBody.sleepSpeedLimit = 1.0; // Body will feel sleepy if speed<1 (speed is the norm of velocity)
+                circleBody.sleepTimeLimit =  1.0; // Body falls asleep after 1s of sleepiness
                 circleBody.addShape(new p2.Circle(radius));
                 circleBody.damping = 0.2;
                 world.addBody(circleBody);
@@ -33,7 +33,7 @@ main() {
             // Create ground
             var planeShape = new p2.Plane();
             var plane = new p2.Body(
-                position:[0,-1]
+                position:new p2.vec2(0.0,-1.0)
             );
             plane.addShape(planeShape);
             world.addBody(plane);

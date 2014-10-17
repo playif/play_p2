@@ -21,10 +21,10 @@ class GridBroadphase extends Broadphase {
    * @param  {World} world
    * @return {Array}
    */
-  List getCollisionPairs(World world) {
-    var result = [],
-        bodies = world.bodies,
-        Ncolliding = bodies.length,
+  List<Body> getCollisionPairs(World world) {
+    List<Body> result = new List<Body>();
+    List<Body> bodies = world.bodies;
+    num Ncolliding = bodies.length,
         binsizeX = this.binsizeX,
         binsizeY = this.binsizeY,
         nx = this.nx,
@@ -35,50 +35,50 @@ class GridBroadphase extends Broadphase {
         ymax = this.ymax;
 
     // Todo: make garbage free
-    var bins = [],
-        Nbins = nx * ny;
-    for (var i = 0; i < Nbins; i++) {
-      bins.add([]);
+    List<List<Body>> bins = new List<List<Body>>();
+    num Nbins = nx * ny;
+    for (int i = 0; i < Nbins; i++) {
+      bins.add(new List<Body>());
     }
 
-    var xmult = nx / (xmax - xmin);
-    var ymult = ny / (ymax - ymin);
+    num xmult = nx / (xmax - xmin);
+    num ymult = ny / (ymax - ymin);
 
     // Put all bodies into bins
-    for (var i = 0; i != Ncolliding; i++) {
-      var bi = bodies[i];
-      var aabb = bi.aabb;
-      var lowerX = max(aabb.lowerBound[0], xmin);
-      var lowerY = max(aabb.lowerBound[1], ymin);
-      var upperX = min(aabb.upperBound[0], xmax);
-      var upperY = min(aabb.upperBound[1], ymax);
-      var xi1 = (xmult * (lowerX - xmin)).floor();
-      var yi1 = (ymult * (lowerY - ymin)).floor();
-      var xi2 = (xmult * (upperX - xmin)).floor();
-      var yi2 = (ymult * (upperY - ymin)).floor();
+    for (int i = 0; i != Ncolliding; i++) {
+      Body bi = bodies[i];
+      AABB aabb = bi.aabb;
+      num lowerX = max(aabb.lowerBound.x, xmin);
+      num lowerY = max(aabb.lowerBound.y, ymin);
+      num upperX = min(aabb.upperBound.x, xmax);
+      num upperY = min(aabb.upperBound.y, ymax);
+      num xi1 = (xmult * (lowerX - xmin)).floor();
+      num yi1 = (ymult * (lowerY - ymin)).floor();
+      num xi2 = (xmult * (upperX - xmin)).floor();
+      num yi2 = (ymult * (upperY - ymin)).floor();
 
       // Put in bin
-      for (var j = xi1; j <= xi2; j++) {
-        for (var k = yi1; k <= yi2; k++) {
-          var xi = j;
-          var yi = k;
-          var idx = xi * (ny - 1) + yi;
+      for (int j = xi1; j <= xi2; j++) {
+        for (int k = yi1; k <= yi2; k++) {
+          int xi = j;
+          int yi = k;
+          int idx = xi * (ny - 1) + yi;
           if (idx >= 0 && idx < Nbins) {
-            bins[idx].push(bi);
+            bins[idx].add(bi);
           }
         }
       }
     }
 
     // Check each bin
-    for (var i = 0; i != Nbins; i++) {
-      var bin = bins[i];
+    for (int i = 0; i != Nbins; i++) {
+      List<Body> bin = bins[i];
 
-      for (var j = 0,
+      for (int j = 0,
           NbodiesInBin = bin.length; j != NbodiesInBin; j++) {
-        var bi = bin[j];
-        for (var k = 0; k != j; k++) {
-          var bj = bin[k];
+        Body bi = bin[j];
+        for (int k = 0; k != j; k++) {
+          Body bj = bin[k];
           if (Broadphase.canCollide(bi, bj) && this.boundingVolumeCheck(bi, bj)) {
             result.addAll([bi, bj]);
           }

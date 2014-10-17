@@ -21,7 +21,7 @@ main() {
 
     // Create a world with island splitting enabled.
     // The island splitting will cut the scene into independent islands and treat them as separate simulations. This can improve performance.
-    var world = new p2.World(gravity: [0, -10], islandSplit: true);
+    p2.World world = new p2.World(gravity: new p2.vec2(0.0, -10.0), islandSplit: true);
 
     app.setWorld(world);
 
@@ -29,21 +29,21 @@ main() {
     world.solver.iterations = N;
 
     // Create circle ropes
-    for (var j = 0; j < M; j++) {
-      var shape = new p2.Circle(r);
-      var lastBody;
-      for (var i = N; i >= 0; i--) {
-        var x = (j + 0.5 - M / 2) * r * 8;
-        var y = (N / 2 - i) * r * 2.1;
-        var p = new p2.Body(mass: i == 0 ? 0 : 1, position: [x, y]);
+    for (int j = 0; j < M; j++) {
+      p2.Circle shape = new p2.Circle(r);
+      p2.Body lastBody;
+      for (int i = N; i >= 0; i--) {
+        num x = (j + 0.5 - M / 2) * r * 8;
+        num y = (N / 2 - i) * r * 2.1;
+        p2.Body p = new p2.Body(mass: i == 0 ? 0 : 1, position: new p2.vec2(x, y));
         p.addShape(shape);
         if (lastBody != null) {
           // Connect the current body to the previous one
-          var dist = (p.position[1] - lastBody.position[1]).abs();
-          var constraint = new p2.DistanceConstraint(p, lastBody, distance: dist);
+          num dist = (p.position.y - lastBody.position.y).abs();
+          p2.DistanceConstraint constraint = new p2.DistanceConstraint(p, lastBody, distance: dist);
           world.addConstraint(constraint);
         } else {
-          p.velocity[0] = (1 * i).toDouble();
+          p.velocity.x = (1 * i).toDouble();
         }
         lastBody = p;
         world.addBody(p);
@@ -54,7 +54,7 @@ main() {
     // Print the number of independent islands to console repeatedly.
     // This will output 10 if the ropes don't touch.
     interval = new Timer.periodic(const Duration(seconds: 1), (t) {
-      var numIslands = world.islandManager.islands.length;
+      int numIslands = world.islandManager.islands.length;
       window.console.log("Number of islands: " + numIslands.toString());
     });
     // },

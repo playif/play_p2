@@ -23,7 +23,7 @@ class Particle extends Shape {
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB (AABB out, [List position, num angle]){
+  computeAABB (AABB out, [vec2 position, num angle]){
     vec2.copy(out.lowerBound, position);
     vec2.copy(out.upperBound, position);
   }

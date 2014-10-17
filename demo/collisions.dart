@@ -12,7 +12,7 @@ main() {
   new WebGLRenderer((WebGLRenderer app) {
 
     p2.World world = new p2.World(
-        gravity : [0, -10]
+        gravity : new p2.vec2(0.0, -10.0)
     );
 
     app.setWorld(world);
@@ -34,17 +34,17 @@ main() {
     p2.Shape plane = null;
 
     // Create a convex shape.
-    List vertices = [];
+    List<p2.vec2> vertices = [];
     for (int i = 0, N = 5; i < N; i++) {
       num a = 2 * Math.PI / N * i;
-      List vertex = [size * 0.5 * Math.cos(a), size * 0.5 * Math.sin(a)]; // Note: vertices are added counter-clockwise
+      p2.vec2 vertex = new p2.vec2(size * 0.5 * Math.cos(a), size * 0.5 * Math.sin(a)); // Note: vertices are added counter-clockwise
       vertices.add(vertex);
     }
     p2.Convex convex = new p2.Convex(vertices);
 
     Map opts = {
         'mass': 1,
-        'position': [0, 1],
+        'position': new p2.vec2(0.0, 1.0),
     };
 
     num numAdded = 0;
@@ -59,9 +59,9 @@ main() {
         p2.Body bodyB = new p2.Body(mass:opts['mass'],position:opts['position']);
         bodyB.addShape(shapeB);
         world.addBody(bodyB);
-        bodyB.position[1] = dropHeight;
+        bodyB.position.y = dropHeight;
       }
-      opts['position'][0] += dist;
+      opts['position'].x += dist;
       numAdded++;
     }
 
@@ -88,14 +88,14 @@ main() {
     add(circle, capsule);
     add(capsule, particle);
 
-    for (var i = 0; i < world.bodies.length; i++) {
-      world.bodies[i].position[0] -= (numAdded - 1) * dist / 2;
+    for (int i = 0; i < world.bodies.length; i++) {
+      world.bodies[i].position.x -= (numAdded - 1) * dist / 2;
     }
 
     // Create ground
     p2.Plane planeShape = new p2.Plane();
     p2.Body planeBody = new p2.Body(
-        position:[0, 0]
+        position:new p2.vec2(0.0, 0.0)
     );
     planeBody.addShape(planeShape);
     world.addBody(planeBody);

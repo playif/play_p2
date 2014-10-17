@@ -10,7 +10,7 @@ main() {
   new WebGLRenderer((WebGLRenderer app){
 
             var world = new p2.World(
-                gravity : [0,-5]
+                gravity : new p2.vec2(0.0,-5.0)
             );
 
             app.setWorld(world);
@@ -35,7 +35,7 @@ main() {
                 for(var j=0; j<M; j++){
                     var p = new p2.Body(
                         mass: m,//j==M-1 ? 0 : m,
-                        position : [(i-N/2)*l*1.05, (j-M/2)*l*1.05]
+                        position : new p2.vec2((i-N/2)*l*1.05, (j-M/2)*l*1.05)
                     );
                     p.addShape(particleShape);
                     bodies[i].add(p);
@@ -99,7 +99,7 @@ main() {
             // Create ground
             var planeShape = new p2.Plane();
             var plane = new p2.Body(
-                position : [0, (-M/2)*l*1.05 - 0.1]
+                position : new p2.vec2(0.0, (-M/2)*l*1.05 - 0.1)
             );
             plane.addShape(planeShape);
             world.addBody(plane);
@@ -109,7 +109,7 @@ main() {
             var circleShape = new p2.Circle(radius);
             var circle = new p2.Body(
                 mass : 1,
-                position : [0, (M/2)*l*1.05 + radius],
+                position : new p2.vec2(0.0, (M/2)*l*1.05 + radius),
                 angularVelocity:1
             );
             circle.addShape(circleShape);
@@ -120,11 +120,11 @@ main() {
             var boxShape = new p2.Rectangle(radius,radius);
             var box1 = new p2.Body(
                 mass : 1,
-                position : [-3, (M/2)*l*1.05 + radius]
+                position : new p2.vec2(-3.0, (M/2)*l*1.05 + radius)
             );
             var box2 = new p2.Body(
                 mass : 1,
-                position : [-4, (M/2)*l*1.05 + radius],
+                position : new p2.vec2(-4.0, (M/2)*l*1.05 + radius),
                 angularVelocity : -2
             );
             box1.addShape(boxShape);
@@ -134,8 +134,8 @@ main() {
             var s = new p2.LinearSpring(box1, box2, 
                 restLength : 1,
                 stiffness : 10,
-                localAnchorA : [0,0.5],
-                localAnchorB : [0,0.5]
+                localAnchorA : new p2.vec2(0.0,0.5),
+                localAnchorB : new p2.vec2(0.0,0.5)
             );
             world.addSpring(s);
 
@@ -144,15 +144,15 @@ main() {
             var capsuleShape = new p2.Capsule(1,0.25);
             var capsuleBody = new p2.Body(
                 mass: 1,
-                position : [4,1]
+                position : new p2.vec2(4.0,1.0)
             );
             capsuleBody.addShape(capsuleShape);
             world.addBody(capsuleBody);
             s = new p2.LinearSpring(capsuleBody, plane, 
                 restLength : 1,
                 stiffness : 10,
-                localAnchorA : [-capsuleShape.length/2,0],
-                worldAnchorB : [4-capsuleShape.length/2,2]
+                localAnchorA : new p2.vec2(-capsuleShape.length/2,0.0),
+                worldAnchorB : new p2.vec2(4-capsuleShape.length/2,2.0)
             );
             world.addSpring(s);
 
@@ -162,11 +162,11 @@ main() {
             var capsuleShapeB = new p2.Capsule(1, 0.2);
             var capsuleBodyA = new p2.Body(
                 mass: 1,
-                position : [5,0]
+                position : new p2.vec2(5.0,0.0)
             );
             var capsuleBodyB = new p2.Body(
                 mass: 1,
-                position : [6,0]
+                position : new p2.vec2(6.0,0.0)
             );
             capsuleBodyA.addShape(capsuleShapeA);
             capsuleBodyB.addShape(capsuleShapeB);
@@ -178,8 +178,8 @@ main() {
             );
             world.addSpring(rotationalSpring);
             var revolute = new p2.RevoluteConstraint(capsuleBodyA, capsuleBodyB, 
-                localPivotA: [0.5, 0],
-                localPivotB: [-0.5, 0],
+                localPivotA: new p2.vec2(0.5, 0.0),
+                localPivotB: new p2.vec2(-0.5, 0.0),
                 collideConnected:false
             );
             world.addConstraint(revolute);

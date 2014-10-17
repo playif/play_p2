@@ -1,14 +1,14 @@
 part of p2;
 
-List worldPivotA = vec2.create(),
+final vec2 worldPivotA = vec2.create(),
     worldPivotB = vec2.create(),
     xAxis = vec2.fromValues(1, 0),
     yAxis = vec2.fromValues(0, 1),
     g = vec2.create();
 
 class RevoluteConstraint extends Constraint {
-  List pivotA;
-  List pivotB;
+  final vec2 pivotA= vec2.create();
+  final vec2 pivotB= vec2.create();
 
   Equation motorEquation;
 
@@ -33,20 +33,8 @@ class RevoluteConstraint extends Constraint {
   Equation upperLimitEquation;
   Equation lowerLimitEquation;
 
-  RevoluteConstraint(Body bodyA, Body bodyB, {List worldPivot, List localPivotA, List localPivotB, num maxForce: double.MAX_FINITE, bool collideConnected: true, bool wakeUpBodies: true}) : super(bodyA, bodyB, Constraint.REVOLUTE, collideConnected: collideConnected, wakeUpBodies: wakeUpBodies) {
-
-    //var maxForce = this.maxForce = typeof(options.maxForce) !== "undefined" ? options.maxForce : Number.MAX_VALUE;
-
-    /**
-         * @property {Array} pivotA
-         */
-    this.pivotA = vec2.create();
-
-    /**
-         * @property {Array} pivotB
-         */
-    this.pivotB = vec2.create();
-
+  RevoluteConstraint(Body bodyA, Body bodyB, {vec2 worldPivot,vec2 localPivotA,vec2 localPivotB, num maxForce: double.MAX_FINITE, bool collideConnected: true, bool wakeUpBodies: true}) : super(bodyA, bodyB, Constraint.REVOLUTE, collideConnected: collideConnected, wakeUpBodies: wakeUpBodies) {
+    
     if (worldPivot != null) {
       // Compute pivotA and pivotB
       vec2.sub(this.pivotA, worldPivot, bodyA.position);
@@ -65,7 +53,6 @@ class RevoluteConstraint extends Constraint {
 
     Equation x = eqs[0];
     Equation y = eqs[1];
-    //var that = this;
 
     x.replacedGq = () {
       vec2.rotate(worldPivotA, this.pivotA, bodyA.angle);
@@ -130,21 +117,21 @@ class RevoluteConstraint extends Constraint {
   }
 
   update() {
-    var bodyA = this.bodyA,
-        bodyB = this.bodyB,
-        pivotA = this.pivotA,
-        pivotB = this.pivotB,
-        eqs = this.equations,
-        normal = eqs[0],
+    Body bodyA = this.bodyA,
+        bodyB = this.bodyB;
+    vec2 pivotA = this.pivotA,
+        pivotB = this.pivotB;
+    List<Equation> eqs = this.equations;
+    Equation normal = eqs[0],
         tangent = eqs[1],
         x = eqs[0],
-        y = eqs[1],
-        upperLimit = this.upperLimit,
-        lowerLimit = this.lowerLimit,
-        upperLimitEquation = this.upperLimitEquation,
+        y = eqs[1];
+    num upperLimit = this.upperLimit,
+        lowerLimit = this.lowerLimit;
+    RotationalLockEquation upperLimitEquation = this.upperLimitEquation,
         lowerLimitEquation = this.lowerLimitEquation;
 
-    var relAngle = this.angle = bodyB.angle - bodyA.angle;
+    num relAngle = this.angle = bodyB.angle - bodyA.angle;
 
     if (this.upperLimitEnabled && relAngle > upperLimit) {
       upperLimitEquation.angle = upperLimit;
@@ -152,7 +139,7 @@ class RevoluteConstraint extends Constraint {
         eqs.add(upperLimitEquation);
       }
     } else {
-      var idx = eqs.indexOf(upperLimitEquation);
+      int idx = eqs.indexOf(upperLimitEquation);
       if (idx != -1) {
         eqs.removeAt(idx);
       }
@@ -164,7 +151,7 @@ class RevoluteConstraint extends Constraint {
         eqs.add(lowerLimitEquation);
       }
     } else {
-      var idx = eqs.indexOf(lowerLimitEquation);
+      int idx = eqs.indexOf(lowerLimitEquation);
       if (idx != -1) {
         eqs.removeAt(idx);
       }
@@ -235,7 +222,7 @@ class RevoluteConstraint extends Constraint {
     if (!this.motorEnabled) {
       return;
     }
-    var i = this.equations.indexOf(this.motorEquation);
+    int i = this.equations.indexOf(this.motorEquation);
     this.equations.removeAt(i);
     this.motorEnabled = false;
   }
@@ -259,7 +246,7 @@ class RevoluteConstraint extends Constraint {
     if (!this.motorEnabled) {
       return;
     }
-    var i = this.equations.indexOf(this.motorEquation);
+    int i = this.equations.indexOf(this.motorEquation);
     this.equations[i].relativeVelocity = speed;
   }
 

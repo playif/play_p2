@@ -10,36 +10,36 @@ main() {
         new WebGLRenderer((WebGLRenderer app){
 
             // Create a world
-            var world = new p2.World(
-                gravity : [0,-10]
+          p2.World world = new p2.World(
+                gravity : new p2.vec2(0.0,-10.0)
             );
 
             app.setWorld(world);
 
             // Create a circle
-            var shape = new p2.Circle(0.5);
+            p2.Circle shape = new p2.Circle(0.5);
             shape.material = new p2.Material();
-            var p = new p2.Body(
+            p2.Body p = new p2.Body(
                 mass: 1,
-                position: [0, 1.5]
+                position: new p2.vec2(0.0, 1.5)
             );
             p.addShape(shape);
             world.addBody(p);
 
             // Create a slippery circle
-            var slipperyShape = new p2.Circle(0.5);
+            p2.Circle slipperyShape = new p2.Circle(0.5);
             slipperyShape.material = new p2.Material();
             p = new p2.Body(
                 mass: 1,
-                position: [-1.5, 1.5]
+                position: new p2.vec2(-1.5, 1.5)
             );
             p.addShape(slipperyShape);
             world.addBody(p);
 
             // Create ground
-            var planeShape = new p2.Plane();
+            p2.Plane planeShape = new p2.Plane();
             planeShape.material = new p2.Material();
-            var plane = new p2.Body(
+            p2.Body plane = new p2.Body(
                 angle:Math.PI/16
             );
             plane.addShape(planeShape);

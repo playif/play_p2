@@ -10,7 +10,7 @@ class World extends EventEmitter {
   List<Body> bodies;
 
   /// Disabled body collision pairs. See [disableBodyCollision].
-  List disabledBodyCollisionPairs;
+  List<Body> disabledBodyCollisionPairs;
 
   /// The solver used to satisfy constraints and contacts. Default is {{#crossLink "GSSolver"}}{{/crossLink}}.
   GSSolver solver;
@@ -22,7 +22,7 @@ class World extends EventEmitter {
   IslandManager islandManager;
 
   /// Gravity in the world. This is applied on all bodies in the beginning of each step().
-  List gravity = vec2.fromValues(0, -9.78);
+  final vec2 gravity = vec2.fromValues(0, -9.78);
 
   /// Gravity to use when approximating the friction max force (mu*mass*gravity).
   num frictionGravity;
@@ -128,11 +128,11 @@ class World extends EventEmitter {
   OverlapKeeper overlapKeeper;
 
 
-  World({Solver solver, List gravity, bool doProfiling: false, Broadphase broadphase, bool islandSplit: false, bool fake: false}) : super() {
+  World({Solver solver, vec2 gravity, bool doProfiling: false, Broadphase broadphase, bool islandSplit: false, bool fake: false}) : super() {
 
-    this.springs = [];
-    this.bodies = [];
-    this.disabledBodyCollisionPairs = [];
+    this.springs = new List<Spring>();
+    this.bodies = new List<Body>();
+    this.disabledBodyCollisionPairs = new List<Body>();
 
     if (solver == null && !fake) {
       solver = new GSSolver();
@@ -143,7 +143,6 @@ class World extends EventEmitter {
 
     this.islandManager = new IslandManager();
 
-    this.gravity = vec2.fromValues(0, -9.78);
     if (gravity != null) {
       vec2.copy(this.gravity, gravity);
     }
@@ -156,7 +155,7 @@ class World extends EventEmitter {
     this.broadphase = broadphase;
     if (this.broadphase == null) this.broadphase = new SAPBroadphase();
     this.broadphase.setWorld(this);
-    this.constraints = [];
+    this.constraints = new List<Constraint>();
     this.defaultMaterial = new Material();
     this.defaultContactMaterial = new ContactMaterial(this.defaultMaterial, this.defaultMaterial);
     this.lastTimeStep = 1 / 60;
@@ -164,10 +163,10 @@ class World extends EventEmitter {
     this.applyDamping = true;
     this.applyGravity = true;
     this.solveConstraints = true;
-    this.contactMaterials = [];
+    this.contactMaterials = new List<ContactMaterial>();
     this.time = 0.0;
     this.stepping = false;
-    this.bodiesToBeRemoved = [];
+    this.bodiesToBeRemoved = new List<Body>();
     this.fixedStepTime = 0.0;
     this.islandSplit = islandSplit;
     this.emitImpactEvent = true;
@@ -217,7 +216,7 @@ class World extends EventEmitter {
       'shapeB': null,
       'bodyA': null,
       'bodyB': null,
-      'contactEquations': []
+      'contactEquations': new List<ContactEquation>()
     };
 
     endContactEvent = {
@@ -317,7 +316,7 @@ class World extends EventEmitter {
    */
 
   ContactMaterial getContactMaterial(Material materialA, Material materialB) {
-    List cmats = this.contactMaterials;
+    List<ContactMaterial> cmats = this.contactMaterials;
     for (int i = 0,
         N = cmats.length; i != N; i++) {
       ContactMaterial cm = cmats[i];
@@ -342,7 +341,7 @@ class World extends EventEmitter {
     }
   }
 
-  List step_r = vec2.create(),
+  static final vec2 step_r = vec2.create(),
       step_runit = vec2.create(),
       step_u = vec2.create(),
       step_f = vec2.create(),
@@ -375,6 +374,7 @@ class World extends EventEmitter {
   step(num dt, [num timeSinceLastCalled = 0, num maxSubSteps = 10]) {
 //    maxSubSteps = maxSubSteps || 10;
 //    timeSinceLastCalled = timeSinceLastCalled || 0;
+    //dt*=20;
 
     if (timeSinceLastCalled == 0) {
       // Fixed, simple stepping
@@ -424,7 +424,7 @@ class World extends EventEmitter {
     }
   }
 
-  List endOverlaps = [];
+  static final List<OverlapKeeperRecord> endOverlaps = new List<OverlapKeeperRecord>();
 
   /**
    * Make a fixed step.
@@ -435,19 +435,18 @@ class World extends EventEmitter {
 
   internalStep(num dt) {
     this.stepping = true;
-//
-//    var doProfiling = this.doProfiling,
+
     num Nsprings = this.springs.length;
 //        springs = this.springs,
 //        bodies = this.bodies,
-    List g = this.gravity;
+    vec2 g = this.gravity;
 //        solver = this.solver,
     num Nbodies = this.bodies.length;
 //        broadphase = this.broadphase,
     Narrowphase np = this.narrowphase;
 //        constraints = this.constraints,
     num t0, t1;
-    List fhMinv = step_fhMinv,
+    vec2 fhMinv = step_fhMinv,
         velodt = step_velodt,
         mg = step_mg;
 //        scale = vec2.scale,
@@ -465,7 +464,7 @@ class World extends EventEmitter {
 
     // Update approximate friction gravity.
     if (this.useWorldGravityAsFrictionGravity) {
-      var gravityLen = vec2.length(this.gravity);
+      num gravityLen = vec2.length(this.gravity);
       if (!(gravityLen == 0 && this.useFrictionGravityOnZeroGravity)) {
         // Nonzero gravity. Use it.
         this.frictionGravity = gravityLen;
@@ -476,7 +475,7 @@ class World extends EventEmitter {
     if (this.applyGravity) {
       for (int i = 0; i != Nbodies; i++) {
         Body b = bodies[i];
-        List fi = b.force;
+        vec2 fi = b.force;
         if (b.type != Body.DYNAMIC || b.sleepState == Body.SLEEPING) {
           continue;
         }
@@ -487,15 +486,15 @@ class World extends EventEmitter {
 
     // Add spring forces
     if (this.applySpringForces) {
-      for (var i = 0; i != Nsprings; i++) {
-        var s = springs[i];
+      for (int i = 0; i != Nsprings; i++) {
+        Spring s = springs[i];
         s.applyForce();
       }
     }
 
     if (this.applyDamping) {
-      for (var i = 0; i != Nbodies; i++) {
-        var b = bodies[i];
+      for (int i = 0; i != Nbodies; i++) {
+        Body b = bodies[i];
         if (b.type == Body.DYNAMIC) {
           b.applyDamping(dt);
         }
@@ -503,10 +502,10 @@ class World extends EventEmitter {
     }
 
     // Broadphase
-    List result = broadphase.getCollisionPairs(this);
+    List<Body> result = broadphase.getCollisionPairs(this);
 
     // Remove ignored collision pairs
-    List ignoredPairs = this.disabledBodyCollisionPairs;
+    List<Body> ignoredPairs = this.disabledBodyCollisionPairs;
     for (int i = ignoredPairs.length - 2; i >= 0; i -= 2) {
       for (int j = result.length - 2; j >= 0; j -= 2) {
         if ((ignoredPairs[i] == result[j] && ignoredPairs[i + 1] == result[j + 1]) || (ignoredPairs[i + 1] == result[j] && ignoredPairs[i] == result[j + 1])) {
@@ -520,7 +519,7 @@ class World extends EventEmitter {
     for (int i = 0; i != Nconstraints; i++) {
       Constraint c = constraints[i];
       if (!c.collideConnected) {
-        for (var j = result.length - 2; j >= 0; j -= 2) {
+        for (int j = result.length - 2; j >= 0; j -= 2) {
           if ((c.bodyA == result[j] && c.bodyB == result[j + 1]) || (c.bodyB == result[j] && c.bodyA == result[j + 1])) {
             result.removeRange(j, j + 2);
           }
@@ -536,22 +535,22 @@ class World extends EventEmitter {
     np.reset();
     for (int i = 0,
         Nresults = result.length; i != Nresults; i += 2) {
-      var bi = result[i],
+      Body bi = result[i],
           bj = result[i + 1];
 
       // Loop over all shapes of body i
       for (int k = 0,
           Nshapesi = bi.shapes.length; k != Nshapesi; k++) {
-        var si = bi.shapes[k],
-            xi = bi.shapeOffsets[k],
-            ai = bi.shapeAngles[k];
+        Shape si = bi.shapes[k];
+        vec2 xi = bi.shapeOffsets[k];
+        num ai = bi.shapeAngles[k];
 
         // All shapes of body j
         for (int l = 0,
             Nshapesj = bj.shapes.length; l != Nshapesj; l++) {
-          var sj = bj.shapes[l],
-              xj = bj.shapeOffsets[l],
-              aj = bj.shapeAngles[l];
+          Shape sj = bj.shapes[l];
+          vec2 xj = bj.shapeOffsets[l];
+          num aj = bj.shapeAngles[l];
 
           ContactMaterial cm = this.defaultContactMaterial;
           if (si.material != null && sj.material != null) {
@@ -578,10 +577,10 @@ class World extends EventEmitter {
     // Emit end overlap events
     if (this.has('endContact')) {
       this.overlapKeeper.getEndOverlaps(endOverlaps);
-      var e = this.endContactEvent;
-      var l = endOverlaps.length;
+      Map e = this.endContactEvent;
+      int l = endOverlaps.length;
       while (l-- > 0) {
-        var data = endOverlaps[l];
+        OverlapKeeperRecord data = endOverlaps[l];
         e['shapeA'] = data.shapeA;
         e['shapeB'] = data.shapeB;
         e['bodyA'] = data.bodyA;
@@ -612,8 +611,8 @@ class World extends EventEmitter {
         }
         islandManager.split(this);
 
-        for (var i = 0; i != islandManager.islands.length; i++) {
-          var island = islandManager.islands[i];
+        for (int i = 0; i != islandManager.islands.length; i++) {
+          Island island = islandManager.islands[i];
           if (island.equations.length != null) {
             solver.solveIsland(dt, island);
           }
@@ -639,8 +638,8 @@ class World extends EventEmitter {
     }
 
     // Step forward
-    for (var i = 0; i != Nbodies; i++) {
-      var body = bodies[i];
+    for (int i = 0; i != Nbodies; i++) {
+      Body body = bodies[i];
 
       if (body.sleepState != Body.SLEEPING && body.type != Body.STATIC) {
         World.integrateBody(body, dt);
@@ -648,7 +647,7 @@ class World extends EventEmitter {
     }
 
     // Reset force
-    for (var i = 0; i != Nbodies; i++) {
+    for (int i = 0; i != Nbodies; i++) {
       bodies[i].setZeroForce();
     }
 
@@ -660,8 +659,8 @@ class World extends EventEmitter {
     // Emit impact event
     if (this.emitImpactEvent && this.has('impact')) {
       Map ev = this.impactEvent;
-      for (var i = 0; i != np.contactEquations.length; i++) {
-        var eq = np.contactEquations[i];
+      for (int i = 0; i != np.contactEquations.length; i++) {
+        ContactEquation eq = np.contactEquations[i];
         if (eq.firstImpact) {
           ev['bodyA'] = eq.bodyA;
           ev['bodyB'] = eq.bodyB;
@@ -686,8 +685,8 @@ class World extends EventEmitter {
       }
 
       // Sleep islands
-      for (var i = 0; i < this.islandManager.islands.length; i++) {
-        var island = this.islandManager.islands[i];
+      for (int i = 0; i < this.islandManager.islands.length; i++) {
+        Island island = this.islandManager.islands[i];
         if (island.wantsToSleep()) {
           island.sleep();
         }
@@ -707,8 +706,8 @@ class World extends EventEmitter {
     this.emit(this.postStepEvent);
   }
 
-  static List ib_fhMinv = vec2.create();
-  static List ib_velodt = vec2.create();
+  static final vec2 ib_fhMinv = vec2.create();
+  static final vec2 ib_velodt = vec2.create();
 
   /**
    * Move a body forward in time.
@@ -719,9 +718,9 @@ class World extends EventEmitter {
    * @todo Move to Body.prototype?
    */
 
-  static integrateBody(body, dt) {
-    var minv = body.invMass,
-        f = body.force,
+  static integrateBody(Body body, num dt) {
+    num minv = body.invMass;
+    vec2 f = body.force,
         pos = body.position,
         velo = body.velocity;
 
@@ -759,7 +758,7 @@ class World extends EventEmitter {
    * @param  {Number} mu
    */
 
-  runNarrowphase(Narrowphase np, Body bi, Shape si, List xi, num ai, Body bj, Shape sj, List xj, num aj, ContactMaterial cm, num glen) {
+  runNarrowphase(Narrowphase np, Body bi, Shape si, vec2 xi, num ai, Body bj, Shape sj, vec2 xj, num aj, ContactMaterial cm, num glen) {
 
     // Check collision groups and masks
     if (!((si.collisionGroup & sj.collisionMask) != 0 && (sj.collisionGroup & si.collisionMask) != 0)) {
@@ -925,7 +924,7 @@ class World extends EventEmitter {
       this.bodiesToBeRemoved.add(body);
     } else {
       body.world = null;
-      var idx = this.bodies.indexOf(body);
+      int idx = this.bodies.indexOf(body);
       if (idx != -1) {
         Utils.splice(this.bodies, idx, 1);
         this.removeBodyEvent['body'] = body;
@@ -942,9 +941,9 @@ class World extends EventEmitter {
    */
 
   Body getBodyById(num id) {
-    var bodies = this.bodies;
-    for (var i = 0; i < bodies.length; i++) {
-      var b = bodies[i];
+    List<Body> bodies = this.bodies;
+    for (int i = 0; i < bodies.length; i++) {
+      Body b = bodies[i];
       if (b.id == id) {
         return b;
       }
@@ -971,8 +970,8 @@ class World extends EventEmitter {
    */
 
   enableBodyCollision(Body bodyA, Body bodyB) {
-    var pairs = this.disabledBodyCollisionPairs;
-    for (var i = 0; i < pairs.length; i += 2) {
+    List<Body> pairs = this.disabledBodyCollisionPairs;
+    for (int i = 0; i < pairs.length; i += 2) {
       if ((pairs[i] == bodyA && pairs[i + 1] == bodyB) || (pairs[i + 1] == bodyA && pairs[i] == bodyB)) {
         pairs.removeRange(i, i + 2);
         return;
@@ -980,19 +979,6 @@ class World extends EventEmitter {
     }
   }
 
-
-//  List v2a(List v) {
-//    if (v == null) {
-//      return v;
-//    }
-//    return [v[0], v[1]];
-//  }
-//
-//  extend(a, b) {
-//    for (var key in b) {
-//      a[key] = b[key];
-//    }
-//  }
 
   Map contactMaterialToJSON(ContactMaterial cm) {
     return {
@@ -1021,26 +1007,26 @@ class World extends EventEmitter {
     }
 
     // Remove all constraints
-    var cs = this.constraints;
-    for (var i = cs.length - 1; i >= 0; i--) {
+    List<Constraint> cs = this.constraints;
+    for (int i = cs.length - 1; i >= 0; i--) {
       this.removeConstraint(cs[i]);
     }
 
     // Remove all bodies
-    var bodies = this.bodies;
-    for (var i = bodies.length - 1; i >= 0; i--) {
+    List<Body> bodies = this.bodies;
+    for (int i = bodies.length - 1; i >= 0; i--) {
       this.removeBody(bodies[i]);
     }
 
     // Remove all springs
-    var springs = this.springs;
-    for (var i = springs.length - 1; i >= 0; i--) {
+    List<Spring> springs = this.springs;
+    for (int i = springs.length - 1; i >= 0; i--) {
       this.removeSpring(springs[i]);
     }
 
     // Remove all contact materials
-    var cms = this.contactMaterials;
-    for (var i = cms.length - 1; i >= 0; i--) {
+    List<ContactMaterial> cms = this.contactMaterials;
+    for (int i = cms.length - 1; i >= 0; i--) {
       this.removeContactMaterial(cms[i]);
     }
 
@@ -1060,7 +1046,7 @@ class World extends EventEmitter {
 //    return world;
 //  }
 
-  List hitTest_tmp1 = vec2.create(),
+  static final vec2 hitTest_tmp1 = vec2.create(),
       hitTest_zero = vec2.fromValues(0, 0),
       hitTest_tmp2 = vec2.fromValues(0, 0);
 
@@ -1073,21 +1059,23 @@ class World extends EventEmitter {
    * @return {Array}              Array of bodies that overlap the point
    */
 
-  List hitTest(List worldPoint, List<Body> bodies, [num precision = 0]) {
+  List<Body> hitTest(vec2 worldPoint, List<Body> bodies, [num precision = 0]) {
     //precision = precision || 0;
 
     // Create a dummy particle body with a particle shape to test against the bodies
     Body pb = new Body(position: worldPoint);
-    var ps = new Particle(),
-        px = worldPoint,
-        pa = 0,
+    Particle ps = new Particle();
+    vec2 px = worldPoint,
         x = hitTest_tmp1,
         zero = hitTest_zero,
         tmp = hitTest_tmp2;
+    num pa = 0;
+    
+    
     pb.addShape(ps);
 
     Narrowphase n = this.narrowphase;
-    List result = [];
+    List<Body> result = new List<Body>();
 
     // Check bodies
     for (int i = 0,
@@ -1096,7 +1084,7 @@ class World extends EventEmitter {
       for (int j = 0,
           NS = b.shapes.length; j != NS; j++) {
         Shape s = b.shapes[j];
-        List offset = b.shapeOffsets[j] == null ? zero : b.shapeOffsets[j];
+        vec2 offset = b.shapeOffsets[j] == null ? zero : b.shapeOffsets[j];
         num angle = b.shapeAngles[j] == null ? 0.0 : b.shapeAngles[j];
 
         // Get shape world position + angle
@@ -1129,7 +1117,7 @@ class World extends EventEmitter {
     for (int i = 0; i != this.constraints.length; i++) {
       Constraint c = this.constraints[i];
       for (int j = 0; j != c.equations.length; j++) {
-        var eq = c.equations[j];
+        Equation eq = c.equations[j];
         if (stiffness != null) {
           eq.stiffness = stiffness;
         }

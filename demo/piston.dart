@@ -10,7 +10,7 @@ main() {
   // Create demo application
   new WebGLRenderer((WebGLRenderer app) {
 
-    p2.World world = new p2.World(gravity: [0, 0]);
+    p2.World world = new p2.World(gravity: new p2.vec2(0.0, 0.0));
 
     app.setWorld(world);
 
@@ -23,12 +23,12 @@ main() {
 
     // Create circle
     p2.Circle shape = new p2.Circle(R);
-    p2.Body circleBody = new p2.Body(mass: 1, position: [0, 0]);
+    p2.Body circleBody = new p2.Body(mass: 1, position: new p2.vec2(0.0, 0.0));
     circleBody.addShape(shape);
     world.addBody(circleBody);
 
     // Constrain it to the world
-    p2.RevoluteConstraint c = new p2.RevoluteConstraint(circleBody, dummyBody, worldPivot: [0, 0], collideConnected: false);
+    p2.RevoluteConstraint c = new p2.RevoluteConstraint(circleBody, dummyBody, worldPivot: new p2.vec2(0.0, 0.0), collideConnected: false);
     c.enableMotor();
     c.setMotorSpeed(5);
     world.addConstraint(c);
@@ -40,7 +40,7 @@ main() {
     world.addBody(armBody);
 
     // Constrain arm to circle
-    p2.RevoluteConstraint c2 = new p2.RevoluteConstraint(circleBody, armBody, localPivotA: [R * 0.7, 0], localPivotB: [L / 2, 0], collideConnected: false);
+    p2.RevoluteConstraint c2 = new p2.RevoluteConstraint(circleBody, armBody, localPivotA: new p2.vec2(R * 0.7, 0.0), localPivotB: new p2.vec2(L / 2, 0.0), collideConnected: false);
     world.addConstraint(c2);
 
     // Piston
@@ -50,11 +50,11 @@ main() {
     world.addBody(pistonBody);
 
     // Connect piston to arm
-    p2.RevoluteConstraint c3 = new p2.RevoluteConstraint(pistonBody, armBody, localPivotA: [0, 0], localPivotB: [-L / 2, 0], collideConnected: false);
+    p2.RevoluteConstraint c3 = new p2.RevoluteConstraint(pistonBody, armBody, localPivotA: new p2.vec2(0.0, 0.0), localPivotB: new p2.vec2(-L / 2, 0.0), collideConnected: false);
     world.addConstraint(c3);
 
     // Prismatic constraint to keep the piston along a line
-    p2.PrismaticConstraint c4 = new p2.PrismaticConstraint(dummyBody, pistonBody, localAnchorA: [0, 0], localAnchorB: [0, 0], localAxisA: [1, 0], collideConnected: false);
+    p2.PrismaticConstraint c4 = new p2.PrismaticConstraint(dummyBody, pistonBody, localAnchorA: new p2.vec2(0.0, 0.0), localAnchorB: new p2.vec2(0.0, 0.0), localAxisA: new p2.vec2(1.0, 0.0), collideConnected: false);
     world.addConstraint(c4);
   });
 

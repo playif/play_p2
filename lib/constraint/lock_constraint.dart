@@ -2,33 +2,33 @@ part of p2;
 
 class LockConstraint extends Constraint {
   num localAngleB;
-  List localOffsetB;
+  final vec2 localOffsetB = vec2.create();
 
 
-  LockConstraint(Body bodyA, Body bodyB, {num angle, num ratio: 1, List localOffsetB, num localAngleB, num maxForce: double.MAX_FINITE, bool collideConnected: true, bool wakeUpBodies: true}) : super(bodyA, bodyB, Constraint.LOCK, collideConnected: collideConnected, wakeUpBodies: wakeUpBodies) {
+  LockConstraint(Body bodyA, Body bodyB, {num angle, num ratio: 1, vec2 localOffsetB, num localAngleB, num maxForce: double.MAX_FINITE, bool collideConnected: true, bool wakeUpBodies: true}) : super(bodyA, bodyB, Constraint.LOCK, collideConnected: collideConnected, wakeUpBodies: wakeUpBodies) {
     Equation x = new Equation(bodyA, bodyB, -maxForce, maxForce),
         y = new Equation(bodyA, bodyB, -maxForce, maxForce),
         rot = new Equation(bodyA, bodyB, -maxForce, maxForce);
 
-    List l = vec2.create(),
+    vec2 l = vec2.create(),
         g = vec2.create();
     x.replacedGq = () {
       vec2.rotate(l, this.localOffsetB, bodyA.angle);
       vec2.sub(g, bodyB.position, bodyA.position);
       vec2.sub(g, g, l);
-      return g[0];
+      return g.x;
     };
     y.replacedGq = () {
       vec2.rotate(l, this.localOffsetB, bodyA.angle);
       vec2.sub(g, bodyB.position, bodyA.position);
       vec2.sub(g, g, l);
-      return g[1];
+      return g.y;
     };
-    var r = vec2.create(),
+    vec2 r = vec2.create(),
         t = vec2.create();
     rot.replacedGq = () {
       vec2.rotate(r, this.localOffsetB, bodyB.angle - this.localAngleB);
-      vec2.scale(r, r, -1);
+      vec2.scale(r, r, -1.0);
       vec2.sub(g, bodyA.position, bodyB.position);
       vec2.add(g, g, r);
       vec2.rotate(t, r, -PI / 2);
@@ -40,7 +40,6 @@ class LockConstraint extends Constraint {
          * The offset of bodyB in bodyA's frame.
          * @property {Array} localOffsetB
          */
-    this.localOffsetB = vec2.create();
     if (localOffsetB != null) {
       vec2.copy(this.localOffsetB, localOffsetB);
     } else {
@@ -71,8 +70,8 @@ class LockConstraint extends Constraint {
    * @param {Number} force
    */
   setMaxForce(force) {
-    var eqs = this.equations;
-    for (var i = 0; i < this.equations.length; i++) {
+    List<Equation> eqs = this.equations;
+    for (int i = 0; i < this.equations.length; i++) {
       eqs[i].maxForce = force;
       eqs[i].minForce = -force;
     }
@@ -87,21 +86,21 @@ class LockConstraint extends Constraint {
     return this.equations[0].maxForce;
   }
 
-  var l = vec2.create();
-  var r = vec2.create();
-  var t = vec2.create();
-  var xAxis = vec2.fromValues(1, 0);
-  var yAxis = vec2.fromValues(0, 1);
+  final vec2 l = vec2.create();
+  final vec2 r = vec2.create();
+  final vec2 t = vec2.create();
+  final vec2 xAxis = vec2.fromValues(1, 0);
+  final vec2 yAxis = vec2.fromValues(0, 1);
   update() {
-    var x = this.equations[0],
+    Equation x = this.equations[0],
         y = this.equations[1],
-        rot = this.equations[2],
-        bodyA = this.bodyA,
+        rot = this.equations[2];
+    Body    bodyA = this.bodyA,
         bodyB = this.bodyB;
 
     vec2.rotate(l, this.localOffsetB, bodyA.angle);
     vec2.rotate(r, this.localOffsetB, bodyB.angle - this.localAngleB);
-    vec2.scale(r, r, -1);
+    vec2.scale(r, r, -1.0);
 
     vec2.rotate(t, r, PI / 2);
     vec2.normalize(t, t);
@@ -116,10 +115,10 @@ class LockConstraint extends Constraint {
     y.G[2] = -vec2.crossLength(l, yAxis);
     y.G[4] = 1.0;
 
-    rot.G[0] = -t[0];
-    rot.G[1] = -t[1];
-    rot.G[3] = t[0];
-    rot.G[4] = t[1];
+    rot.G[0] = -t.x;
+    rot.G[1] = -t.y;
+    rot.G[3] = t.x;
+    rot.G[4] = t.y;
     rot.G[5] = vec2.crossLength(r, t);
   }
 

@@ -4,7 +4,7 @@ abstract class Broadphase {
   int type;
 
   /// The resulting overlapping pairs. Will be filled with results during .getCollisionPairs().
-  List result;
+  List<Body> result;
 
   /// The world to search for collision pairs in. To change it, use .setWorld()
   World world;
@@ -14,7 +14,7 @@ abstract class Broadphase {
 
   Broadphase([int type]) {
     this.type = type;
-    this.result = [];
+    this.result = new List<Body>();
     this.world = null;
     this.boundingVolumeType = Broadphase.AABB;
   }
@@ -31,16 +31,16 @@ abstract class Broadphase {
   }
 
   /// Get all potential intersecting body pairs.
-  List getCollisionPairs (World world){
+  List<Body> getCollisionPairs (World world){
     throw new Exception("getCollisionPairs must be implemented in a subclass!");
   }
 
-  static List  dist = vec2.create();
+  static vec2 dist = vec2.create();
 
   /// Check whether the bounding radius of two bodies overlap.
   static bool boundingRadiusCheck (Body bodyA, Body bodyB){
     vec2.sub(dist, bodyA.position, bodyB.position);
-    var d2 = vec2.squaredLength(dist),
+    num d2 = vec2.squaredLength(dist),
     r = bodyA.boundingRadius + bodyB.boundingRadius;
     return d2 <= r*r;
   }
@@ -52,7 +52,7 @@ abstract class Broadphase {
 
   /// Check whether the bounding radius of two bodies overlap.
   bool boundingVolumeCheck( Body bodyA, Body bodyB){
-    var result;
+    bool result;
 
     switch(this.boundingVolumeType){
       case Broadphase.BOUNDING_CIRCLE:

@@ -13,7 +13,7 @@ main() {
 
             // Create the physics world
             var world = new p2.World(
-                gravity : [0,-10]
+                gravity : new p2.vec2(0.0,-10.0)
             );
 
             app.setWorld(world);
@@ -28,14 +28,14 @@ main() {
             world.addBody(plane);
 
             // Create chassis
-            var chassisBody = new p2.Body( mass : 1, position:[0,1] ),
+            var chassisBody = new p2.Body( mass : 1, position:new p2.vec2(0.0,1.0) ),
                 chassisShape = new p2.Rectangle(1,0.5);
             chassisBody.addShape(chassisShape);
             world.addBody(chassisBody);
 
             // Create wheels
-            var wheelBody1 = new p2.Body( mass : 1, position:[chassisBody.position[0] - 0.5,0.7] ),
-                wheelBody2 = new p2.Body( mass : 1, position:[chassisBody.position[0] + 0.5,0.7] ),
+            var wheelBody1 = new p2.Body( mass : 1, position:new p2.vec2(chassisBody.position.x - 0.5,0.7) ),
+                wheelBody2 = new p2.Body( mass : 1, position:new p2.vec2(chassisBody.position.x + 0.5,0.7) ),
                 wheelShape = new p2.Circle(0.3);
             wheelBody1.addShape(wheelShape);
             wheelBody2.addShape(wheelShape);
@@ -58,15 +58,15 @@ main() {
 
             // Constrain wheels to chassis
             var c1 = new p2.PrismaticConstraint(chassisBody,wheelBody1,
-                localAnchorA : [-0.5,-0.3],
-                localAnchorB : [0,0],
-                localAxisA : [0,1],
+                localAnchorA : new p2.vec2(-0.5,-0.3),
+                localAnchorB : new p2.vec2(0.0,0.0),
+                localAxisA : new p2.vec2(0.0,1.0),
                 disableRotationalLock : true
             );
             var c2 = new p2.PrismaticConstraint(chassisBody,wheelBody2,
-                localAnchorA : [ 0.5,-0.3],
-                localAnchorB : [0,0],
-                localAxisA : [0,1],
+                localAnchorA : new p2.vec2( 0.5,-0.3),
+                localAnchorB : new p2.vec2(0.0,0.0),
+                localAxisA : new p2.vec2(0.0,1.0),
                 disableRotationalLock : true
             );
             c1.setLimits(-0.4, 0.2);
@@ -80,16 +80,16 @@ main() {
                 restLength : restLength,
                 stiffness : stiffness,
                 damping : damping,
-                localAnchorA : [-0.5,0],
-                localAnchorB : [0,0]
+                localAnchorA : new p2.vec2(-0.5,0.0),
+                localAnchorB : new p2.vec2(0.0,0.0)
             ));
             // Right spring
             world.addSpring(new p2.LinearSpring(chassisBody, wheelBody2, 
                 restLength : restLength,
                 stiffness : stiffness,
                 damping : damping,
-                localAnchorA : [0.5,0],
-                localAnchorB : [0,0]
+                localAnchorA : new p2.vec2(0.5,0.0),
+                localAnchorB : new p2.vec2(0.0,0.0)
             ));
 
             app.newShapeCollisionGroup = OTHER;

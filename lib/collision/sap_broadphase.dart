@@ -3,7 +3,7 @@ part of p2;
 /// Sweep and prune broadphase along one axis.
 class SAPBroadphase extends Broadphase {
   /// List of bodies currently in the broadphase.
-  List axisList;
+  List<Body> axisList;
 
   /// The axis to sort along. 0 means x-axis and 1 y-axis. If your bodies are more spread out over the X axis, set axisIndex to 0, and you will gain some performance.
   num axisIndex;
@@ -14,7 +14,7 @@ class SAPBroadphase extends Broadphase {
 
 
   SAPBroadphase() : super(Broadphase.SAP) {
-    this.axisList = [];
+    this.axisList = new List<Body>();
 
     this.axisIndex = 0;
 
@@ -39,7 +39,7 @@ class SAPBroadphase extends Broadphase {
     // Add all bodies from the new world
     Utils.appendArray(this.axisList, world.bodies);
     //this.axisList=world.bodies;
-    
+
     // Remove old handlers, if any
     world.off("addBody", this._addBodyHandler).off("removeBody", this._removeBodyHandler);
 
@@ -50,15 +50,22 @@ class SAPBroadphase extends Broadphase {
   }
 
   /// Sorts bodies along an axis.
-  static List sortAxisList(List a, [num axisIndex = 0]) {
+  static List<Body> sortAxisList(List<Body> a, [num axisIndex = 0]) {
     int j;
     for (int i = 1,
         l = a.length; i < l; i++) {
       Body v = a[i];
       for (j = i - 1; j >= 0; j--) {
-        if (a[j].aabb.lowerBound[axisIndex] <= v.aabb.lowerBound[axisIndex]) {
-          break;
+        if (axisIndex == 0) {
+          if (a[j].aabb.lowerBound.x <= v.aabb.lowerBound.x) {
+            break;
+          }
+        } else {
+          if (a[j].aabb.lowerBound.y <= v.aabb.lowerBound.y) {
+            break;
+          }
         }
+
         a[j + 1] = a[j];
       }
       a[j + 1] = v;
@@ -67,8 +74,8 @@ class SAPBroadphase extends Broadphase {
   }
 
   /// Get the colliding pairs
-  List getCollisionPairs(World world) {
-    List bodies = this.axisList,
+  List<Body> getCollisionPairs(World world) {
+    List<Body> bodies = this.axisList,
         result = this.result;
     int axisIndex = this.axisIndex;
 
@@ -95,7 +102,15 @@ class SAPBroadphase extends Broadphase {
         Body bj = bodies[j];
 
         // Bounds overlap?
-        bool overlaps = (bj.aabb.lowerBound[axisIndex] <= bi.aabb.upperBound[axisIndex]);
+
+        bool overlaps;
+        if (axisIndex == 0) {
+          overlaps = (bj.aabb.lowerBound.x <= bi.aabb.upperBound.x);
+        } else {
+          overlaps = (bj.aabb.lowerBound.y <= bi.aabb.upperBound.y);
+        }
+
+
         if (!overlaps) {
           break;
         }

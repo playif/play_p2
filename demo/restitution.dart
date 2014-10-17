@@ -9,27 +9,27 @@ main() {
   new WebGLRenderer((WebGLRenderer app) {
 
     // Create a World
-    p2.World world = new p2.World(gravity: [0, -10]);
+    p2.World world = new p2.World(gravity: new p2.vec2(0.0, -10.0));
 
     app.setWorld(world);
 
     p2.Circle circleShape = new p2.Circle(0.5);
-    p2.Body ballBody1 = new p2.Body(position: [-2, 1], mass: 1);
+    p2.Body ballBody1 = new p2.Body(position: new p2.vec2(-2.0, 1.0), mass: 1);
 
     // Create a material for the circle shape
     circleShape.material = new p2.Material();
     ballBody1.addShape(circleShape);
 
     // Remove damping from the ball, so it does not lose energy
-    ballBody1.damping = 0;
-    ballBody1.angularDamping = 0;
+    ballBody1.damping = 0.0;
+    ballBody1.angularDamping = 0.0;
 
     // Add ball to world
     world.addBody(ballBody1);
 
     // Create a platform that the ball can bounce on
     p2.Rectangle platformShape1 = new p2.Rectangle(1, 1);
-    p2.Body platformBody1 = new p2.Body(position: [-2, -1]);
+    p2.Body platformBody1 = new p2.Body(position: new p2.vec2(-2.0, -1.0));
     platformBody1.addShape(platformShape1);
     world.addBody(platformBody1);
 
@@ -44,15 +44,15 @@ main() {
 
 
     // Create another ball
-    p2.Body ballBody2 = new p2.Body(position: [0, 1], mass: 1);
+    p2.Body ballBody2 = new p2.Body(position: new p2.vec2(0.0, 1.0), mass: 1);
     ballBody2.addShape(circleShape);
-    ballBody2.damping = 0;
-    ballBody2.angularDamping = 0;
+    ballBody2.damping = 0.0;
+    ballBody2.angularDamping = 0.0;
     world.addBody(ballBody2);
 
     // Create another platform
     p2.Rectangle platformShape2 = new p2.Rectangle(1, 1);
-    p2.Body platformBody2 = new p2.Body(position: [0, -1]);
+    p2.Body platformBody2 = new p2.Body(position: new p2.vec2(0.0, -1.0));
     platformBody2.addShape(platformShape2);
     world.addBody(platformBody2);
 
@@ -63,14 +63,14 @@ main() {
 
 
     // New ball
-    p2.Body ballBody3 = new p2.Body(position: [2, 1], mass: 1);
+    p2.Body ballBody3 = new p2.Body(position: new p2.vec2(2.0, 1.0), mass: 1);
     ballBody3.addShape(circleShape);
-    ballBody3.damping = 0;
-    ballBody3.angularDamping = 0;
+    ballBody3.damping = 0.0;
+    ballBody3.angularDamping = 0.0;
     world.addBody(ballBody3);
 
     p2.Rectangle planeShape3 = new p2.Rectangle(1, 1);
-    p2.Body plane3 = new p2.Body(position: [2, -1]);
+    p2.Body plane3 = new p2.Body(position: new p2.vec2(2.0, -1.0));
     plane3.addShape(planeShape3);
     world.addBody(plane3);
 

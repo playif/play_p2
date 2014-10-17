@@ -18,7 +18,7 @@ init() {
   boxShape = new p2.Rectangle(2, 1);
   boxBody = new p2.Body(
       mass:1,
-      position:[0, 2],
+      position:new p2.vec2(0.0, 2.0),
       angularVelocity:1
   );
   boxBody.addShape(boxShape);
@@ -27,7 +27,7 @@ init() {
   // Add a plane
   planeShape = new p2.Plane();
   planeBody = new p2.Body(
-      position:[0, -1]
+      position:new p2.vec2(0.0, -1.0)
   );
   planeBody.addShape(planeShape);
   world.addBody(planeBody);

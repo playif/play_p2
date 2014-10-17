@@ -1,17 +1,41 @@
 part of p2;
 
-typedef List Vec2Operation(List out, List a, List b);
+typedef vec2 Vec2Operation(vec2 out, a, b);
 
 class vec2 {
+  double x = 0.0;
+  double y = 0.0;
+
+
+  vec2(double x, double y) {
+    this.x = x;
+    this.y = y;
+  }
+
+//  num operator [](int v) {
+//    if (v == 0) {
+//      return x;
+//    } else {
+//      return y;
+//    }
+//  }
+//
+//  operator []=(int v, num n) {
+//    if (v == 0) {
+//      x = n;
+//    } else {
+//      y = n;
+//    }
+//  }
 
   /// Make a cross product and only return the z component
-  static num crossLength(List a, List b) {
-    return a[0] * b[1] - a[1] * b[0];
+  static num crossLength(vec2 a, vec2 b) {
+    return a.x * b.y - a.y * b.x;
   }
 
   /// Cross product between a vector and the Z component of a vector
 
-  static List crossVZ(List out, List vec, num zcomp) {
+  static vec2 crossVZ(vec2 out, vec2 vec, num zcomp) {
     vec2.rotate(out, vec, -PI / 2); // Rotate according to the right hand rule
     vec2.scale(out, out, zcomp); // Scale with z
     return out;
@@ -19,7 +43,7 @@ class vec2 {
 
   /// Cross product between a vector and the Z component of a vector
 
-  static List crossZV(List out, num zcomp, List vec) {
+  static vec2 crossZV(vec2 out, num zcomp, vec2 vec) {
     vec2.rotate(out, vec, PI / 2); // Rotate according to the right hand rule
     vec2.scale(out, out, zcomp); // Scale with z
     return out;
@@ -27,32 +51,32 @@ class vec2 {
 
   /// Rotate a vector by an angle
 
-  static rotate(List out, List a, num angle) {
+  static rotate(vec2 out, vec2 a, num angle) {
     if (angle != 0) {
-      var c = cos(angle),
-      s = sin(angle),
-      x = a[0],
-      y = a[1];
-      out[0] = c * x - s * y;
-      out[1] = s * x + c * y;
+      num c = cos(angle),
+          s = sin(angle),
+          x = a.x,
+          y = a.y;
+      out.x = c * x - s * y;
+      out.y = s * x + c * y;
     } else {
-      out[0] = a[0].toDouble();
-      out[1] = a[1].toDouble();
+      out.x = a.x;
+      out.y = a.y;
     }
   }
 
   /// Rotate a vector 90 degrees clockwise
 
-  static rotate90cw(List out, List a) {
-    var x = a[0];
-    var y = a[1];
-    out[0] = y;
-    out[1] = -x;
+  static rotate90cw(vec2 out, vec2 a) {
+    num x = a.x,
+        y = a.y;
+    out.x = y;
+    out.y = -x;
   }
 
   /// Transform a point position to local frame.
 
-  static toLocalFrame(List out, List worldPoint, List framePosition, num frameAngle) {
+  static toLocalFrame(vec2 out, vec2 worldPoint, vec2 framePosition, num frameAngle) {
     vec2.copy(out, worldPoint);
     vec2.sub(out, out, framePosition);
     vec2.rotate(out, out, -frameAngle);
@@ -60,7 +84,7 @@ class vec2 {
 
   /// Transform a point position to global frame.
 
-  static toGlobalFrame(List out, List localPoint, List framePosition, num frameAngle) {
+  static toGlobalFrame(vec2 out, vec2 localPoint, vec2 framePosition, num frameAngle) {
     vec2.copy(out, localPoint);
     vec2.rotate(out, out, frameAngle);
     vec2.add(out, out, framePosition);
@@ -68,7 +92,7 @@ class vec2 {
 
   /// Compute centroid of a triangle spanned by vectors a,b,c.
 
-  static centroid(List out, List a, List b, List c) {
+  static vec2 centroid(vec2 out, vec2 a, vec2 b, vec2 c) {
     vec2.add(out, a, b);
     vec2.add(out, out, c);
     vec2.scale(out, out, 1 / 3);
@@ -77,71 +101,75 @@ class vec2 {
 
   /// Creates a new, empty vec2
 
-  static List create() {
-    Float32List out = new Float32List(2);
-    out[0] = 0.0;
-    out[1] = 0.0;
+  static vec2 create() {
+    vec2 out = new vec2(0.0,0.0);
     return out;
   }
 
   /// Creates a new vec2 initialized with values from an existing vector
 
-  static List clone(List a) {
-    Float32List out = new Float32List(2);
-    out[0] = a[0];
-    out[1] = a[1];
+  static vec2 clone(vec2 a) {
+    vec2 out = new vec2(0.0,0.0);
+    out.x = a.x;
+    out.y = a.y;
     return out;
   }
 
   /// Creates a new vec2 initialized with the given values
 
-  static List fromValues(num x, num y) {
-    Float32List out = new Float32List(2);
-    out[0] = x.toDouble();
-    out[1] = y.toDouble();
+  static vec2 fromValues(num x, num y) {
+    vec2 out = new vec2(x.toDouble(), y.toDouble());
     return out;
   }
 
   /// Copy the values from one vec2 to another
 
-  static List copy(List out, List a) {
-    out[0] = a[0].toDouble();
-    out[1] = a[1].toDouble();
+  static vec2 copy(vec2 out, vec2 a) {
+    out.x = a.x;
+    out.y = a.y;
     return out;
   }
 
   /// Set the components of a vec2 to the given values
 
-  static List set(List out, num x, num y) {
-    out[0] = x.toDouble();
-    out[1] = y.toDouble();
+  static vec2 set(vec2 out, num x, num y) {
+    out.x = x;
+    out.y = y;
     return out;
   }
 
   /// Adds two vec2's
 
-  static List add(List out, List a, List b) {
-    out[0] = a[0] + b[0];
-    out[1] = a[1] + b[1];
+  static vec2 add(vec2 out, vec2 a, vec2 b) {
+    out.x = a.x + b.x;
+    out.y = a.y + b.y;
+    return out;
+  }
+
+  static vec2 add2(vec2 out, vec2 a, vec2 b) {
+    
+    out.x = a.x + b.x;
+    out.y = a.y + b.y;
+    //print("hi");
     return out;
   }
 
   /// Subtracts two vec2's
 
-  static List subtract(List out, List a, List b) {
-    out[0] = a[0] - b[0];
-    out[1] = a[1] - b[1];
+  static vec2 subtract(vec2 out, vec2 a, vec2 b) {
+    out.x = a.x - b.x;
+    out.y = a.y - b.y;
     return out;
   }
- 
+
   /// Alias for vec2.subtract
   static Vec2Operation sub = subtract;
 
   /// Multiplies two vec2's
 
-  static List multiply(List out, List a, List b) {
-    out[0] = a[0] * b[0];
-    out[1] = a[1] * b[1];
+  static vec2 multiply(vec2 out, vec2 a, vec2 b) {
+    out.x = a.x * b.x;
+    out.y = a.y * b.y;
     return out;
   }
 
@@ -151,9 +179,9 @@ class vec2 {
 
   /// Divides two vec2's
 
-  static List divide(List out, List a, List b) {
-    out[0] = a[0] / b[0];
-    out[1] = a[1] / b[1];
+  static vec2 divide(vec2 out, vec2 a, vec2 b) {
+    out.x = a.x / b.x;
+    out.y = a.y / b.y;
     return out;
   }
 
@@ -162,17 +190,22 @@ class vec2 {
 
   /// Scales a vec2 by a scalar number
 
-  static List scale(List out, List a, num b) {
-    out[0] = a[0] * b;
-    out[1] = a[1] * b;
+  static vec2 scale(vec2 out, vec2 a, num b) {
+    out.x = a.x * b;
+    out.y = a.y * b;
+    return out;
+  }
+  static vec2 scale2(vec2 out, vec2 a, num b) {
+    out.x = a.x * b;
+    out.y = a.y * b;
     return out;
   }
 
   /// Calculates the euclidian distance between two vec2's
 
-  static num distance(List a, List b) {
-    num x = b[0] - a[0],
-    y = b[1] - a[1];
+  static num distance(vec2 a, vec2 b) {
+    num x = b.x - a.x,
+        y = b.y - a.y;
     return sqrt(x * x + y * y);
   }
 
@@ -181,9 +214,9 @@ class vec2 {
 
   /// Calculates the squared euclidian distance between two vec2's
 
-  static num squaredDistance(List a, List b) {
-    num x = b[0] - a[0],
-    y = b[1] - a[1];
+  static num squaredDistance(vec2 a, vec2 b) {
+    num x = b.x - a.x,
+        y = b.y - a.y;
     return x * x + y * y;
   }
 
@@ -192,9 +225,9 @@ class vec2 {
 
   /// Calculates the length of a vec2
 
-  static num length(List a) {
-    num x = a[0],
-    y = a[1];
+  static num length(vec2 a) {
+    num x = a.x,
+        y = a.y;
     return sqrt(x * x + y * y);
   }
 
@@ -203,9 +236,9 @@ class vec2 {
 
   /// Calculates the squared length of a vec2
 
-  static num squaredLength(List a) {
-    num x = a[0],
-    y = a[1];
+  static num squaredLength(vec2 a) {
+    num x = a.x,
+        y = a.y;
     return x * x + y * y;
   }
 
@@ -214,37 +247,37 @@ class vec2 {
 
   /// Negates the components of a vec2
 
-  static List negate(List out, List a) {
-    out[0] = -a[0];
-    out[1] = -a[1];
+  static vec2 negate(vec2 out, vec2 a) {
+    out.x = -a.x;
+    out.y = -a.y;
     return out;
   }
 
   /// Normalize a vec2
 
-  static List normalize(List out, List a) {
-    num x = a[0],
-    y = a[1];
+  static vec2 normalize(vec2 out, vec2 a) {
+    num x = a.x,
+        y = a.y;
     num len = x * x + y * y;
     if (len > 0) {
       //TODO: evaluate use of glm_invsqrt here?
       len = 1 / sqrt(len);
-      out[0] = a[0] * len;
-      out[1] = a[1] * len;
+      out.x = a.x * len;
+      out.y = a.y * len;
     }
     return out;
   }
 
   /// Calculates the dot product of two vec2's
 
-  static num dot(List a, List b) {
-    return a[0] * b[0] + a[1] * b[1];
+  static num dot(vec2 a, vec2 b) {
+    return a.x * b.x + a.y * b.y;
   }
 
   /// Returns a string representation of a vector
 
-  static String str(List<num> a) {
-    return 'vec2(${a[0]}, ${a[1]})';
+  static String str(vec2 a) {
+    return 'vec2(${a.x}, ${a.y})';
   }
 
 

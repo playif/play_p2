@@ -18,7 +18,7 @@ abstract class Solver extends EventEmitter{
 
     this.type = type;
 
-    this.equations = [];
+    this.equations = new List<Equation>();
 
     this.equationSortFunction = equationSortFunction;
   }
@@ -88,7 +88,7 @@ abstract class Solver extends EventEmitter{
    */
   addEquations (List<Equation> eqs){
     //Utils.appendArray(this.equations,eqs);
-    for(var i=0, N=eqs.length; i!=N; i++){
+    for(int i=0, N=eqs.length; i!=N; i++){
       Equation eq = eqs[i];
       if(eq.enabled){
         this.equations.add(eq);
@@ -98,7 +98,7 @@ abstract class Solver extends EventEmitter{
 
   /// Remove an equation.
   removeEquation (Equation eq){
-    var i = this.equations.indexOf(eq);
+    int i = this.equations.indexOf(eq);
     if(i != -1){
       this.equations.removeAt(i);
     }

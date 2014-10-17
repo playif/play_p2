@@ -3,14 +3,14 @@ part of p2;
 class ContactEquation extends Equation {
 
   /// Vector from body i center of mass to the contact point.
-  List contactPointA;
-  List penetrationVec;
+  final vec2 contactPointA = vec2.create();
+  final vec2 penetrationVec = vec2.create();
 
   /// World-oriented vector from body A center of mass to the contact point.
-  List contactPointB;
+  final vec2 contactPointB = vec2.create();
 
   /// The normal vector, pointing out of body i
-  List normalA;
+  final vec2 normalA = vec2.create();
 
   /// The restitution to use (0=no bounciness, 1=max bounciness).
   num restitution;
@@ -24,11 +24,7 @@ class ContactEquation extends Equation {
   /// The shape in body j that triggered this contact.
   Shape shapeB;
 
-  ContactEquation(Body bodyA, Body bodyB) :super(bodyA, bodyB, 0, double.MAX_FINITE) {
-    this.contactPointA = vec2.create();
-    this.penetrationVec = vec2.create();
-    this.contactPointB = vec2.create();
-    this.normalA = vec2.create();
+  ContactEquation(Body bodyA, Body bodyB) : super(bodyA, bodyB, 0, double.MAX_FINITE) {
     this.restitution = 0;
     this.firstImpact = false;
     this.shapeA = null;
@@ -36,27 +32,27 @@ class ContactEquation extends Equation {
   }
 
   num computeB(num a, num b, num h) {
-    Body bi = this.bodyA,
-    bj = this.bodyB;
-    List ri = this.contactPointA,
-    rj = this.contactPointB,
-    xi = bi.position,
-    xj = bj.position;
+    final Body bi = this.bodyA,
+        bj = this.bodyB;
+    final vec2 ri = this.contactPointA,
+        rj = this.contactPointB,
+        xi = bi.position,
+        xj = bj.position;
 
-    List penetrationVec = this.penetrationVec,
-    n = this.normalA,
-    G = this.G;
+    final vec2 penetrationVec = this.penetrationVec,
+        n = this.normalA;
+    Float32List G = this.G;
 
     // Caluclate cross products
     num rixn = vec2.crossLength(ri, n),
-    rjxn = vec2.crossLength(rj, n);
+        rjxn = vec2.crossLength(rj, n);
 
     // G = [-n -rixn n rjxn]
-    G[0] = -n[0];
-    G[1] = -n[1];
+    G[0] = -n.x;
+    G[1] = -n.y;
     G[2] = -rixn;
-    G[3] = n[0];
-    G[4] = n[1];
+    G[3] = n.x;
+    G[4] = n.y;
     G[5] = rjxn;
 
     // Calculate q = xj+rj -(xi+ri) i.e. the penetration vector

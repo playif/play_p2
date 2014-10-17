@@ -45,63 +45,63 @@ class Body extends EventEmitter {
    * The shapes of the body. The local transform of the shape in .shapes[i] is
    * defined by .shapeOffsets[i] and .shapeAngles[i].
    */
-  List<Shape> shapes;
+  final List<Shape> shapes= new List<Shape>();
 
   /**
    * The local shape offsets, relative to the body center of mass. This is an
    * array of Array.
    */
-  List<List> shapeOffsets;
+  final List<vec2> shapeOffsets = new List<vec2>();
 
   /**
    * The body-local shape angle transforms. This is an array of numbers (angles).
    * @property shapeAngles
    * @type {Array}
    */
-  List<num> shapeAngles;
+  final List<num> shapeAngles = new List<num>();
 
   /// The mass of the body.
-  num mass;
+  double mass;
 
   /// The inverse mass of the body.
-  num invMass;
+  double invMass;
 
   /// The inertia of the body around the Z axis.
-  num inertia;
+  double inertia;
 
   /// The inverse inertia of the body.
-  num invInertia;
+  double invInertia;
 
-  num invMassSolve;
-  num invInertiaSolve;
+  double invMassSolve;
+  double invInertiaSolve;
 
 
   /// Set to true if you want to fix the rotation of the body.
   bool fixedRotation;
 
   /// The position of the body
-  List position;
+  final vec2 position= vec2.create();
 
   /// The interpolated position of the body.
-  List interpolatedPosition;
+  final vec2 interpolatedPosition= vec2.create();
 
   /// The interpolated angle of the body.
   num interpolatedAngle;
 
   /// The previous position of the body.
-  List previousPosition;
+  final vec2 previousPosition= vec2.create();
 
   /// The previous angle of the body.
   num previousAngle;
 
   /// The velocity of the body
-  List velocity;
+  final vec2 velocity= vec2.create();
 
   /// Constraint velocity that was added to the body during the last step.
-  List vlambda;
+  final vec2 vlambda= vec2.create();
 
   /// Angular constraint velocity that was added to the body during last step.
-  num wlambda = 0;
+  double wlambda = 0.0;
 
   /**
    * The angle of the body, in radians.
@@ -118,10 +118,10 @@ class Body extends EventEmitter {
    *         return angle;
    *     }
    */
-  num angle;
+  double angle;
 
   /// The angular velocity of the body, in radians per second.
-  num angularVelocity;
+  double angularVelocity;
 
   /**
    * The force acting on the body. Since the body force (and {{#crossLink "Body/angularForce:property"}}{{/crossLink}}) will be zeroed after each step, so you need to set the force before each step.
@@ -142,16 +142,16 @@ class Body extends EventEmitter {
    *         world.step(1/60);
    *     }
    */
-  List force;
+  final vec2 force= vec2.create();
 
   /// The angular force acting on the body.
-  num angularForce;
+  double angularForce;
 
   /// The linear damping acting on the body in the velocity direction. Should be a value between 0 and 1.
-  num damping;
+  double damping;
 
   /// The angular force acting on the body. Should be a value between 0 and 1.
-  num angularDamping;
+  double angularDamping;
 
   /**
    * The type of motion this body has. Should be one of: {{#crossLink "Body/STATIC:property"}}Body.STATIC{{/crossLink}}, {{#crossLink "Body/DYNAMIC:property"}}Body.DYNAMIC{{/crossLink}} and {{#crossLink "Body/KINEMATIC:property"}}Body.KINEMATIC{{/crossLink}}.
@@ -182,11 +182,11 @@ class Body extends EventEmitter {
    *         type: Body.KINEMATIC // Type can be set via the options object.
    *     });
    */
-  int type;
+  int type=0;
 
 
   /// Bounding circle radius.
-  num boundingRadius;
+  double boundingRadius;
 
   /// Bounding box of this body.
   AABB aabb;
@@ -227,59 +227,53 @@ class Body extends EventEmitter {
   int sleepState;
 
   /// If the speed (the norm of the velocity) is smaller than this value, the body is considered sleepy.
-  num sleepSpeedLimit = 0.2;
+  double sleepSpeedLimit = 0.2;
 
   /// If the body has been sleepy for this sleepTimeLimit seconds, it is considered sleeping.
-  num sleepTimeLimit;
+  double sleepTimeLimit;
 
   /// Gravity scaling factor. If you want the body to ignore gravity, set this to zero. If you want to reverse gravity, set it to -1.
-  num gravityScale;
+  double gravityScale;
 
   /// The last time when the body went to SLEEPY state.
-  num timeLastSleepy;
+  double timeLastSleepy;
 
-  num idleTime=0;
+  double idleTime = 0.0;
 
-  var concavePath;
+  List<vec2> concavePath;
 
   bool _wakeUpAfterNarrowphase;
 
   static int _idCounter = 0;
 
-  Body({int type, num mass:0, List position, List velocity, num angle: 0, num angularVelocity:0, List force, num angularForce: 0, bool fixedRotation: false, num damping: 0.1, num angularDamping: 0.1}) : super() {
+  Object parent;
+
+  Body({int type, num mass: 0.0, vec2 position, vec2 velocity, num angle: 0.0, num angularVelocity: 0.0,  vec2 force, num angularForce: 0.0, bool fixedRotation: false, num damping: 0.1, num angularDamping: 0.1}) : super() {
 
     this.id = ++Body._idCounter;
 
     this.world = null;
 
+    this.mass = mass.toDouble();
 
-    this.shapes = [];
+    this.invMass = 0.0;
 
+    this.inertia = 0.0;
 
-    this.shapeOffsets = [];
+    this.invInertia = 0.0;
 
-    this.shapeAngles = [];
-
-    this.mass = mass;
-
-    this.invMass = 0;
-
-    this.inertia = 0;
-
-    this.invInertia = 0;
-
-    this.invMassSolve = 0;
-    this.invInertiaSolve = 0;
+    this.invMassSolve = 0.0;
+    this.invInertiaSolve = 0.0;
 
     this.fixedRotation = fixedRotation;
 
 
-    this.position = vec2.fromValues(0, 0);
+    //this.position ;
     if (position != null) {
       vec2.copy(this.position, position);
     }
 
-    this.interpolatedPosition = vec2.fromValues(0, 0);
+    //this.interpolatedPosition = vec2.fromValues(0, 0);
 
     this.interpolatedAngle = 0;
 
@@ -288,7 +282,7 @@ class Body extends EventEmitter {
      * @property previousPosition
      * @type {Array}
      */
-    this.previousPosition = vec2.fromValues(0, 0);
+    //this.previousPosition = vec2.fromValues(0, 0);
 
     /**
      * The previous angle of the body.
@@ -302,7 +296,7 @@ class Body extends EventEmitter {
      * @property velocity
      * @type {Array}
      */
-    this.velocity = vec2.fromValues(0, 0);
+    //this.velocity = vec2.fromValues(0, 0);
     if (velocity != null) {
       vec2.copy(this.velocity, velocity);
     }
@@ -312,14 +306,14 @@ class Body extends EventEmitter {
      * @property vlambda
      * @type {Array}
      */
-    this.vlambda = vec2.fromValues(0, 0);
+    //this.vlambda = vec2.fromValues(0, 0);
 
     /**
      * Angular constraint velocity that was added to the body during last step.
      * @property wlambda
      * @type {Array}
      */
-    this.wlambda = 0;
+    this.wlambda = 0.0;
 
     /**
      * The angle of the body, in radians.
@@ -336,14 +330,14 @@ class Body extends EventEmitter {
      *         return angle;
      *     }
      */
-    this.angle = angle;
+    this.angle = angle.toDouble();
 
     /**
      * The angular velocity of the body, in radians per second.
      * @property angularVelocity
      * @type {number}
      */
-    this.angularVelocity = angularVelocity;
+    this.angularVelocity = angularVelocity.toDouble();
 
     /**
      * The force acting on the body. Since the body force (and {{#crossLink "Body/angularForce:property"}}{{/crossLink}}) will be zeroed after each step, so you need to set the force before each step.
@@ -364,7 +358,7 @@ class Body extends EventEmitter {
      *         world.step(1/60);
      *     }
      */
-    this.force = vec2.create();
+    //this.force = vec2.create();
     if (force != null) {
       vec2.copy(this.force, force);
     }
@@ -374,7 +368,7 @@ class Body extends EventEmitter {
      * @property angularForce
      * @type {number}
      */
-    this.angularForce = angularForce;
+    this.angularForce = angularForce.toDouble();
 
     /**
      * The linear damping acting on the body in the velocity direction. Should be a value between 0 and 1.
@@ -382,7 +376,7 @@ class Body extends EventEmitter {
      * @type {Number}
      * @default 0.1
      */
-    this.damping = damping;
+    this.damping = damping.toDouble();
 
     /**
      * The angular force acting on the body. Should be a value between 0 and 1.
@@ -390,7 +384,7 @@ class Body extends EventEmitter {
      * @type {Number}
      * @default 0.1
      */
-    this.angularDamping = angularDamping;
+    this.angularDamping = angularDamping.toDouble();
 
     /**
      * The type of motion this body has. Should be one of: {{#crossLink "Body/STATIC:property"}}Body.STATIC{{/crossLink}}, {{#crossLink "Body/DYNAMIC:property"}}Body.DYNAMIC{{/crossLink}} and {{#crossLink "Body/KINEMATIC:property"}}Body.KINEMATIC{{/crossLink}}.
@@ -421,12 +415,11 @@ class Body extends EventEmitter {
      *         type: Body.KINEMATIC // Type can be set via the options object.
      *     });
      */
-    
 
-    if(type != null){
+
+    if (type != null) {
       this.type = type;
-    }
-    else if (mass == 0) {
+    } else if (mass == 0) {
       this.type = Body.STATIC;
     } else {
       this.type = Body.DYNAMIC;
@@ -437,7 +430,7 @@ class Body extends EventEmitter {
      * @property boundingRadius
      * @type {Number}
      */
-    this.boundingRadius = 0;
+    this.boundingRadius = 0.0;
 
     /**
      * Bounding box of this body.
@@ -495,21 +488,21 @@ class Body extends EventEmitter {
      * @type {Number}
      * @default 1
      */
-    this.sleepTimeLimit = 1;
+    this.sleepTimeLimit = 1.0;
 
     /**
      * Gravity scaling factor. If you want the body to ignore gravity, set this to zero. If you want to reverse gravity, set it to -1.
      * @property {Number} gravityScale
      * @default 1
      */
-    this.gravityScale = 1;
+    this.gravityScale = 1.0;
 
     /**
      * The last time when the body went to SLEEPY state.
      * @property {Number} timeLastSleepy
      * @private
      */
-    this.timeLastSleepy = 0;
+    this.timeLastSleepy = 0.0;
 
     this.concavePath = null;
 
@@ -520,8 +513,8 @@ class Body extends EventEmitter {
 
   updateSolveMassProperties() {
     if (this.sleepState == Body.SLEEPING || this.type == Body.KINEMATIC) {
-      this.invMassSolve = 0;
-      this.invInertiaSolve = 0;
+      this.invMassSolve = 0.0;
+      this.invInertiaSolve = 0.0;
     } else {
       this.invMassSolve = this.invMass;
       this.invInertiaSolve = this.invInertia;
@@ -558,8 +551,8 @@ class Body extends EventEmitter {
     return this.aabb;
   }
 
-  AABB shapeAABB = new AABB();
-  List tmp = vec2.create();
+  static final AABB shapeAABB = new AABB();
+  static final vec2 tmp = vec2.create();
 
   /**
    * Updates the AABB of the Body
@@ -568,10 +561,10 @@ class Body extends EventEmitter {
 
   updateAABB() {
     List<Shape> shapes = this.shapes;
-    List<List> shapeOffsets = this.shapeOffsets;
+    List<vec2> shapeOffsets = this.shapeOffsets;
     List<num> shapeAngles = this.shapeAngles;
     num N = shapes.length;
-    List offset = tmp;
+    final vec2 offset = tmp;
     num bodyAngle = this.angle;
 
     for (int i = 0; i != N; i++) {
@@ -602,10 +595,10 @@ class Body extends EventEmitter {
    */
 
   updateBoundingRadius() {
-    List shapes = this.shapes,
-        shapeOffsets = this.shapeOffsets;
-    num N = shapes.length,
-        radius = 0;
+    List<Shape> shapes = this.shapes;
+    List<vec2> shapeOffsets = this.shapeOffsets;
+    num N = shapes.length;
+    double radius = 0.0;
 
     for (int i = 0; i != N; i++) {
       Shape shape = shapes[i];
@@ -643,11 +636,11 @@ class Body extends EventEmitter {
    *     body.addShape(shape,[0,1],Math.PI/2);
    */
 
-  addShape(Shape shape, [List offset, num angle = 0.0]) {
+  addShape(Shape shape, [vec2 offset, num angle = 0.0]) {
 
     // Copy the offset vector
     if (offset != null) {
-      offset = vec2.fromValues(offset[0], offset[1]);
+      offset = vec2.fromValues(offset.x, offset.y);
     } else {
       offset = vec2.fromValues(0, 0);
     }
@@ -669,7 +662,7 @@ class Body extends EventEmitter {
    */
 
   bool removeShape(Shape shape) {
-    var idx = this.shapes.indexOf(shape);
+    int idx = this.shapes.indexOf(shape);
 
     if (idx != -1) {
       this.shapes.removeAt(idx);
@@ -697,30 +690,30 @@ class Body extends EventEmitter {
     if (this.type == Body.STATIC || this.type == Body.KINEMATIC) {
 
       this.mass = double.MAX_FINITE;
-      this.invMass = 0;
+      this.invMass = 0.0;
       this.inertia = double.MAX_FINITE;
-      this.invInertia = 0;
+      this.invInertia = 0.0;
 
     } else {
 
-      var shapes = this.shapes,
-          N = shapes.length,
-          m = this.mass / N,
-          I = 0;
+      List<Shape> shapes = this.shapes;
+      int N = shapes.length;
+      double m = this.mass / N,
+          I = 0.0;
 
       if (!this.fixedRotation) {
-        for (var i = 0; i < N; i++) {
-          var shape = shapes[i],
-              r2 = vec2.squaredLength(this.shapeOffsets[i]),
+        for (int i = 0; i < N; i++) {
+          Shape shape = shapes[i];
+          num r2 = vec2.squaredLength(this.shapeOffsets[i]),
               Icm = shape.computeMomentOfInertia(m);
           I += Icm + m * r2;
         }
         this.inertia = I;
-        this.invInertia = I > 0 ? 1 / I : 0;
+        this.invInertia = I > 0.0 ? 1.0 / I : 0.0;
 
       } else {
         this.inertia = double.MAX_FINITE;
-        this.invInertia = 0;
+        this.invInertia = 0.0;
       }
 
       // Inverse mass properties are easy
@@ -729,7 +722,7 @@ class Body extends EventEmitter {
     }
   }
 
-  List Body_applyForce_r = vec2.create();
+  static final vec2 Body_applyForce_r = vec2.create();
 
   /**
    * Apply force to a world point. This could for example be a point on the RigidBody surface. Applying force this way will add to Body.force and Body.angularForce.
@@ -738,16 +731,16 @@ class Body extends EventEmitter {
    * @param {Array} worldPoint A world point to apply the force on.
    */
 
-  applyForce(List force, List worldPoint) {
+  applyForce(vec2 force, vec2 worldPoint) {
     // Compute point position relative to the body center
-    var r = Body_applyForce_r;
+    vec2 r = Body_applyForce_r;
     vec2.sub(r, worldPoint, this.position);
 
     // Add linear force
     vec2.add(this.force, this.force, force);
 
     // Compute produced rotational force
-    var rotForce = vec2.crossLength(r, force);
+    num rotForce = vec2.crossLength(r, force);
 
     // Add rotational force
     this.angularForce += rotForce;
@@ -760,7 +753,7 @@ class Body extends EventEmitter {
    * @param  {Array} worldPoint   The input world vector
    */
 
-  toLocalFrame(List out, List worldPoint) {
+  toLocalFrame(vec2 out, worldPoint) {
     vec2.toLocalFrame(out, worldPoint, this.position, this.angle);
   }
 
@@ -771,7 +764,7 @@ class Body extends EventEmitter {
    * @param  {Array} localPoint   The input local vector
    */
 
-  toWorldFrame(List out, List localPoint) {
+  toWorldFrame(vec2 out, vec2 localPoint) {
     vec2.toGlobalFrame(out, localPoint, this.position, this.angle);
   }
 
@@ -786,17 +779,17 @@ class Body extends EventEmitter {
    * @return {Boolean} True on success, else false.
    */
 
-  bool fromPolygon(List<List> path, {bool optimalDecomp: false, bool skipSimpleCheck: false, num removeCollinearPoints: 0}) {
+  bool fromPolygon(List<vec2> path, {bool optimalDecomp: false, bool skipSimpleCheck: false, num removeCollinearPoints: 0}) {
 //    options = options || {
 //    };
 
     // Remove all shapes
-    for (int i = this.shapes.length-1; i >= 0; --i) {
+    for (int i = this.shapes.length - 1; i >= 0; --i) {
       this.removeShape(this.shapes[i]);
     }
 
-    var p = new decomp.Polygon();
-    p.vertices = path.map((v)=>v.map((s)=>s.toDouble()).toList()).toList();
+    decomp.Polygon p = new decomp.Polygon();
+    p.vertices = path.toList();
 
     // Make it counter-clockwise
     p.makeCCW();
@@ -814,22 +807,22 @@ class Body extends EventEmitter {
 
     // Save this path for later
     this.concavePath = p.vertices.toList();
-    for (var i = 0; i < this.concavePath.length; i++) {
+    for (int i = 0; i < this.concavePath.length; i++) {
       //List v = [0, 0];
-      List v = vec2.fromValues(0, 0);
+      vec2 v = vec2.fromValues(0, 0);
       vec2.copy(v, this.concavePath[i]);
       this.concavePath[i] = v;
     }
 
     // Slow or fast decomp?
-    List convexes;
+    List<decomp.Polygon> convexes;
     if (optimalDecomp) {
       convexes = p.decomp();
     } else {
       convexes = p.quickDecomp();
     }
 
-    List cm = vec2.create();
+    vec2 cm = vec2.create();
 
     // Add convexes
     for (int i = 0; i != convexes.length; i++) {
@@ -838,11 +831,11 @@ class Body extends EventEmitter {
 
       // Move all vertices so its center of mass is in the local center of the convex
       for (int j = 0; j != c.vertices.length; j++) {
-        List v = c.vertices[j];
+        vec2 v = c.vertices[j];
         vec2.sub(v, v, c.centerOfMass);
       }
 
-      vec2.scale(cm, c.centerOfMass, 1);
+      vec2.scale(cm, c.centerOfMass, 1.0);
       c.updateTriangles();
       c.updateCenterOfMass();
       c.updateBoundingRadius();
@@ -858,7 +851,7 @@ class Body extends EventEmitter {
     return true;
   }
 
-  List adjustCenterOfMass_tmp1 = vec2.fromValues(0, 0),
+  static final vec2 adjustCenterOfMass_tmp1 = vec2.fromValues(0, 0),
       adjustCenterOfMass_tmp2 = vec2.fromValues(0, 0),
       adjustCenterOfMass_tmp3 = vec2.fromValues(0, 0),
       adjustCenterOfMass_tmp4 = vec2.fromValues(0, 0);
@@ -869,15 +862,15 @@ class Body extends EventEmitter {
    */
 
   adjustCenterOfMass() {
-    var offset_times_area = adjustCenterOfMass_tmp2,
+    vec2 offset_times_area = adjustCenterOfMass_tmp2,
         sum = adjustCenterOfMass_tmp3,
-        cm = adjustCenterOfMass_tmp4,
-        totalArea = 0;
+        cm = adjustCenterOfMass_tmp4;
+    num totalArea = 0;
     vec2.set(sum, 0, 0);
 
-    for (var i = 0; i != this.shapes.length; i++) {
-      var s = this.shapes[i],
-          offset = this.shapeOffsets[i];
+    for (int i = 0; i != this.shapes.length; i++) {
+      Shape s = this.shapes[i];
+      vec2 offset = this.shapeOffsets[i];
       vec2.scale(offset_times_area, offset, s.area);
       vec2.add(sum, sum, offset_times_area);
       totalArea += s.area;
@@ -886,9 +879,9 @@ class Body extends EventEmitter {
     vec2.scale(cm, sum, 1 / totalArea);
 
     // Now move all shapes
-    for (var i = 0; i != this.shapes.length; i++) {
-      var s = this.shapes[i],
-          offset = this.shapeOffsets[i];
+    for (int i = 0; i != this.shapes.length; i++) {
+      Shape s = this.shapes[i];
+      vec2 offset = this.shapeOffsets[i];
 
       // Offset may be undefined. Fix that.
       if (offset == null) {
@@ -902,7 +895,7 @@ class Body extends EventEmitter {
     vec2.add(this.position, this.position, cm);
 
     // And concave path
-    for (var i = 0; this.concavePath!= null && i < this.concavePath.length; i++) {
+    for (int i = 0; this.concavePath != null && i < this.concavePath.length; i++) {
       vec2.sub(this.concavePath[i], this.concavePath[i], cm);
     }
 
@@ -921,17 +914,15 @@ class Body extends EventEmitter {
   }
 
   resetConstraintVelocity() {
-    var b = this,
-        vlambda = b.vlambda;
-    vec2.set(vlambda, 0, 0);
-    b.wlambda = 0;
+    vec2 vlambda = this.vlambda;
+    vec2.set(vlambda, 0.0, 0.0);
+    this.wlambda = 0.0;
   }
 
   addConstraintVelocity() {
-    var b = this,
-        v = b.velocity;
-    vec2.add(v, v, b.vlambda);
-    b.angularVelocity += b.wlambda;
+    vec2 v = this.velocity;
+    vec2.add(v, v, this.vlambda);
+    this.angularVelocity += this.wlambda;
   }
 
   /**
@@ -943,7 +934,7 @@ class Body extends EventEmitter {
   applyDamping(dt) {
     if (this.type == Body.DYNAMIC) {
       // Only for dynamic bodies
-      var v = this.velocity;
+      vec2 v = this.velocity;
       vec2.scale(v, v, pow(1.0 - this.damping, dt));
       this.angularVelocity *= pow(1.0 - this.angularDamping, dt);
     }
@@ -956,9 +947,9 @@ class Body extends EventEmitter {
    */
 
   wakeUp() {
-    var s = this.sleepState;
+    int s = this.sleepState;
     this.sleepState = Body.AWAKE;
-    this.idleTime = 0;
+    this.idleTime = 0.0;
     if (s != Body.AWAKE) {
       this.emit(Body.wakeUpEvent);
     }
@@ -971,10 +962,10 @@ class Body extends EventEmitter {
 
   sleep() {
     this.sleepState = Body.SLEEPING;
-    this.angularVelocity = 0;
-    this.angularForce = 0;
-    vec2.set(this.velocity, 0, 0);
-    vec2.set(this.force, 0, 0);
+    this.angularVelocity = 0.0;
+    this.angularForce = 0.0;
+    vec2.set(this.velocity, 0.0, 0.0);
+    vec2.set(this.force, 0.0, 0.0);
     this.emit(Body.sleepEvent);
   }
 
@@ -993,13 +984,13 @@ class Body extends EventEmitter {
 
     this.wantsToSleep = false;
 
-    var sleepState = this.sleepState,
-        speedSquared = vec2.squaredLength(this.velocity) + pow(this.angularVelocity, 2),
+    int sleepState = this.sleepState;
+    num speedSquared = vec2.squaredLength(this.velocity) + pow(this.angularVelocity, 2),
         speedLimitSquared = pow(this.sleepSpeedLimit, 2);
 
     // Add to idle time
     if (speedSquared >= speedLimitSquared) {
-      this.idleTime = 0;
+      this.idleTime = 0.0;
       this.sleepState = Body.AWAKE;
     } else {
       this.idleTime += dt;
@@ -1029,7 +1020,7 @@ class Body extends EventEmitter {
     */
   }
 
-  getVelocityFromPosition([List store, num timeStep]) {
+  getVelocityFromPosition([vec2 store, num timeStep]) {
     if (store == null) {
       store = vec2.create();
     }

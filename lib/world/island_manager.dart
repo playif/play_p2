@@ -2,53 +2,22 @@ part of p2;
 
 /// Splits the system of bodies and equations into independent islands
 class IslandManager {
-  List<IslandNode> _nodePool = [];
-  List<Island> _islandPool = [];
+  final List<IslandNode> _nodePool = new List<IslandNode>();
+  final List<Island> _islandPool = new List<Island>();
 
   /// The equations to split. Manually fill this array before running .split().
-  List<Equation> equations = [];
+  final List<Equation> equations = new List<Equation>();
 
-  /**
-   * The resulting {{#crossLink "Island"}}{{/crossLink}}s.
-   * @property {Array} islands
-   */
-  List<Island> islands;
+  /// The resulting {{#crossLink "Island"}}{{/crossLink}}s.
+  final List<Island> islands = new List<Island>();
 
   /// The resulting graph nodes.
-  List<IslandNode> nodes;
+  final List<IslandNode> nodes = new List<IslandNode>();
 
   /// The node queue, used when traversing the graph of nodes.
-  List<IslandNode> queue;
+  final List<IslandNode> queue = new List<IslandNode>();
 
   IslandManager() {
-    // Pooling of node objects saves some GC load
-    this._nodePool = [];
-    this._islandPool = [];
-
-    /**
-     * The equations to split. Manually fill this array before running .split().
-     * @property {Array} equations
-     */
-    this.equations = [];
-
-    /**
-     * The resulting {{#crossLink "Island"}}{{/crossLink}}s.
-     * @property {Array} islands
-     */
-    this.islands = [];
-
-    /**
-     * The resulting graph nodes.
-     * @property {Array} nodes
-     */
-    this.nodes = [];
-
-    /**
-     * The node queue, used when traversing the graph of nodes.
-     * @private
-     * @property {Array} queue
-     */
-    this.queue = [];
   }
 
   /**
@@ -60,9 +29,9 @@ class IslandManager {
    */
 
   static IslandNode getUnvisitedNode(List<IslandNode> nodes) {
-    var Nnodes = nodes.length;
-    for (var i = 0; i != Nnodes; i++) {
-      var node = nodes[i];
+    int Nnodes = nodes.length;
+    for (int i = 0; i != Nnodes; i++) {
+      IslandNode node = nodes[i];
       if (!node.visited && node.body.type == Body.DYNAMIC) {
         return node;
       }
@@ -78,11 +47,11 @@ class IslandManager {
    * @param  {Array} eqs
    */
 
-  visit(IslandNode node, List bds, List eqs) {
+  visit(IslandNode node, List<Body> bds, List<Equation> eqs) {
     bds.add(node.body);
-    var Neqs = node.equations.length;
-    for (var i = 0; i != Neqs; i++) {
-      var eq = node.equations[i];
+    num Neqs = node.equations.length;
+    for (int i = 0; i != Neqs; i++) {
+      Equation eq = node.equations[i];
       if (eqs.indexOf(eq) == -1) {
         // Already added?
         eqs.add(eq);
@@ -98,10 +67,9 @@ class IslandManager {
    * @param  {Array} eqs  An array to append resulting Equations to.
    */
 
-  bfs(IslandNode root, List bds, List eqs) {
+  bfs(IslandNode root, List<Body> bds, List<Equation> eqs) {
 
     // Reset the visit queue
-    //var queue = this.queue;
     queue.clear();
 
     // Add root node to queue
@@ -137,7 +105,7 @@ class IslandManager {
    */
 
   List<Island> split(World world) {
-    var bodies = world.bodies;
+    List<Body> bodies = world.bodies;
     //nodes = this.nodes,
     //equations = this.equations;
 
@@ -160,11 +128,11 @@ class IslandManager {
 
     // Add connectivity data. Each equation connects 2 bodies.
     for (int k = 0; k != equations.length; k++) {
-      var eq = equations[k],
-      i = bodies.indexOf(eq.bodyA),
-      j = bodies.indexOf(eq.bodyB),
-      ni = nodes[i],
-      nj = nodes[j];
+      Equation eq = equations[k];
+      int i = bodies.indexOf(eq.bodyA),
+          j = bodies.indexOf(eq.bodyB);
+      IslandNode ni = nodes[i],
+          nj = nodes[j];
       ni.neighbors.add(nj);
       nj.neighbors.add(ni);
       ni.equations.add(eq);
@@ -172,7 +140,6 @@ class IslandManager {
     }
 
     // Move old islands to the island pool
-    //var islands = this.islands;
     while (islands.isNotEmpty) {
       Island island = islands.removeLast();
       island.reset();
@@ -180,7 +147,7 @@ class IslandManager {
     }
 
     // Get islands
-    var child;
+    IslandNode child;
     while ((child = IslandManager.getUnvisitedNode(nodes)) != null) {
 
       // Create new island

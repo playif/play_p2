@@ -30,7 +30,7 @@ part of p2;
  */
 class Heightfield extends Shape {
   /// An array of numbers, or height values, that are spread out along the x axis.
-  List data;
+  List<num> data;
 
   /// Max value of the data
   num maxValue;
@@ -42,7 +42,7 @@ class Heightfield extends Shape {
   num elementWidth;
 
 
-  Heightfield(List data, {num maxValue, num minValue, num elementWidth}) : super(Shape.HEIGHTFIELD) {
+  Heightfield(List<num> data, {num maxValue, num minValue, num elementWidth}) : super(Shape.HEIGHTFIELD) {
 //    options = Utils.defaults(options, {
 //        maxValue : null,
 //        minValue : null,
@@ -89,7 +89,7 @@ class Heightfield extends Shape {
   }
 
   updateArea() {
-    List data = this.data;
+    List<num> data = this.data;
     num area = 0;
     for (int i = 0; i < data.length - 1; i++) {
       area += (data[i] + data[i + 1]) / 2 * this.elementWidth;
@@ -103,12 +103,12 @@ class Heightfield extends Shape {
    * @param  {Array}  position
    * @param  {Number} angle
    */
-  computeAABB(AABB out, [List position, num angle]) {
+  computeAABB(AABB out, [vec2 position, num angle]) {
     // Use the max data rectangle
-    out.upperBound[0] = this.elementWidth * this.data.length + position[0];
-    out.upperBound[1] = this.maxValue + position[1];
-    out.lowerBound[0] = position[0];
-    out.lowerBound[1] = -double.MAX_FINITE; // Infinity
+    out.upperBound.x = this.elementWidth * this.data.length + position.x;
+    out.upperBound.y = this.maxValue + position.y;
+    out.lowerBound.x = position.x;
+    out.lowerBound.y = -double.MAX_FINITE; // Infinity
   }
 
 }
